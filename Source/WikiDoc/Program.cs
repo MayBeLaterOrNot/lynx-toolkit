@@ -221,7 +221,7 @@ namespace WikiDoc
             BindingFlags flags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static ;
             
             // Only declared members
-            flags|= BindingFlags.DeclaredOnly;
+           // flags|= BindingFlags.DeclaredOnly;
             
             string header1 = "!! {0} Class";
             string header2 = "*{0}*";
@@ -258,6 +258,8 @@ namespace WikiDoc
                 w.WriteLine(tableHeader);
                 foreach (var ci in constructors)
                 {
+                    if (ci.DeclaringType.Assembly != type.Assembly) continue;
+
                     string description = GetDescription(xmldoc, "M:" + type.FullName + ".#ctor") + GetInheritedText(ci, type);
                     w.WriteLine("| {0}({1}) | {2} |", GetNiceTypeName(type), GetMethodParameters(ci), description);
                 }
@@ -272,6 +274,7 @@ namespace WikiDoc
                 w.WriteLine(tableHeader);
                 foreach (var pi in properties)
                 {
+                    if (pi.DeclaringType.Assembly != type.Assembly) continue;
                     string description = GetDescription(xmldoc, "P:" + pi.DeclaringType.FullName + "." + pi.Name) + GetInheritedText(pi, type);
                     w.WriteLine("| " + pi.Name + " | " + description + " | ");
                 }
@@ -285,6 +288,8 @@ namespace WikiDoc
                 bool isHeaderAdded = false;
                 foreach (var mi in methods)
                 {
+                    if (mi.DeclaringType.Assembly != type.Assembly) continue;
+
                     if (mi.Name.StartsWith("get_") || mi.Name.StartsWith("set_"))
                     {
                         continue;
@@ -315,6 +320,8 @@ namespace WikiDoc
                 w.WriteLine(tableHeader);
                 foreach (var ei in events)
                 {
+                    if (ei.DeclaringType.Assembly != type.Assembly) continue;
+
                     string description = GetDescription(xmldoc, "E:" + ei.DeclaringType.FullName + "." + ei.Name) + GetInheritedText(ei, type);
                     w.WriteLine("| {0} | {1} |", ei.Name, description);
                 }

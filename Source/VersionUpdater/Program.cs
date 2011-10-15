@@ -54,6 +54,9 @@ namespace VersionUpdater
                         break;
                 }
             }
+        
+            if (copyright == null && company != null) copyright = string.Format("Copyright © {0} {1}", company,DateTime.Now.Year);
+
             var updater = new Updater(version, copyright, company);
 
             updater.ScanFolder(directory);
@@ -102,7 +105,7 @@ namespace VersionUpdater
             if (Copyright != null)
             {
                 AssemblyInfoReplacements.Add(new Regex(@"AssemblyCopyright\(.*\)"),
-                                             string.Format("AssemblyCopyright(\"Copyright © {0} {1}\")", Copyright, DateTime.Now.Year));
+                                             string.Format("AssemblyCopyright(\"{0}\")", Copyright));
             }
         }
 

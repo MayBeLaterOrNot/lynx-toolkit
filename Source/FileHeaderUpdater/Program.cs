@@ -17,7 +17,7 @@ namespace FileHeaderUpdater
         {
             string company = null;
             string copyright = null;
-            string exclude = "AssemblyInfo.cs";
+            string exclude = "AssemblyInfo.cs Packages";
             string directory = Directory.GetCurrentDirectory();
 
             // command line argument parsing
