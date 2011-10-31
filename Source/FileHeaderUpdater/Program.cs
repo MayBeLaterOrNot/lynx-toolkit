@@ -77,7 +77,7 @@ namespace FileHeaderUpdater
         private bool IsExcluded(string path)
         {
             var name = Path.GetFileName(path);
-            if (Exclude != null && Exclude.Contains(name))
+            if (Exclude != null && Exclude.ToLower().Contains(name.ToLower()))
                 return true;
             return false;
         }
@@ -90,11 +90,11 @@ namespace FileHeaderUpdater
             {
                 var header =
                     String.Format(
-                        @"//-----------------------------------------------------------------------
+                        @"// --------------------------------------------------------------------------------------------------------------------
 // <copyright file=""{0}"" company=""{1}"">
-//     {2}
+//   {2}
 // </copyright>
-//-----------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 ",
                         fileName,
                         Company,
@@ -110,7 +110,7 @@ namespace FileHeaderUpdater
             }
             using (var w = new StreamWriter(file))
             {
-                w.Write(sb.ToString());
+                w.Write(sb.ToString().Trim());
             }
             Log(file);
         }
