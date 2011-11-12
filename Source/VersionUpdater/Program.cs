@@ -11,6 +11,8 @@ using System.Text.RegularExpressions;
 
 namespace VersionUpdater
 {
+    using System.Text;
+
     // Version information for an assembly consists of the following four values:
     //
     //      Major Version
@@ -54,8 +56,8 @@ namespace VersionUpdater
                         break;
                 }
             }
-        
-            if (copyright == null && company != null) copyright = string.Format("Copyright © {0} {1}", company,DateTime.Now.Year);
+
+            if (copyright == null && company != null) copyright = string.Format("Copyright © {0} {1}", company, DateTime.Now.Year);
 
             var updater = new Updater(version, copyright, company);
 
@@ -73,6 +75,9 @@ namespace VersionUpdater
             version = version.Replace("yyyy", DateTime.Now.Year.ToString());
             version = version.Replace("MM", DateTime.Now.Month.ToString());
             version = version.Replace("dd", DateTime.Now.Day.ToString());
+
+            version = To16bitVersionNumbers(version);
+
             Version = version;
 
             string nuSpecVersion = version.Replace(".*", ".0");
@@ -107,6 +112,39 @@ namespace VersionUpdater
                 AssemblyInfoReplacements.Add(new Regex(@"AssemblyCopyright\(.*\)"),
                                              string.Format("AssemblyCopyright(\"{0}\")", Copyright));
             }
+        }
+
+        /// <summary>
+        /// Modifies the version numbers to be within 16-bit boundaries.
+        /// </summary>
+        /// <param name="version">The version.</param>
+        /// <returns>The modified version number.</returns>
+        private static string To16bitVersionNumbers(string version)
+        {
+            var vs = version.Split('.');
+            var sb = new StringBuilder();
+            foreach (var s in vs)
+            {
+                if (sb.Length > 0)
+                {
+                    sb.Append(".");
+                }
+                int i;
+                if (int.TryParse(s, out i))
+                {
+                    if (i > 65534)
+                    {
+                        // only use the last 4 digts
+                        i = i % 10000;
+                    }
+                    sb.Append(i);
+                }
+                else
+                {
+                    sb.Append(s);
+                }
+            }
+            return sb.ToString();
         }
 
         public string Copyright { get; set; }

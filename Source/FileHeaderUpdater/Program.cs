@@ -17,7 +17,7 @@ namespace FileHeaderUpdater
         {
             string company = null;
             string copyright = null;
-            string exclude = "AssemblyInfo.cs Packages";
+            string exclude = "AssemblyInfo.cs Packages .Designer.cs obj bin";
             string directory = Directory.GetCurrentDirectory();
 
             // command line argument parsing
@@ -63,10 +63,18 @@ namespace FileHeaderUpdater
 
         public void ScanFolder(string path)
         {
+            Log(path);
             foreach (string file in Directory.GetFiles(path, "*.cs"))
             {
                 if (!IsExcluded(file))
+                {
+                    Log("  " + Path.GetFileName(file));
                     UpdateFile(file);
+                }
+                else
+                {
+                    Log("  "+ Path.GetFileName(file) + " excluded.");
+                }
             }
 
             foreach (string dir in Directory.GetDirectories(path))
@@ -77,8 +85,12 @@ namespace FileHeaderUpdater
         private bool IsExcluded(string path)
         {
             var name = Path.GetFileName(path);
-            if (Exclude != null && Exclude.ToLower().Contains(name.ToLower()))
-                return true;
+            foreach (var item in Exclude.Split(' '))
+            {
+                if (string.IsNullOrWhiteSpace(item)) continue;
+                if (name.ToLower().Contains(item.ToLower()))
+                    return true;
+            }
             return false;
         }
 
@@ -112,7 +124,6 @@ namespace FileHeaderUpdater
             {
                 w.Write(sb.ToString().Trim());
             }
-            Log(file);
         }
 
         private void Log(string msg)

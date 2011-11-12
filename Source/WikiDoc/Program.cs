@@ -25,6 +25,7 @@ namespace WikiDoc
     internal class Program
     {
         #region Public Methods
+        public static string OutputDirectory { get; set; }
 
         /// <summary>
         /// The main program.
@@ -37,8 +38,23 @@ namespace WikiDoc
             Console.WriteLine("WikiDoc {0}", Assembly.GetExecutingAssembly().GetName().Version.ToString(3));
             Console.WriteLine();
 
+            OutputDirectory = string.Empty;
+
             foreach (var arg in args)
             {
+                string[] kv = arg.Split('=');
+                if (kv.Length > 0)
+                {
+                    switch (kv[0])
+                    {
+                        case "/Output":
+                            OutputDirectory = kv[1];
+                            Console.WriteLine("Output directory:   {0}", OutputDirectory);
+                            Console.WriteLine();
+                            continue;
+                    }
+                }
+
                 if (File.Exists(arg))
                 {
                     GenerateDoc(arg);
@@ -88,9 +104,12 @@ namespace WikiDoc
         private static void GenerateDoc(string assemblyFile)
         {
             string assemblyPath = Path.GetFullPath(assemblyFile);
+            string fileName = Path.GetFileName(assemblyFile);
 
             string xmlPath = Path.ChangeExtension(assemblyPath, ".xml");
-            string docPath = Path.ChangeExtension(assemblyPath, ".txt");
+            string docPath = Path.Combine(OutputDirectory, Path.ChangeExtension(fileName, ".txt"));
+
+            CreateDirectoryIfMissing(OutputDirectory);
 
             string assemblyDirectory = Path.GetDirectoryName(assemblyPath);
 
@@ -108,14 +127,14 @@ namespace WikiDoc
                     throw new FileNotFoundException("Assembly not found.", file);
                 };
 
-            Console.WriteLine("Directory:    {0}", assemblyDirectory);
-            Console.WriteLine("Assembly:     {0}", Path.GetFileName(assemblyPath));
+            Console.WriteLine("Directory:          {0}", assemblyDirectory);
+            Console.WriteLine("Assembly:           {0}", Path.GetFileName(assemblyPath));
             var assembly = Assembly.LoadFile(assemblyPath);
             var xmldoc = new XmlDocument();
-            Console.WriteLine("Xml comments: {0}", Path.GetFileName(xmlPath));
+            Console.WriteLine("Xml comments:       {0}", Path.GetFileName(xmlPath));
             xmldoc.Load(xmlPath);
 
-            Console.WriteLine("Output:       {0}", Path.GetFileName(docPath));
+            Console.WriteLine("Output:             {0}", Path.GetFileName(docPath));
 
             Console.WriteLine();
             using (var w = new StreamWriter(docPath))
@@ -143,7 +162,20 @@ namespace WikiDoc
                 }
             }
 
-            Process.Start(docPath);
+            // Process.Start(docPath);
+        }
+
+        /// <summary>
+        /// Creates the directory if missing.
+        /// </summary>
+        /// <param name="path">The path.</param>
+        private static void CreateDirectoryIfMissing(string path)
+        {
+            var outputdir = Path.GetFullPath(path);
+            if (!Directory.Exists(outputdir))
+            {
+                Directory.CreateDirectory(outputdir);
+            }
         }
 
         private static void GenerateNamespaceDoc(Assembly assembly, StreamWriter w, XmlDocument xmldoc)
@@ -218,11 +250,11 @@ namespace WikiDoc
         /// </param>
         private static void GenerateDoc(StreamWriter w, Type type, XmlDocument xmldoc)
         {
-            BindingFlags flags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static ;
-            
+            BindingFlags flags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static;
+
             // Only declared members
-           // flags|= BindingFlags.DeclaredOnly;
-            
+            // flags|= BindingFlags.DeclaredOnly;
+
             string header1 = "!! {0} Class";
             string header2 = "*{0}*";
             string tableHeader = "|| Name || Description ||";
