@@ -11,17 +11,24 @@ using System.Text.RegularExpressions;
 
 namespace VersionUpdater
 {
+    using System.Globalization;
     using System.Text;
 
-    // Version information for an assembly consists of the following four values:
+    // Description:
+    //   Does a recursive scan on all AssemblyInfo.cs and *.nuspec files from the specified root folder.
+    //   The program updates version and company/copyright information.
     //
-    //      Major Version
-    //      Minor Version 
-    //      Build Number
-    //      Revision
-    //
-    // You can specify all the values or you can default the Build and Revision Numbers 
-    // by using the '*' as shown below:
+    // Syntax:
+    //   VersionUpdater.exe [/Directory=xxx] [/Version=x.x.x.x] [/Company=xxx] [/Copyright=xxx]
+    // Arguments:
+    //   /Directory specifies the root directory (all subdirectories will be scanned)
+    //   /Version specifies the version number (Major.Minor.Build.Revision)
+    //      * = automatic build/revision numbers
+    //      yyyy = year
+    //      MM = month
+    //      dd = day
+    //   /Company
+    //   /Copyright
 
     // See also
     // http://www.codeproject.com/KB/XML/vrt.aspx
@@ -129,14 +136,16 @@ namespace VersionUpdater
                 {
                     sb.Append(".");
                 }
-                int i;
-                if (int.TryParse(s, out i))
+
+                long i;
+                if (long.TryParse(s, out i) || long.TryParse(s, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out i))
                 {
                     if (i > 65534)
                     {
                         // only use the last 4 digts
                         i = i % 10000;
                     }
+
                     sb.Append(i);
                 }
                 else
@@ -144,6 +153,7 @@ namespace VersionUpdater
                     sb.Append(s);
                 }
             }
+
             return sb.ToString();
         }
 
