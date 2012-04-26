@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FindObsoleteFiles", "FindOb
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WikiTable", "WikiTable\WikiTable.csproj", "{AF15BB82-BA56-449B-A112-A98DD4B0B7A9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CleanSource", "CleanSource\CleanSource.csproj", "{1FE14C4F-E9F1-4139-935C-B5C7911E724B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -37,6 +39,10 @@ Global
 		{AF15BB82-BA56-449B-A112-A98DD4B0B7A9}.Debug|x86.Build.0 = Debug|x86
 		{AF15BB82-BA56-449B-A112-A98DD4B0B7A9}.Release|x86.ActiveCfg = Release|x86
 		{AF15BB82-BA56-449B-A112-A98DD4B0B7A9}.Release|x86.Build.0 = Release|x86
+		{1FE14C4F-E9F1-4139-935C-B5C7911E724B}.Debug|x86.ActiveCfg = Debug|x86
+		{1FE14C4F-E9F1-4139-935C-B5C7911E724B}.Debug|x86.Build.0 = Debug|x86
+		{1FE14C4F-E9F1-4139-935C-B5C7911E724B}.Release|x86.ActiveCfg = Release|x86
+		{1FE14C4F-E9F1-4139-935C-B5C7911E724B}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
