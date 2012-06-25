@@ -4,15 +4,15 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text.RegularExpressions;
 
 namespace VersionUpdater
 {
+    using System;
+    using System.Collections.Generic;
     using System.Globalization;
+    using System.IO;
     using System.Text;
+    using System.Text.RegularExpressions;
 
     // Description:
     //   Does a recursive scan on all AssemblyInfo.cs and *.nuspec files from the specified root folder.
