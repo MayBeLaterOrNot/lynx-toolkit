@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeplexReleaseUploader", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReplaceTool", "ReplaceTool\ReplaceTool.csproj", "{C5B4E0F7-2785-4869-BE64-C5B4B1B2760F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FtpUpload", "FtpUpload\FtpUpload.csproj", "{29B534AC-8E80-4881-92BB-02938E05B26B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -55,6 +57,10 @@ Global
 		{C5B4E0F7-2785-4869-BE64-C5B4B1B2760F}.Debug|x86.Build.0 = Debug|x86
 		{C5B4E0F7-2785-4869-BE64-C5B4B1B2760F}.Release|x86.ActiveCfg = Release|x86
 		{C5B4E0F7-2785-4869-BE64-C5B4B1B2760F}.Release|x86.Build.0 = Release|x86
+		{29B534AC-8E80-4881-92BB-02938E05B26B}.Debug|x86.ActiveCfg = Debug|x86
+		{29B534AC-8E80-4881-92BB-02938E05B26B}.Debug|x86.Build.0 = Debug|x86
+		{29B534AC-8E80-4881-92BB-02938E05B26B}.Release|x86.ActiveCfg = Release|x86
+		{29B534AC-8E80-4881-92BB-02938E05B26B}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
