@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------
+﻿//-----------------------------------------------------------------------
 // <copyright file="App.xaml.cs" company="LynxToolkit">
 //     Copyright © LynxToolkit. All rights reserved.
 // </copyright>
@@ -7,8 +7,6 @@
 using System;
 using System.Collections.Generic;
 using System.Configuration;
-using System.Data;
-using System.Linq;
 using System.Windows;
 
 namespace WikiTable
