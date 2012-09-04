@@ -36,6 +36,7 @@ ClientBin/
 lib/
 
 _ReSharper*/
+_TeamCity*/
 *.dotCover
 
 [Tt]est[Rr]esult*
