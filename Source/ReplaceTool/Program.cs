@@ -22,7 +22,7 @@ namespace ReplaceTool
         /// <summary>
         ///   Valid text file types.
         /// </summary>
-        private const string ValidTextFileTypes = ".cs .xml .xaml .sln .csproj .DotSettings .user .StyleCop .txt";
+        public static string ValidTextFileTypes { get; set; }
 
         /// <summary>
         ///   The expression.
@@ -46,11 +46,13 @@ namespace ReplaceTool
         /// </param>
         public static void Main(string[] args)
         {
-            Console.WriteLine("ReplaceTool [pattern] [replacement] [startdirectory]");
+            Console.WriteLine("ReplaceTool [pattern] [replacement] [startdirectory] [*.ext]");
             Console.WriteLine("version " + Assembly.GetEntryAssembly().GetName().Version);
             Console.WriteLine();
             Console.WriteLine("Replaces text in directory names, file names and text files.");
             Console.WriteLine();
+            
+            ValidTextFileTypes = ".cs .xml .xaml .sln .csproj .DotSettings .user .StyleCop .txt .cmd";
 
             if (args.Length < 2)
             {
@@ -60,12 +62,19 @@ namespace ReplaceTool
             var pattern = args[0];
             replacement = args[1];
             var source = args.Length > 2 ? args[2] : ".";
-
+            foreach (var arg in args)
+            {
+                if (arg.StartsWith("*"))
+                {
+                    ValidTextFileTypes += " " + arg.Substring(1);
+                }
+            }
             expression = new Regex(pattern, RegexOptions.Compiled);
 
             Console.WriteLine("Search pattern: \"{0}\"", pattern);
             Console.WriteLine("Replace by: \"{0}\"", replacement);
             Console.WriteLine("Start in: \"{0}\"", source);
+            Console.WriteLine("File types: \"{0}\"", ValidTextFileTypes);
             Console.WriteLine();
 
             Search(source);
