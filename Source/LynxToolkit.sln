@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FtpUpload", "FtpUpload\FtpU
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IcoMaker", "IcoMaker\IcoMaker.csproj", "{F75C500C-BF23-4BF5-B87D-6EEA54AECB9D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolutionInfo", "SolutionInfo\SolutionInfo.csproj", "{9D73D692-E4EF-4F29-8F1D-36145ACE17E8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -132,6 +134,16 @@ Global
 		{F75C500C-BF23-4BF5-B87D-6EEA54AECB9D}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{F75C500C-BF23-4BF5-B87D-6EEA54AECB9D}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{F75C500C-BF23-4BF5-B87D-6EEA54AECB9D}.Release|x86.ActiveCfg = Release|Any CPU
+		{9D73D692-E4EF-4F29-8F1D-36145ACE17E8}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{9D73D692-E4EF-4F29-8F1D-36145ACE17E8}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{9D73D692-E4EF-4F29-8F1D-36145ACE17E8}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{9D73D692-E4EF-4F29-8F1D-36145ACE17E8}.Debug|x86.ActiveCfg = Debug|x86
+		{9D73D692-E4EF-4F29-8F1D-36145ACE17E8}.Debug|x86.Build.0 = Debug|x86
+		{9D73D692-E4EF-4F29-8F1D-36145ACE17E8}.Release|Any CPU.ActiveCfg = Release|x86
+		{9D73D692-E4EF-4F29-8F1D-36145ACE17E8}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{9D73D692-E4EF-4F29-8F1D-36145ACE17E8}.Release|Mixed Platforms.Build.0 = Release|x86
+		{9D73D692-E4EF-4F29-8F1D-36145ACE17E8}.Release|x86.ActiveCfg = Release|x86
+		{9D73D692-E4EF-4F29-8F1D-36145ACE17E8}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
