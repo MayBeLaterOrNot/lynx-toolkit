@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IcoMaker", "IcoMaker\IcoMak
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolutionInfo", "SolutionInfo\SolutionInfo.csproj", "{9D73D692-E4EF-4F29-8F1D-36145ACE17E8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WikiToHtml", "WikiToHtml\WikiToHtml.csproj", "{B5324E91-1C25-4B5E-B0E4-C56FEFE5F262}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -144,6 +146,16 @@ Global
 		{9D73D692-E4EF-4F29-8F1D-36145ACE17E8}.Release|Mixed Platforms.Build.0 = Release|x86
 		{9D73D692-E4EF-4F29-8F1D-36145ACE17E8}.Release|x86.ActiveCfg = Release|x86
 		{9D73D692-E4EF-4F29-8F1D-36145ACE17E8}.Release|x86.Build.0 = Release|x86
+		{B5324E91-1C25-4B5E-B0E4-C56FEFE5F262}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5324E91-1C25-4B5E-B0E4-C56FEFE5F262}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5324E91-1C25-4B5E-B0E4-C56FEFE5F262}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{B5324E91-1C25-4B5E-B0E4-C56FEFE5F262}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{B5324E91-1C25-4B5E-B0E4-C56FEFE5F262}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B5324E91-1C25-4B5E-B0E4-C56FEFE5F262}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5324E91-1C25-4B5E-B0E4-C56FEFE5F262}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5324E91-1C25-4B5E-B0E4-C56FEFE5F262}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{B5324E91-1C25-4B5E-B0E4-C56FEFE5F262}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{B5324E91-1C25-4B5E-B0E4-C56FEFE5F262}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
