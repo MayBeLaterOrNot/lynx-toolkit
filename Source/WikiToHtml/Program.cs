@@ -21,7 +21,7 @@ namespace WikiToHtml
         private static string searchPattern;
         private static string unlockProgram;
         private static string unlockArguments;
-        private static CreoleWikiEngine.WikiToHtmlConverter.Options options;
+        private static CreoleWikiEngine.CreoleConverter.Options options;
 
         private static void Main(string[] args)
         {
@@ -32,7 +32,7 @@ namespace WikiToHtml
             if (args.Length == 0)
             {
                 Console.WriteLine(
-                    "Arguments: [-Syntax=creole] [-LocalLinks=formatString] [-UnlockProgram=program] [-UnlockArguments=args] [-LocalLinks=formatstring] [Template] [searchPattern] [InputFolder]");
+                    "Arguments: [-Syntax=creole|markdown] [-LocalLinks=formatString] [-UnlockProgram=program] [-UnlockArguments=args] [-LocalLinks=formatstring] [Template] [searchPattern] [InputFolder]");
                 Console.WriteLine(
                     "Example: wiki2html.exe -LocalLinks={0}/{1}.html -UnlockProgram=p4.exe \"-UnlockArguments=edit {0}\" Template.html *.wiki ..\\Help");
                 Console.WriteLine("  The 'unlock' program will be executed for each output file. {0} is replaced by the output file name.");
@@ -41,19 +41,19 @@ namespace WikiToHtml
                 return;
             }
 
-            options = new CreoleWikiEngine.WikiToHtmlConverter.Options();
+            options = new CreoleWikiEngine.CreoleConverter.Options();
 
-            wikiSyntax = "creole";
+            wikiSyntax = null;
             templatePath = "Template.html";
             searchPattern = "*.txt";
-            // unlockProgram = "p4.exe";
-            // unlockArguments = "edit {0}";
-
+            bool directoryProvided = false;
             foreach (var arg in args)
             {
                 if (arg.Contains('*'))
                 {
                     searchPattern = arg;
+                    Console.WriteLine("Search pattern: {0}", searchPattern);
+ 
                     continue;
                 }
 
@@ -61,6 +61,7 @@ namespace WikiToHtml
                 {
                     var f = arg.Split('=');
                     wikiSyntax = f[1];
+                    Console.WriteLine("Syntax: {0}", wikiSyntax);
                     continue;
                 }
 
@@ -96,6 +97,7 @@ namespace WikiToHtml
                     {
                         // argument is a template
                         templatePath = arg;
+                        Console.WriteLine("Template: {0}", arg);
                         continue;
                     }
 
@@ -106,10 +108,11 @@ namespace WikiToHtml
                 if (Directory.Exists(arg))
                 {
                     SearchDirectory(arg);
+                    directoryProvided = true;
                 }
             }
 
-            if (args.Length == 0)
+            if (!directoryProvided)
             {
                 SearchDirectory(".");
             }
@@ -193,13 +196,19 @@ namespace WikiToHtml
 
             string body;
 
-            switch (wikiSyntax.ToLower())
+            // If syntax is not specified, use the file extension (without the dot).
+            var syntax = wikiSyntax ?? ext.Trim('.');
+            switch (syntax.ToLower())
             {
+                case "md":
                 case "markdown":
-                    throw new NotImplementedException();
+                    var markdownOptions = new MarkdownSharp.MarkdownOptions();
+                    var markdownEngine = new MarkdownSharp.Markdown(markdownOptions);
+                    body = markdownEngine.Transform(input);
+                    break;
+                case "cre":
                 case "creole":
-                case "creole10":
-                    var engine = new CreoleWikiEngine.WikiToHtmlConverter(options);
+                    var engine = new CreoleWikiEngine.CreoleConverter(options);
                     body = engine.Transform(input);
                     break;
                 default:
@@ -215,27 +224,28 @@ namespace WikiToHtml
             if (File.Exists(outputPath))
             {
                 var existingHtml = File.ReadAllText(outputPath);
-                if (existingHtml == html)
+                if (string.Equals(existingHtml, html))
                 {
-                    // Process.Start(outputPath);
                     // no change
                     return;
                 }
             }
 
+            // Write the filename
             if (!directoryPrinted)
             {
                 Console.WriteLine(Path.GetDirectoryName(inputPath));
                 directoryPrinted = true;
             }
             Console.WriteLine("  " + file);
+
+            // Make the file writable / VCS check-out
             UnlockFile(outputPath);
+
             using (var w = new StreamWriter(outputPath, false, Encoding.UTF8))
             {
                 w.Write(html);
             }
-
-            // Process.Start(outputPath);
         }
     }
 }

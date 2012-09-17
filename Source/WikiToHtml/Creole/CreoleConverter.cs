@@ -10,7 +10,7 @@
     /// </summary>
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Reviewed. Suppression is OK here.")]
     // ReSharper disable FieldCanBeMadeReadOnly.Local
-    public class WikiToHtmlConverter
+    public class CreoleConverter
     {
         private const string LineBreakReplacement = "¶";
 
@@ -105,10 +105,10 @@
         private IReplacement replaceTilde;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="WikiToHtmlConverter"/> class.
+        /// Initializes a new instance of the <see cref="CreoleConverter"/> class.
         /// </summary>
         /// <param name="options">The options.</param>
-        public WikiToHtmlConverter(Options options = null)
+        public CreoleConverter(Options options = null)
         {
             this.options = options ?? new Options();
 
@@ -269,15 +269,15 @@
         /// <summary>
         /// Transforms the specified input text.
         /// </summary>
-        /// <param name="input">The input text.</param>
+        /// <param name="text">The input text.</param>
         /// <returns>The output html.</returns>
-        public string Transform(string input)
+        public string Transform(string text)
         {
             var codeblocks = new Substitution(@"(?<=^|\n){{{((([^\n]*?):)?\r?\n.*?)(?<=^|\n)}}}", "\u0017");
             var inlineCodeblocks = new Substitution(@"{{{(.*?[^¶])}}}", "\u0018");
             var headerblocks = new Substitution(@"(?<=^|¶)((=+) (.*?))=*(?=¶|$)", "= \u0019");
 
-            var result = codeblocks.Substitute(input);
+            var result = codeblocks.Substitute(text);
             result = NewLine.Replace(result, @"¶");
             result = inlineCodeblocks.Substitute(result);
             result = headerblocks.Substitute(result);
