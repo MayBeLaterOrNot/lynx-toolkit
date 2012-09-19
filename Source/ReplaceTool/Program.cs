@@ -4,7 +4,7 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-namespace ReplaceTool
+namespace LynxToolkit
 {
     using System;
     using System.IO;
@@ -46,12 +46,8 @@ namespace ReplaceTool
         /// </param>
         public static void Main(string[] args)
         {
-            Console.WriteLine("ReplaceTool [pattern] [replacement] [startdirectory] [*.ext]");
-            Console.WriteLine("version " + Assembly.GetEntryAssembly().GetName().Version);
-            Console.WriteLine();
-            Console.WriteLine("Replaces text in directory names, file names and text files.");
-            Console.WriteLine();
-            
+            Console.WriteLine(Application.Header);
+
             ValidTextFileTypes = ".cs .xml .xaml .sln .csproj .DotSettings .user .StyleCop .txt .cmd";
 
             if (args.Length < 2)
@@ -194,7 +190,7 @@ namespace ReplaceTool
             if (folder != destFolder)
             {
                 Console.WriteLine("Rename folder to {0}", destFolder);
-                Directory.Move(folder, destFolder);
+                Try(() => Directory.Move(folder, destFolder));
                 folder = destFolder;
             }
 
@@ -210,26 +206,41 @@ namespace ReplaceTool
                 {
                     // Rename file
                     Console.WriteLine("Rename file to {0}", newPath);
-                    File.Move(path, newPath);
+                    Try(() => File.Move(path, newPath));
                 }
 
-                if (ValidTextFileTypes.Contains(ext) || IsText(path))
+                Try(() =>
                 {
-                    // Replace in file
-                    var content = File.ReadAllText(newPath);
-                    var newContent = expression.Replace(content, replacement);
-                    if (content != newContent)
+                    if (ValidTextFileTypes.Contains(ext) || IsText(newPath))
                     {
-                        Console.WriteLine("Modified {0}", newPath);
-                        File.WriteAllText(newPath, newContent);
+                        var content = File.ReadAllText(newPath);
+                        var newContent = expression.Replace(content, replacement);
+                        if (content != newContent)
+                        {
+                            Console.WriteLine("Modified {0}", newPath);
+                            Try(() => File.WriteAllText(newPath, newContent));
+                        }
+
                     }
-                }
+                });
             }
 
             // Search in sub-folders
             foreach (var d in Directory.GetDirectories(folder))
             {
                 Search(d);
+            }
+        }
+
+        private static void Try(Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
             }
         }
 

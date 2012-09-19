@@ -14,7 +14,7 @@ namespace CleanSource
     /// The program.
     /// </summary>
     /// <remarks>
-    /// Cleaning up for a Resharper (I think) code-cleanup bug.
+    /// Obsolete program.
     /// </remarks>
     public static class Program
     {

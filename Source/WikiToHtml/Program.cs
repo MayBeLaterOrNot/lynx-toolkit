@@ -4,13 +4,12 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-namespace WikiToHtml
+namespace LynxToolkit
 {
     using System;
     using System.Linq;
     using System.Diagnostics;
     using System.IO;
-    using System.Reflection;
     using System.Text;
     using System.Text.RegularExpressions;
 
@@ -25,9 +24,7 @@ namespace WikiToHtml
 
         private static void Main(string[] args)
         {
-            Console.WriteLine("Wiki to Html converter");
-            Console.WriteLine("version " + Assembly.GetEntryAssembly().GetName().Version);
-            Console.WriteLine();
+            Console.WriteLine(Application.Header);
 
             if (args.Length == 0)
             {
@@ -53,7 +50,7 @@ namespace WikiToHtml
                 {
                     searchPattern = arg;
                     Console.WriteLine("Search pattern: {0}", searchPattern);
- 
+
                     continue;
                 }
 
@@ -107,6 +104,7 @@ namespace WikiToHtml
 
                 if (Directory.Exists(arg))
                 {
+                    Console.WriteLine();
                     SearchDirectory(arg);
                     directoryProvided = true;
                 }
@@ -114,6 +112,7 @@ namespace WikiToHtml
 
             if (!directoryProvided)
             {
+                Console.WriteLine();
                 SearchDirectory(".");
             }
         }
@@ -153,23 +152,17 @@ namespace WikiToHtml
             string outputPath = Path.ChangeExtension(inputPath, ".html");
             string input = File.ReadAllText(inputPath);
 
+
             string title = null;
             string keywords = string.Empty;
             string description = string.Empty;
 
-            // the first header is the default title
-            var headers = Regex.Match(input, @"^=+\s*(.*)$", RegexOptions.Multiline);
-            if (headers.Success)
-            {
-                title = headers.Groups[1].Value.Trim();
-            }
-
             input = Regex.Replace(
                 input,
                 "^@Title=(.*)$",
-                titleMatch =>
+                match =>
                 {
-                    title = titleMatch.Groups[1].Value.Trim();
+                    title = match.Groups[1].Value.Trim();
                     return string.Empty;
                 },
                 RegexOptions.Multiline);
@@ -177,9 +170,9 @@ namespace WikiToHtml
             input = Regex.Replace(
                 input,
                 "^@Keywords=(.*)$",
-                titleMatch =>
+                match =>
                 {
-                    keywords = titleMatch.Groups[1].Value.Trim();
+                    keywords = match.Groups[1].Value.Trim();
                     return string.Empty;
                 },
                 RegexOptions.Multiline);
@@ -187,9 +180,9 @@ namespace WikiToHtml
             input = Regex.Replace(
                 input,
                 "^@Description=(.*)$",
-                titleMatch =>
+                match =>
                 {
-                    description = titleMatch.Groups[1].Value.Trim();
+                    description = match.Groups[1].Value.Trim();
                     return string.Empty;
                 },
                 RegexOptions.Multiline);
@@ -214,6 +207,17 @@ namespace WikiToHtml
                 default:
                     throw new InvalidOperationException("Invalid wiki syntax.");
             }
+
+            if (title == null)
+            {
+                // the first header is the default title
+                var headers = Regex.Match(body, @"^<h1>(.*)</h1>$", RegexOptions.Multiline);
+                if (headers.Success)
+                {
+                    title = headers.Groups[1].Value.Trim();
+                }
+            }
+
 
             string templateContent = File.ReadAllText(templatePath);
             var html = Regex.Replace(templateContent, @"\$title", title ?? string.Empty);

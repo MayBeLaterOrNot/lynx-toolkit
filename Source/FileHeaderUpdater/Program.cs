@@ -7,7 +7,7 @@
 using System;
 using System.Text;
 
-namespace FileHeaderUpdater
+namespace LynxToolkit
 {
     using System.IO;
 
@@ -15,6 +15,8 @@ namespace FileHeaderUpdater
     {
         static void Main(string[] args)
         {
+            Console.WriteLine(Application.Header);
+
             string company = null;
             string copyright = null;
             string exclude = "AssemblyInfo.cs Packages .Designer.cs obj bin";

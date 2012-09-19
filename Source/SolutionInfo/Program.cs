@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SolutionInfo
+namespace LynxToolkit
 {
     using System.IO;
     using System.Linq;
@@ -12,6 +12,8 @@ namespace SolutionInfo
     {
         static void Main(string[] args)
         {
+            Console.WriteLine(Application.Header);
+
             var clean = false;
             foreach (var arg in args)
             {
@@ -37,21 +39,29 @@ namespace SolutionInfo
             var projectReferencesFile = Path.ChangeExtension(solutionFileName, ".ProjectReferences.csv");
             var configurationsFile = Path.ChangeExtension(solutionFileName, ".Configurations.csv");
 
-            Console.WriteLine("Solution file: " + solutionFile);
+            Console.WriteLine("Solution file:");
+            Console.WriteLine("  " + solutionFile);
+            Console.WriteLine();
+
             Console.WriteLine("Output files:");
             Console.WriteLine("  " + projectsFile);
             Console.WriteLine("  " + referencesFile);
             Console.WriteLine("  " + projectReferencesFile);
             Console.WriteLine("  " + configurationsFile);
+            Console.WriteLine();
+
+            Console.WriteLine("Project files:");
+            foreach (var p in solution.Projects.Where(IsCSProject))
+            {
+                Console.WriteLine("  " + Path.GetFileName(p));
+            }
 
             var projects = new List<Project>();
             using (var ps = new StreamWriter(projectsFile))
             {
-                ps.WriteLine(
-                    "Project;AssemblyName;RootNamespace;TargetFrameworkVersion;TargetFrameworkProfile;SignAssembly");
-                foreach (var projectFile in solution.Projects)
+                ps.WriteLine("Project;AssemblyName;RootNamespace;TargetFrameworkVersion;TargetFrameworkProfile;SignAssembly");
+                foreach (var projectFile in solution.Projects.Where(IsCSProject))
                 {
-                    if (!projectFile.Contains(".csproj")) continue;
                     var path = Path.Combine(dir, projectFile);
                     var project = new Project(path, clean);
                     ps.WriteLine(
@@ -118,8 +128,10 @@ namespace SolutionInfo
             }
         }
 
-
-
+        private static bool IsCSProject(string s)
+        {
+            return s.Contains(".csproj");
+        }
     }
 
 
@@ -209,8 +221,6 @@ namespace SolutionInfo
             References = new List<Reference>();
             ProjectReferences = new List<ProjectReference>();
             Configurations = new List<Condition>();
-
-            Console.WriteLine("Reading " + Path.GetFileName(path));
 
             // load xml file
             doc = new XmlDocument();

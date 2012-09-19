@@ -7,22 +7,18 @@
 using System;
 using System.IO;
 
-namespace FtpUpload
+namespace LynxToolkit
 {
     using System.Net;
-    using System.Reflection;
-
-    // Uploads a single file to FTP using binary/passive mode
 
     internal class Program
     {
         private static void Main(string[] args)
         {
-            Console.WriteLine("FtpUpload {0}", Assembly.GetExecutingAssembly().GetName().Version);
+            Console.WriteLine(Application.Header);
             if (args.Length < 5)
             {
                 Console.WriteLine("Missing arguments.");
-                Console.WriteLine("Syntax: [host] [username] [password] [localfile] [remotefile]");
                 return;
             }
 

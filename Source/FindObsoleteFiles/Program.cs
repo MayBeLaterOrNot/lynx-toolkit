@@ -7,7 +7,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace FindObsoleteFiles
+namespace LynxToolkit
 {
     using System.IO;
     using System.Text.RegularExpressions;
@@ -18,14 +18,16 @@ namespace FindObsoleteFiles
     {
         static void Main(string[] args)
         {
+            Console.WriteLine(Application.Header);
+
             foreach (var arg in args)
             {
                 var f = new Finder();
                 f.Find(arg);
             }
-            Console.ReadKey();
         }
     }
+
     class Finder
     {
         public IEnumerable<string> GetProjects(string path)
@@ -84,7 +86,7 @@ namespace FindObsoleteFiles
             var doc = new XmlDocument();
             doc.Load(projPath);
             var root = doc.DocumentElement;
-            XmlNamespaceManager nsmgr = new XmlNamespaceManager(doc.NameTable);
+            var nsmgr = new XmlNamespaceManager(doc.NameTable);
             nsmgr.AddNamespace("b", "http://schemas.microsoft.com/developer/msbuild/2003");
 
             foreach (XmlNode node in root.SelectNodes("//b:Compile",nsmgr))

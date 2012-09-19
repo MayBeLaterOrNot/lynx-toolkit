@@ -5,12 +5,14 @@
     using System.Diagnostics.CodeAnalysis;
     using System.Text.RegularExpressions;
 
+    using LynxToolkit;
+
     /// <summary>
     /// Converts Creole 1.0 formatted wiki text to xhtml.
     /// </summary>
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Reviewed. Suppression is OK here.")]
     // ReSharper disable FieldCanBeMadeReadOnly.Local
-    public class CreoleConverter
+    public class CreoleConverter : IWikiConverter
     {
         private const string LineBreakReplacement = "¶";
 

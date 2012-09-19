@@ -5,7 +5,7 @@
 //-----------------------------------------------------------------------
 
 
-namespace VersionUpdater
+namespace LynxToolkit
 {
     using System;
     using System.Collections.Generic;
@@ -33,10 +33,12 @@ namespace VersionUpdater
     // See also
     // http://www.codeproject.com/KB/XML/vrt.aspx
 
-    internal class Program
+    class Program
     {
         private static void Main(string[] args)
         {
+            Console.WriteLine(Application.Header);
+
             // default parameters
             string version = "yyyy.MM.*";
             string company = null;
@@ -47,24 +49,34 @@ namespace VersionUpdater
             foreach (string arg in args)
             {
                 string[] kv = arg.Split('=');
-                switch (kv[0])
+                if (kv.Length > 1)
                 {
-                    case "/Version":
-                        version = kv[1];
-                        break;
-                    case "/Directory":
-                        directory = kv[1];
-                        break;
-                    case "/Company":
-                        company = kv[1];
-                        break;
-                    case "/Copyright":
-                        copyright = kv[1];
-                        break;
+                    switch (kv[0])
+                    {
+                        case "/Version":
+                            version = kv[1];
+                            break;
+                        case "/Directory":
+                            directory = kv[1];
+                            break;
+                        case "/Company":
+                            company = kv[1];
+                            break;
+                        case "/Copyright":
+                            copyright = kv[1];
+                            break;
+                    }
+                }
+                else
+                {
+                    directory = arg;
                 }
             }
 
-            if (copyright == null && company != null) copyright = string.Format("Copyright © {0} {1}", company, DateTime.Now.Year);
+            if (copyright == null && company != null)
+            {
+                copyright = string.Format("Copyright © {0} {1}", company, DateTime.Now.Year);
+            }
 
             var updater = new Updater(version, copyright, company);
 
@@ -79,11 +91,11 @@ namespace VersionUpdater
             Copyright = copyright;
             Company = company;
 
-            version = version.Replace("yyyy", DateTime.Now.Year.ToString());
-            version = version.Replace("MM", DateTime.Now.Month.ToString());
-            version = version.Replace("dd", DateTime.Now.Day.ToString());
+            version = version.Replace("yyyy", DateTime.Now.Year.ToString(CultureInfo.InvariantCulture));
+            version = version.Replace("MM", DateTime.Now.Month.ToString(CultureInfo.InvariantCulture));
+            version = version.Replace("dd", DateTime.Now.Day.ToString(CultureInfo.InvariantCulture));
 
-            version = To16bitVersionNumbers(version);
+            version = To16BitVersionNumbers(version);
 
             Version = version;
 
@@ -126,7 +138,7 @@ namespace VersionUpdater
         /// </summary>
         /// <param name="version">The version.</param>
         /// <returns>The modified version number.</returns>
-        private static string To16bitVersionNumbers(string version)
+        private static string To16BitVersionNumbers(string version)
         {
             var vs = version.Split('.');
             var sb = new StringBuilder();
@@ -158,16 +170,20 @@ namespace VersionUpdater
         }
 
         public string Copyright { get; set; }
+
         public string Company { get; set; }
+
         public string Version { get; set; }
+
         public string FileVersion { get; set; }
 
         public Dictionary<Regex, string> NuSpecReplacements { get; set; }
+
         public Dictionary<Regex, string> AssemblyInfoReplacements { get; set; }
 
         public void ScanFolder(string path)
         {
-            foreach (string file in Directory.GetFiles(path, "AssemblyInfo.cs"))
+            foreach (string file in Directory.GetFiles(path, "*AssemblyInfo.cs"))
             {
                 UpdateFile(file, AssemblyInfoReplacements);
             }

@@ -4,11 +4,10 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-namespace WikiDoc
+namespace LynxToolkit
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.IO;
     using System.Linq;
     using System.Reflection;
@@ -25,6 +24,7 @@ namespace WikiDoc
     internal class Program
     {
         #region Public Methods
+
         public static string OutputDirectory { get; set; }
 
         /// <summary>
@@ -35,8 +35,7 @@ namespace WikiDoc
         /// </param>
         internal static void Main(string[] args)
         {
-            Console.WriteLine("WikiDoc {0}", Assembly.GetExecutingAssembly().GetName().Version.ToString(3));
-            Console.WriteLine();
+            Console.WriteLine(Application.Header);
 
             OutputDirectory = string.Empty;
 

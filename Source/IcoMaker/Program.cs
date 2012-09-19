@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing.Imaging;
 
-namespace IcoMaker
+namespace LynxToolkit
 {
     using System.Drawing;
     using System.IO;
@@ -11,6 +11,8 @@ namespace IcoMaker
     {
         static void Main(string[] args)
         {
+            Console.WriteLine(Application.Header);
+
             var ico = new Icon();
             string iconFilename = null;
             foreach (var arg in args)
