@@ -8,8 +8,8 @@
     <ProjectGuid>{E68CCC23-168F-45D0-81F5-94B1326B7992}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>WikiDoc</RootNamespace>
-    <AssemblyName>WikiDoc</AssemblyName>
+    <RootNamespace>XmlDocT</RootNamespace>
+    <AssemblyName>XmlDocT</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>

@@ -17,8 +17,9 @@ namespace LynxToolkit
 
     /// <summary>
     /// Utility to generate "MSDN-style" documentation in Codeplex wiki format.
-    ///   - Reads XML comments from .xml files
-    ///   - Reflects assemblies to find inheritance hierarchy
+    ///   - Reads XML comments from the XML documentation files
+    ///   - Reflects the assemblies to find inheritance hierarchy
+    /// Limitations
     ///   - Does not create cross references (yet)
     /// </summary>
     internal class Program
@@ -38,17 +39,27 @@ namespace LynxToolkit
             Console.WriteLine(Application.Header);
 
             OutputDirectory = string.Empty;
+            string format = "html";
+            bool singlePage = false;
 
             foreach (var arg in args)
             {
                 string[] kv = arg.Split('=');
                 if (kv.Length > 0)
                 {
-                    switch (kv[0])
+                    switch (kv[0].ToLower())
                     {
-                        case "/Output":
+                        case "/singlepage":
+                            singlePage = true;
+                            break;
+                        case "/output":
                             OutputDirectory = kv[1];
                             Console.WriteLine("Output directory:   {0}", OutputDirectory);
+                            Console.WriteLine();
+                            continue;
+                        case "/format":
+                            format = kv[1].ToLower();
+                            Console.WriteLine("Format:             {0}", format);
                             Console.WriteLine();
                             continue;
                     }
@@ -56,7 +67,7 @@ namespace LynxToolkit
 
                 if (File.Exists(arg))
                 {
-                    GenerateDoc(arg);
+                    GenerateDoc(arg, format, singlePage);
                 }
                 else
                 {
@@ -64,7 +75,7 @@ namespace LynxToolkit
                     {
                         foreach (var fileName in Directory.GetFiles(arg, "*.dll"))
                         {
-                            GenerateDoc(fileName);
+                            GenerateDoc(fileName, format, singlePage);
                         }
                     }
                 }
@@ -100,7 +111,7 @@ namespace LynxToolkit
         /// <param name="assemblyFile">
         /// The assembly file.
         /// </param>
-        private static void GenerateDoc(string assemblyFile)
+        private static void GenerateDoc(string assemblyFile, string format, bool singlePage)
         {
             string assemblyPath = Path.GetFullPath(assemblyFile);
             string fileName = Path.GetFileName(assemblyFile);

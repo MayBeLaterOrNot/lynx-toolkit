@@ -50,41 +50,29 @@ namespace LynxToolkit
                 {
                     searchPattern = arg;
                     Console.WriteLine("Search pattern: {0}", searchPattern);
-
                     continue;
                 }
 
-                if (arg.StartsWith("-Syntax"))
+                var f = arg.Split('=');
+                switch (f[0].ToLower())
                 {
-                    var f = arg.Split('=');
-                    wikiSyntax = f[1];
-                    Console.WriteLine("Syntax: {0}", wikiSyntax);
-                    continue;
-                }
-
-                if (arg.StartsWith("-LocalLinks"))
-                {
-                    var f = arg.Split('=');
-                    options.LocalLinkFunction = (space, link) =>
-                        {
-                            var href = string.Format(f[1], string.IsNullOrEmpty(space) ? "~" : space, link);
-                            return href.Replace("~/", "");
-                        };
-                    continue;
-                }
-
-                if (arg.StartsWith("-UnlockProgram"))
-                {
-                    var f = arg.Split('=');
-                    unlockProgram = f[1];
-                    continue;
-                }
-
-                if (arg.StartsWith("-UnlockArguments"))
-                {
-                    var f = arg.Split('=');
-                    unlockArguments = f[1];
-                    continue;
+                    case "-syntax":
+                        wikiSyntax = f[1];
+                        Console.WriteLine("Syntax: {0}", wikiSyntax);
+                        break;
+                    case "-locallinks":
+                        options.LocalLinkFunction = (space, link) =>
+                            {
+                                var href = string.Format(f[1], string.IsNullOrEmpty(space) ? "~" : space, link);
+                                return href.Replace("~/", "");
+                            };
+                        break;
+                    case "-unlockprogram":
+                        unlockProgram = f[1];
+                        break;
+                    case "-unlockarguments":
+                        unlockArguments = f[1];
+                        break;
                 }
 
                 if (File.Exists(arg))

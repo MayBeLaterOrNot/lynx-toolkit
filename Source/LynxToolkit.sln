@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VersionUpdater", "VersionUpdater\VersionUpdater.csproj", "{9FB27C7C-39F4-4F2E-8942-923DE53666CB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WikiDoc", "WikiDoc\WikiDoc.csproj", "{E68CCC23-168F-45D0-81F5-94B1326B7992}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XmlDocT", "XmlDocT\XmlDocT.csproj", "{E68CCC23-168F-45D0-81F5-94B1326B7992}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileHeaderUpdater", "FileHeaderUpdater\FileHeaderUpdater.csproj", "{B159B388-4C92-4B7D-A22B-DE649D6457CA}"
 EndProject
