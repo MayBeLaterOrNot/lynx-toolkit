@@ -41,6 +41,7 @@ namespace LynxToolkit
 
             // default parameters
             string version = "yyyy.MM.*";
+            string informationalVersion = null;
             string company = null;
             string copyright = null;
             string directory = Directory.GetCurrentDirectory();
@@ -55,6 +56,9 @@ namespace LynxToolkit
                     {
                         case "/Version":
                             version = kv[1];
+                            break;
+                        case "/InformationalVersion":
+                            informationalVersion = kv[1];
                             break;
                         case "/Directory":
                             directory = kv[1];
@@ -78,7 +82,7 @@ namespace LynxToolkit
                 copyright = string.Format("Copyright © {0} {1}", company, DateTime.Now.Year);
             }
 
-            var updater = new Updater(version, copyright, company);
+            var updater = new Updater(version, informationalVersion, copyright, company);
 
             updater.ScanFolder(directory);
         }
@@ -86,7 +90,7 @@ namespace LynxToolkit
 
     public class Updater
     {
-        public Updater(string version, string copyright, string company)
+        public Updater(string version, string informationalVersion, string copyright, string company)
         {
             Copyright = copyright;
             Company = company;
@@ -96,8 +100,8 @@ namespace LynxToolkit
             version = version.Replace("dd", DateTime.Now.Day.ToString(CultureInfo.InvariantCulture));
 
             version = To16BitVersionNumbers(version);
-
             Version = version;
+            InformationalVersion = informationalVersion ?? version;
 
             string nuSpecVersion = version.Replace(".*", ".0");
 
@@ -115,6 +119,10 @@ namespace LynxToolkit
                                                {
                                                    new Regex(@"AssemblyVersion\(.*\)"),
                                                    string.Format("AssemblyVersion(\"{0}\")", Version)
+                                                   },
+                                               {
+                                                   new Regex(@"AssemblyInformationalVersion\(.*\)"),
+                                                   string.Format("AssemblyInformationalVersion(\"{0}\")", InformationalVersion)
                                                    },
                                                {
                                                    new Regex(@"AssemblyFileVersion\(.*\)"),
@@ -174,6 +182,8 @@ namespace LynxToolkit
         public string Company { get; set; }
 
         public string Version { get; set; }
+
+        public string InformationalVersion { get; set; }
 
         public string FileVersion { get; set; }
 
