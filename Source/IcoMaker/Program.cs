@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing.Imaging;
 
 namespace LynxToolkit
 {
@@ -17,13 +16,29 @@ namespace LynxToolkit
             string iconFilename = null;
             foreach (var arg in args)
             {
-                if (arg.Contains(".ico")) iconFilename = arg;
-                if (arg.Contains(".png")) ico.Add(arg);
+                if (arg.Contains(".ico"))
+                {
+                    iconFilename = arg;
+                }
+
+                if (arg.Contains(".png"))
+                {
+                    ico.AddImage(arg);
+                }
+
+                if (arg.Contains(".bmp"))
+                {
+                    ico.AddBitmap(arg);
+                }
             }
 
-            if (ico.Images.Count > 0)
+            if (ico.Entries.Count > 0)
             {
-                if (iconFilename == null) iconFilename = "default.ico";
+                if (iconFilename == null)
+                {
+                    iconFilename = "default.ico";
+                }
+
                 Console.WriteLine("Exporting to " + iconFilename);
                 ico.Save(iconFilename);
             }
@@ -39,6 +54,7 @@ namespace LynxToolkit
                 {
                     Console.WriteLine("{0}x{1} {2}c {4}cp {5}bpp {6}b {8}", entry.Width, entry.Height, entry.Colors, entry.Reserved, entry.ColorPlanes, entry.BitsPerPixel, entry.Size, entry.Offset, entry.Format);
                 }
+
                 Console.ReadKey();
             }
         }
@@ -49,15 +65,15 @@ namespace LynxToolkit
     public class Icon
     {
         public IList<Entry> Entries { get; private set; }
-        public IList<Image> Images { get; private set; }
 
         public ImageType ImageType { get; set; }
 
         public Icon()
         {
-            Entries = new List<Entry>();
-            Images = new List<Image>();
+            this.Entries = new List<Entry>();
         }
+
+        public enum ImageFormat { Unknown, PNG, BMP }
 
         public class Entry
         {
@@ -71,24 +87,27 @@ namespace LynxToolkit
             public uint Offset { get; set; }
             public byte[] ImageData { get; set; }
 
-            public string Format
+            public Image Image { get; set; }
+            public IcoMaker.Bitmap Bitmap { get; set; }
+
+            public ImageFormat Format
             {
                 get
                 {
                     if (ImageData == null || ImageData.Length < 4)
-                        return null;
+                        return ImageFormat.Unknown;
                     if ((ImageData[0] == 137) && (ImageData[1] == 80) && (ImageData[2] == 78) && (ImageData[3] == 71))
-                        return "PNG";
-                    return "BMP";
+                        return ImageFormat.PNG;
+                    return ImageFormat.BMP;
                 }
             }
         }
 
         public void Load(string path)
         {
-            using (var s = File.OpenRead(path))
+            using (var stream = File.OpenRead(path))
             {
-                using (var r = new BinaryReader(s))
+                using (var r = new BinaryReader(stream))
                 {
                     var reserved = r.ReadUInt16();
                     if (reserved != 0)
@@ -100,33 +119,45 @@ namespace LynxToolkit
                     var n = r.ReadUInt16();
                     for (int i = 0; i < n; i++)
                     {
-                        var entry = new Entry();
-                        entry.Width = r.ReadByte();
-                        entry.Height = r.ReadByte();
-                        entry.Colors = r.ReadByte();
-                        entry.Reserved = r.ReadByte();
-                        entry.ColorPlanes = r.ReadUInt16();
-                        entry.BitsPerPixel = r.ReadUInt16();
-                        entry.Size = r.ReadUInt32();
-                        entry.Offset = r.ReadUInt32();
-                        Entries.Add(entry);
+                        var entry = new Entry
+                            {
+                                Width = r.ReadByte(),
+                                Height = r.ReadByte(),
+                                Colors = r.ReadByte(),
+                                Reserved = r.ReadByte(),
+                                ColorPlanes = r.ReadUInt16(),
+                                BitsPerPixel = r.ReadUInt16(),
+                                Size = r.ReadUInt32(),
+                                Offset = r.ReadUInt32()
+                            };
+                        this.Entries.Add(entry);
                     }
+
                     for (int i = 0; i < n; i++)
                     {
-                        var entry = Entries[i];
+                        var entry = this.Entries[i];
                         r.BaseStream.Seek(entry.Offset, SeekOrigin.Begin);
                         entry.ImageData = r.ReadBytes((int)entry.Size);
 
-                        // load the image
                         using (var ms = new MemoryStream(entry.ImageData))
                         {
-                            Images.Add(Image.FromStream(s));
+                            switch (entry.Format)
+                            {
+                                case ImageFormat.PNG:
+                                    entry.Image = Image.FromStream(ms);
+                                    break;
+                                case ImageFormat.BMP:
+                                    // Recall that if an image is stored in BMP format, it must exclude the opening BITMAPFILEHEADER.
+                                    entry.Bitmap = IcoMaker.Bitmap.Load(ms, true);
+                                    break;
+                            }
                         }
                     }
                 }
             }
 
         }
+
         public void Save(string path)
         {
             // http://en.wikipedia.org/wiki/ICO_(file_format)
@@ -136,20 +167,31 @@ namespace LynxToolkit
                 {
                     w.Write((short)0);
                     w.Write((short)1);
-                    w.Write((short)Images.Count);
-                    int offset = 6 + Images.Count * 16;
+                    w.Write((short)this.Entries.Count);
+                    int offset = 6 + this.Entries.Count * 16;
                     var buffers = new List<byte[]>();
-                    foreach (var i in Images)
+                    foreach (var e in this.Entries)
                     {
-                        w.Write((byte)i.Width); // Specifies image width in pixels. Can be any number between 0 and 255. Value 0 means image width is 256 pixels.
-                        w.Write((byte)i.Height); // Specifies image height in pixels. Can be any number between 0 and 255. Value 0 means image height is 256 pixels.
-                        w.Write((byte)0); // Specifies number of colors in the color palette. Should be 0 if the image does not use a color palette.
-                        w.Write((byte)0); // Reserved
-                        w.Write((short)0); // Specifies color planes. Should be 0 or 1
-                        w.Write((short)0); // Specifies bits per pixel. 
-                        var bytes = this.BitmapToByteArray(i);
+                        w.Write(e.Width);        // Specifies image width in pixels. Can be any number between 0 and 255. Value 0 means image width is 256 pixels.
+                        w.Write(e.Height);       // Specifies image height in pixels. Can be any number between 0 and 255. Value 0 means image height is 256 pixels.
+                        w.Write(e.Colors);       // Specifies number of colors in the color palette. Should be 0 if the image does not use a color palette.
+                        w.Write((byte)0);        // Reserved
+                        w.Write(e.ColorPlanes);  // Specifies color planes. Should be 0 or 1
+                        w.Write(e.BitsPerPixel); // Specifies bits per pixel. 
+
+                        byte[] bytes = null;
+                        switch (e.Format)
+                        {
+                            case ImageFormat.PNG:
+                                bytes = this.ImageToByteArray(e.Image);
+                                break;
+                            case ImageFormat.BMP:
+                                bytes = this.BitmapToByteArray(e.Bitmap, true);
+                                break;
+                        }
+
                         buffers.Add(bytes);
-                        var size = bytes.Length;
+                        var size = bytes != null ? bytes.Length : 0;
                         w.Write((uint)size); // Specifies the size of the image's data in bytes
                         w.Write((uint)offset); // Specifies the offset of BMP or PNG data from the beginning of the ICO/CUR file
                         offset += size;
@@ -167,19 +209,53 @@ namespace LynxToolkit
             }
         }
 
-        byte[] BitmapToByteArray(Image bmp)
+        private byte[] BitmapToByteArray(IcoMaker.Bitmap bitmap, bool excludeFileHeader)
         {
             using (var ms = new MemoryStream())
             {
-                bmp.Save(ms, ImageFormat.Png);
+                bitmap.Save(ms, excludeFileHeader);
                 return ms.GetBuffer();
             }
         }
 
-        public void Add(string filename)
+        private byte[] ImageToByteArray(Image image)
         {
-            var img = Image.FromFile(filename);
-            Images.Add(img);
+            using (var ms = new MemoryStream())
+            {
+                image.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+                return ms.GetBuffer();
+            }
+        }
+
+        public void AddImage(string filename)
+        {
+            var image = Image.FromFile(filename);
+            var entry = new Entry
+                {
+                    Image = image,
+                    Width = (byte)image.Width,
+                    Height = (byte)image.Height,
+                    Colors = (byte)image.Height,
+                    ColorPlanes = 1,
+                    BitsPerPixel = 0
+                };
+            this.Entries.Add(entry);
+        }
+
+        public void AddBitmap(string filename)
+        {
+            var bitmap = IcoMaker.Bitmap.LoadFromFile(filename);
+            var entry = new Entry
+                {
+                    Bitmap = bitmap,
+                    Width = (byte)bitmap.Width,
+                    Height = (byte)bitmap.Height,
+                    Colors = (byte)bitmap.Height,
+                    ColorPlanes = 1,
+                    BitsPerPixel = 0
+                };
+            this.Entries.Add(entry);
+
         }
     }
 }
