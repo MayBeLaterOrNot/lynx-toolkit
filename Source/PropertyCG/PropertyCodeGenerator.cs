@@ -13,6 +13,7 @@ namespace LynxToolkit
     {
         string AffectsRenderAttribute { get; }
         bool UseExpressions { get; }
+        bool IncludeRegions { get; }
     }
 
     public class PropertyCodeGenerator : IOptions
@@ -23,6 +24,7 @@ namespace LynxToolkit
 
         public string AffectsRenderAttribute { get; set; }
         public bool UseExpressions { get; set; }
+        public bool IncludeRegions { get; set; }
 
         public string OpenForEditExecutable { get; set; }
         public string OpenForEditArguments { get; set; }
@@ -35,6 +37,8 @@ namespace LynxToolkit
             this.PropertiesFileName = Path.ChangeExtension(this.FileName, ".Properties.cs");
             this.PropertyClassModel = new PropertyClassModel();
             this.AffectsRenderAttribute = "AffectsRender";
+            this.UseExpressions = false;
+            this.IncludeRegions = false;
         }
 
         public void Generate()
@@ -286,7 +290,7 @@ namespace LynxToolkit
                     continue;
                 }
                 var attributeMatch = attributeExpression.Match(line);
-                if (attributeMatch.Success && Name == null)
+                if (attributeMatch.Success)
                 {
                     attributes.Add(attributeMatch.Groups[1].Value);
                     continue;
@@ -378,8 +382,11 @@ namespace LynxToolkit
             sb.AppendLine("{");
             sb.Indent();
 
-            sb.AppendLine("#region Fields");
-            sb.AppendLine();
+            if (options.IncludeRegions)
+            {
+                sb.AppendLine("#region Fields");
+                sb.AppendLine();
+            }
             foreach (var p in this.Properties.Values)
             {
                 sb.AppendLine("/// <summary>");
@@ -388,16 +395,26 @@ namespace LynxToolkit
                 sb.AppendLine("private {0} {1};", p.Type, p.BackingFieldName);
                 sb.AppendLine();
             }
-            sb.AppendLine("#endregion");
-            sb.AppendLine();
+            if (options.IncludeRegions)
+            {
+                sb.AppendLine("#endregion");
+                sb.AppendLine();
+            }
 
-            sb.AppendLine("#region Public properties");
-            sb.AppendLine();
+            if (options.IncludeRegions)
+            {
+                sb.AppendLine("#region Public properties");
+                sb.AppendLine();
+            }
             foreach (var p in this.Properties.Values)
             {
                 sb.AppendLine("/// <summary>");
                 sb.AppendLine("/// {0}", p.Summary);
                 sb.AppendLine("/// </summary>");
+                foreach (var a in p.Attributes)
+                {
+                    sb.AppendLine(a);
+                }
                 sb.AppendLine("public {0} {1}", p.Type, p.Name);
                 sb.AppendLine("{");
                 sb.Indent();
@@ -457,7 +474,10 @@ namespace LynxToolkit
                 sb.AppendLine("}");
                 sb.AppendLine();
             }
-            sb.AppendLine("#endregion");
+            if (options.IncludeRegions)
+            {
+                sb.AppendLine("#endregion");
+            }
             sb.Unindent();
             sb.AppendLine("}");
             if (this.EnumTypes.Count > 0)

@@ -24,6 +24,7 @@ namespace LynxToolkit
         public static string OpenForEditArguments { get; set; }
         public static string SearchPattern { get; set; }
         public static string Folder { get; set; }
+        public static bool Force { get; set; }
 
         /// <summary>
         /// The main program.
@@ -55,6 +56,9 @@ namespace LynxToolkit
                         continue;
                     case "/type":
                         SearchPattern = "*." + argx[1];
+                        continue;
+                    case "/f":
+                        Force = true;
                         continue;
                 }
 
@@ -98,7 +102,7 @@ namespace LynxToolkit
         private static void Process(string file)
         {
             var pcg = new PropertyCodeGenerator(file) { OpenForEditExecutable = OpenForEditExecutable, OpenForEditArguments = OpenForEditArguments };
-            if (pcg.IsUpToDate()) return;
+            if (pcg.IsUpToDate() && !Force) return;
             pcg.Generate();
             if (pcg.SaveIfModified())
             {
