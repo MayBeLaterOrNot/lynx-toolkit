@@ -436,6 +436,11 @@ namespace LynxToolkit
 
                 if (p.Dependencies.Count > 0 || p.PropertyChangeCallback)
                 {
+                    if (p.PropertyChangeCallback)
+                    {
+                        sb.AppendLine("var oldValue = this.{0};", p.BackingFieldName);
+                    }
+
                     sb.AppendLine("if (this.SetValue(ref {0}, value, \"{1}\"))", p.BackingFieldName, p.Name);
                     sb.AppendLine("{");
                     sb.Indent();
@@ -452,7 +457,7 @@ namespace LynxToolkit
                     }
                     if (p.PropertyChangeCallback)
                     {
-                        sb.AppendLine("this.On{0}Changed(value);", p.Name);
+                        sb.AppendLine("this.On{0}Changed(oldValue, value);", p.Name);
                     }
                     sb.Unindent();
                     sb.AppendLine("}");
