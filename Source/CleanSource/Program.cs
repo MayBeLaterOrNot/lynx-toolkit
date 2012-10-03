@@ -14,11 +14,8 @@ namespace CleanSource
     using System.Text.RegularExpressions;
 
     /// <summary>
-    /// The program.
+    /// The 'CleanSource' program.
     /// </summary>
-    /// <remarks>
-    /// Obsolete program.
-    /// </remarks>
     public static class Program
     {
         /// <summary>
@@ -27,9 +24,9 @@ namespace CleanSource
         private const string ConstructorSummarySubString = "/// Initializes a new instance of the";
 
         /// <summary>
-        /// Search for #region/#endregion lines
+        /// Expression to search for region/end region lines.
         /// </summary>
-        private static Regex regionExpression = new Regex(@"^(\s*#(?:end)?region.*?)$", RegexOptions.Compiled | RegexOptions.Multiline | RegexOptions.Singleline);
+        private static readonly Regex RegionExpression = new Regex(@"^(\s*#(?:end)?region.*?)$", RegexOptions.Compiled | RegexOptions.Multiline | RegexOptions.Singleline);
 
         /// <summary>
         /// The number of files cleaned.
@@ -41,10 +38,25 @@ namespace CleanSource
         /// </summary>
         private static int fileCount;
 
-        public static bool CleanSummary { get; set; }
-        public static bool CleanRegions { get; set; }
-        public static string OpenForEditExecutable { get; set; }
-        public static string OpenForEditArguments { get; set; }
+        /// <summary>
+        /// Clean summaries.
+        /// </summary>
+        private static bool cleanSummary;
+
+        /// <summary>
+        /// Remove regions.
+        /// </summary>
+        private static bool cleanRegions;
+
+        /// <summary>
+        /// The executable to check out files.
+        /// </summary>
+        private static string openForEditExecutable;
+
+        /// <summary>
+        /// The arguments to check out files.
+        /// </summary>
+        private static string openForEditArguments;
 
         /// <summary>
         /// The main entry point of the program.
@@ -60,21 +72,24 @@ namespace CleanSource
                 switch (argx[0].ToLower())
                 {
                     case "/cleansummary":
-                        CleanSummary = true;
+                        cleanSummary = true;
                         continue;
                     case "/cleanregions":
-                        CleanRegions = true;
+                        cleanRegions = true;
                         continue;
                     case "/scc":
                         if (string.Equals(argx[1], "p4", StringComparison.InvariantCultureIgnoreCase))
                         {
-                            OpenForEditExecutable = "p4.exe";
-                            OpenForEditArguments = "edit {0}";
+                            openForEditExecutable = "p4.exe";
+                            openForEditArguments = "edit {0}";
                         }
+
                         continue;
                 }
+
                 Scan(arg);
             }
+
             Console.WriteLine("{0} files cleaned (of {1})", filesCleaned, fileCount);
         }
 
@@ -100,19 +115,28 @@ namespace CleanSource
             bool modified = false;
 
             int end;
+
             // Remove blank lines at end of file
             // http://stylecop.soyuz5.com/SA1518.html
             for (end = input.Length - 1; end >= 0; end--)
             {
-                if (!string.IsNullOrWhiteSpace(input[end])) break;
+                if (!string.IsNullOrWhiteSpace(input[end]))
+                {
+                    break;
+                }
             }
 
             int start;
+
             // remove blank lines at start of file
             // http://stylecop.soyuz5.com/SA1517.html
-            for (start=0;start<end;start++)
+            for (start = 0; start < end; start++)
             {
-                if (!string.IsNullOrWhiteSpace(input[start])) break;
+                if (!string.IsNullOrWhiteSpace(input[start]))
+                {
+                    break;
+                }
+
                 modified = true;
             }
 
@@ -123,16 +147,21 @@ namespace CleanSource
                 var thisline = input[i];
                 var nextline = i + 1 < end ? input[i + 1] : null;
 
-                if (CleanRegions && regionExpression.Match(thisline).Success)
+                if (cleanRegions && RegionExpression.Match(thisline).Success)
                 {
                     modified = true;
-                    // skip following blank line
-                    if (string.IsNullOrWhiteSpace(nextline)) i++;
+ 
+                    // skip the following blank line
+                    if (string.IsNullOrWhiteSpace(nextline))
+                    {
+                        i++;
+                    }
+
                     continue;
                 }
 
                 // Remove duplicate lines containing "/// Initializes a new instance of the"
-                if (CleanSummary && previousLine != null && previousLine.Contains(ConstructorSummarySubString) && thisline.Contains(ConstructorSummarySubString))
+                if (cleanSummary && previousLine != null && previousLine.Contains(ConstructorSummarySubString) && thisline.Contains(ConstructorSummarySubString))
                 {
                     modified = true;
                     continue;
@@ -145,11 +174,25 @@ namespace CleanSource
                     continue;
                 }
 
+                // remove empty remarks comments
+                if (nextline != null && Regex.IsMatch(thisline, @"^\s*///\s<remarks>\s*$") && Regex.IsMatch(nextline, @"^\s*///\s</remarks>\s*$"))
+                {
+                    i++;
+                    continue;
+                }
+
                 // trim the end
                 var trimmed = thisline.TrimEnd();
-                if (!string.Equals(trimmed, thisline)) modified = true;
+                if (!string.Equals(trimmed, thisline))
+                {
+                    modified = true;
+                }
 
-                if (output.Length > 0) output.AppendLine();
+                if (output.Length > 0)
+                {
+                    output.AppendLine();
+                }
+
                 output.Append(trimmed);
                 previousLine = trimmed;
             }
@@ -157,15 +200,29 @@ namespace CleanSource
             if (modified)
             {
                 Console.WriteLine(file);
-                if (OpenForEditExecutable != null) OpenForEdit(file, OpenForEditExecutable, OpenForEditArguments);
+                if (openForEditExecutable != null)
+                {
+                    OpenForEdit(file, openForEditExecutable, openForEditArguments);
+                }
+
                 File.WriteAllText(file, output.ToString());
                 filesCleaned++;
             }
         }
 
-        public static void OpenForEdit(string filename, string exe, string argumentFormatString)
+        /// <summary>
+        /// Opens the specified file for edit.
+        /// </summary>
+        /// <param name="filename">The filename.</param>
+        /// <param name="exe">The executable.</param>
+        /// <param name="argumentFormatString">The argument format string.</param>
+        private static void OpenForEdit(string filename, string exe, string argumentFormatString)
         {
-            if (exe == null) return;
+            if (exe == null)
+            {
+                return;
+            }
+
             var psi = new ProcessStartInfo(exe, string.Format(argumentFormatString, filename)) { CreateNoWindow = true, WindowStyle = ProcessWindowStyle.Hidden };
             var p = Process.Start(psi);
             p.WaitForExit();
