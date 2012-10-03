@@ -1,17 +1,14 @@
 ﻿//-----------------------------------------------------------------------
-// <copyright file="Program.cs" company="LynxToolkit">
+// <copyright file="Program.cs" company="Lynx">
 //     Copyright © LynxToolkit. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
 
-namespace LynxToolkit
+namespace PropertyCG
 {
     using System;
     using System.Diagnostics;
     using System.IO;
-    using System.Reflection;
-    using System.Text;
-    using System.Text.RegularExpressions;
 
     /// <summary>
     ///   The main program.
@@ -36,7 +33,7 @@ namespace LynxToolkit
         {
             var stopwatch = Stopwatch.StartNew();
 
-            Console.WriteLine(Application.Header);
+            Console.WriteLine(LynxToolkit.Application.Header);
 
             SearchPattern = "*.oml";
             Folder = ".";
@@ -71,14 +68,21 @@ namespace LynxToolkit
                 OpenForEditArguments = "edit {0}";
             }
 
-            if (!Folder.EndsWith("\\")) Folder += "\\";
+            if (!Folder.EndsWith("\\"))
+            {
+                Folder += "\\";
+            }
 
             Console.WriteLine("  Searching for {0} files in {1} and sub-folders.", SearchPattern, Folder);
             Console.WriteLine();
 
             Search(Folder, SearchPattern, Process);
             Search(Folder, "*.csproj", ProcessProject);
-            if (filesChanged + projectsChanged > 0) Console.WriteLine();
+            if (filesChanged + projectsChanged > 0)
+            {
+                Console.WriteLine();
+            }
+
             Console.WriteLine("  {0} files changed.", filesChanged);
             Console.WriteLine("  {0} projects changed.", projectsChanged);
             Console.WriteLine();
@@ -95,18 +99,25 @@ namespace LynxToolkit
             {
                 process(file);
             }
+
             foreach (var dir in Directory.GetDirectories(folder))
+            {
                 Search(dir, searchPattern, process);
+            }
         }
 
         private static void Process(string file)
         {
             var pcg = new PropertyCodeGenerator(file) { OpenForEditExecutable = OpenForEditExecutable, OpenForEditArguments = OpenForEditArguments };
-            if (pcg.IsUpToDate() && !Force) return;
+            if (pcg.IsUpToDate() && !Force)
+            {
+                return;
+            }
+
             pcg.Generate();
             if (pcg.SaveIfModified())
             {
-                Console.WriteLine("  " + pcg.PropertiesFileName.Replace(Folder, ""));
+                Console.WriteLine("  " + pcg.PropertiesFileName.Replace(Folder, string.Empty));
                 filesChanged++;
             }
         }
@@ -117,7 +128,7 @@ namespace LynxToolkit
             var pcg = new ProjectUpdater(file, ext) { OpenForEditExecutable = OpenForEditExecutable, OpenForEditArguments = OpenForEditArguments };
             if (pcg.Update())
             {
-                Console.WriteLine("  " + file.Replace(Folder, ""));
+                Console.WriteLine("  " + file.Replace(Folder, string.Empty));
                 projectsChanged++;
             }
         }

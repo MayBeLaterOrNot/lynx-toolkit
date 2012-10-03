@@ -1,13 +1,12 @@
 ﻿//-----------------------------------------------------------------------
-// <copyright file="Program.cs" company="LynxToolkit">
+// <copyright file="Program.cs" company="Lynx">
 //     Copyright © LynxToolkit. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
 
-namespace LynxToolkit
+namespace CleanSource
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
@@ -53,7 +52,7 @@ namespace LynxToolkit
         /// <param name="args">The args.</param>
         private static void Main(string[] args)
         {
-            Console.WriteLine(Application.Header);
+            Console.WriteLine(LynxToolkit.Application.Header);
 
             foreach (var arg in args)
             {

@@ -1,16 +1,16 @@
-﻿namespace LynxToolkit
+﻿namespace CodeplexReleaseUploader
 {
     using System;
     using System.Collections.Generic;
     using System.IO;
 
-    using global::CodeplexReleaseUploader.Codeplex.Services;
+    using Codeplex.Services;
 
     class Program
     {
         static void Main(string[] args)
         {
-            Console.WriteLine(Application.Header);
+            Console.WriteLine(LynxToolkit.Application.Header);
 
             var rs = new ReleaseServiceSoapClient();
             string projectName = null;

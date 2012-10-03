@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace LynxToolkit
+namespace SolutionInfo
 {
     using System.IO;
     using System.Linq;
@@ -12,7 +12,7 @@ namespace LynxToolkit
     {
         static void Main(string[] args)
         {
-            Console.WriteLine(Application.Header);
+            Console.WriteLine(LynxToolkit.Application.Header);
 
             var clean = false;
             foreach (var arg in args)

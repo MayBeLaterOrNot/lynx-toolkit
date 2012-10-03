@@ -45,8 +45,20 @@
     <Compile Include="..\GlobalAssemblyInfo.cs">
       <Link>Properties\GlobalAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="..\PropertyCG\EnumType.cs">
+      <Link>EnumType.cs</Link>
+    </Compile>
+    <Compile Include="..\PropertyCG\Property.cs">
+      <Link>Property.cs</Link>
+    </Compile>
+    <Compile Include="..\PropertyCG\PropertyClassModel.cs">
+      <Link>PropertyClassModel.cs</Link>
+    </Compile>
     <Compile Include="..\PropertyCG\PropertyCodeGenerator.cs">
       <Link>PropertyCodeGenerator.cs</Link>
+    </Compile>
+    <Compile Include="..\PropertyCG\StringBuilderEx.cs">
+      <Link>StringBuilderEx.cs</Link>
     </Compile>
     <Compile Include="GenerateCodeTask.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -1,10 +1,10 @@
 ﻿//-----------------------------------------------------------------------
-// <copyright file="Program.cs" company="LynxToolkit">
+// <copyright file="Program.cs" company="Lynx">
 //     Copyright © LynxToolkit. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
 
-namespace LynxToolkit
+namespace WikiToHtml
 {
     using System;
     using System.Linq;
@@ -24,7 +24,7 @@ namespace LynxToolkit
 
         private static void Main(string[] args)
         {
-            Console.WriteLine(Application.Header);
+            Console.WriteLine(LynxToolkit.Application.Header);
 
             if (args.Length == 0)
             {

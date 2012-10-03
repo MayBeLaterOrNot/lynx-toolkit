@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------
-// <copyright file="Program.cs" company="LynxToolkit">
+// <copyright file="Program.cs" company="Lynx">
 //     Copyright © LynxToolkit. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
@@ -7,7 +7,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace LynxToolkit
+namespace FindObsoleteFiles
 {
     using System.IO;
     using System.Text.RegularExpressions;
@@ -18,7 +18,7 @@ namespace LynxToolkit
     {
         static void Main(string[] args)
         {
-            Console.WriteLine(Application.Header);
+            Console.WriteLine(LynxToolkit.Application.Header);
 
             foreach (var arg in args)
             {

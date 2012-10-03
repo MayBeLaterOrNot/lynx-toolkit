@@ -1,10 +1,10 @@
 ﻿//-----------------------------------------------------------------------
-// <copyright file="Program.cs" company="LynxToolkit">
+// <copyright file="Program.cs" company="Lynx">
 //     Copyright © LynxToolkit. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
 
-namespace LynxToolkit
+namespace ReplaceTool
 {
     using System;
     using System.IO;
@@ -46,7 +46,7 @@ namespace LynxToolkit
         /// </param>
         public static void Main(string[] args)
         {
-            Console.WriteLine(Application.Header);
+            Console.WriteLine(LynxToolkit.Application.Header);
 
             ValidTextFileTypes = ".cs .xml .xaml .sln .csproj .DotSettings .user .StyleCop .txt .cmd";
 

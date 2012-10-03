@@ -1,10 +1,10 @@
 //-----------------------------------------------------------------------
-// <copyright file="Program.cs" company="LynxToolkit">
+// <copyright file="Program.cs" company="Lynx">
 //     Copyright © LynxToolkit. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
 
-namespace LynxToolkit
+namespace WikiTable
 {
     using System;
     using System.Text;
@@ -15,7 +15,7 @@ namespace LynxToolkit
         [STAThread]
         private static int Main(string[] args)
         {
-            Console.WriteLine(Application.Header);
+            Console.WriteLine(LynxToolkit.Application.Header);
             var input = Clipboard.GetText();
             if (string.IsNullOrWhiteSpace(input))
             {

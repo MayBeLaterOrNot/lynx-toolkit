@@ -1,11 +1,10 @@
 //-----------------------------------------------------------------------
-// <copyright file="Program.cs" company="LynxToolkit">
+// <copyright file="Program.cs" company="Lynx">
 //     Copyright © LynxToolkit. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
 
-
-namespace LynxToolkit
+namespace VersionUpdater
 {
     using System;
     using System.Collections.Generic;
@@ -37,7 +36,7 @@ namespace LynxToolkit
     {
         private static void Main(string[] args)
         {
-            Console.WriteLine(Application.Header);
+            Console.WriteLine(LynxToolkit.Application.Header);
 
             // default parameters
             string version = "yyyy.MM.*";

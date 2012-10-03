@@ -1,4 +1,4 @@
-namespace LynxToolkit
+namespace PropertyCG
 {
     using System;
     using System.IO;

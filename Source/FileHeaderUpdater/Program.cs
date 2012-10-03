@@ -1,21 +1,20 @@
 //-----------------------------------------------------------------------
-// <copyright file="Program.cs" company="LynxToolkit">
+// <copyright file="Program.cs" company="Lynx">
 //     Copyright © LynxToolkit. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Text;
-
-namespace LynxToolkit
+namespace FileHeaderUpdater
 {
+    using System;
     using System.IO;
+    using System.Text;
 
     class Program
     {
         static void Main(string[] args)
         {
-            Console.WriteLine(Application.Header);
+            Console.WriteLine(LynxToolkit.Application.Header);
 
             string company = null;
             string copyright = null;

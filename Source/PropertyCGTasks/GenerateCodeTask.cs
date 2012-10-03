@@ -1,12 +1,11 @@
-﻿using System;
-
+﻿
 namespace PropertyCGTasks
 {
+    using System;
     using System.Diagnostics;
     using System.IO;
     using System.Text;
-
-    using LynxToolkit;
+    using PropertyCG;
 
     using Microsoft.Build.Framework;
     using Microsoft.Build.Utilities;
@@ -67,11 +66,11 @@ namespace PropertyCGTasks
         {
             Console.SetOut(new LogWriter(this));
             var stopwatch = Stopwatch.StartNew();
-            this.LogMessage(Application.Header);
+            this.LogMessage(LynxToolkit.Application.Header);
             try
             {
                 this.LogMessage("  " + Environment.CurrentDirectory);
-                this.SearchDirectory(Folder);
+                this.SearchDirectory(this.Folder);
             }
             catch (Exception exception)
             {
