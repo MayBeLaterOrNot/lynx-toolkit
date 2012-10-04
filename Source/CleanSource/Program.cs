@@ -1,6 +1,6 @@
 ﻿//-----------------------------------------------------------------------
 // <copyright file="Program.cs" company="Lynx">
-//     Copyright © LynxToolkit. All rights reserved.
+//     Copyright © Lynx Toolkit.
 // </copyright>
 //-----------------------------------------------------------------------
 
@@ -178,6 +178,11 @@ namespace CleanSource
                 if (nextline != null && Regex.IsMatch(thisline, @"^\s*///\s<remarks>\s*$") && Regex.IsMatch(nextline, @"^\s*///\s</remarks>\s*$"))
                 {
                     i++;
+                    continue;
+                }
+                
+                if (Regex.IsMatch(thisline,@"^\s*///\s*<remarks>\s*</remarks>\s*$"))
+                {
                     continue;
                 }
 
