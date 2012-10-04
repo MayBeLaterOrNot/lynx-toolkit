@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------
 // <copyright file="AssemblyInfo.cs" company="Lynx">
-//     Copyright © LynxToolkit. All rights reserved.
+//     Copyright © Lynx Toolkit.
 // </copyright>
 //-----------------------------------------------------------------------
 

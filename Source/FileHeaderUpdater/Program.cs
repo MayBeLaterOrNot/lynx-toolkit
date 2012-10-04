@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------
 // <copyright file="Program.cs" company="Lynx">
-//     Copyright © LynxToolkit. All rights reserved.
+//     Copyright © Lynx Toolkit.
 // </copyright>
 //-----------------------------------------------------------------------
 
@@ -41,7 +41,7 @@ namespace FileHeaderUpdater
                         break;
                 }
             }
-            if (copyright == null && company != null) copyright = string.Format("Copyright © {0}. All rights reserved.", company);
+            if (copyright == null && company != null) copyright = string.Format("Copyright © {0}.", company);
 
             var updater = new Updater(copyright, company, exclude);
 
