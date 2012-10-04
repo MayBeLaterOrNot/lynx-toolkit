@@ -45,6 +45,7 @@
       <Link>Properties\GlobalAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="EnumType.cs" />
+    <Compile Include="IPropertyCodeGeneratorOptions.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="ProjectUpdater.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

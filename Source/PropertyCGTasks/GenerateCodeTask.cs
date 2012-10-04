@@ -5,10 +5,11 @@ namespace PropertyCGTasks
     using System.Diagnostics;
     using System.IO;
     using System.Text;
-    using PropertyCG;
 
     using Microsoft.Build.Framework;
     using Microsoft.Build.Utilities;
+
+    using PropertyCG;
 
     // Issues
     // - log messages not visible?
@@ -98,7 +99,7 @@ namespace PropertyCGTasks
         private void Process(string file)
         {
             var cg = new PropertyCodeGenerator(file);
-            cg.Generate();
+            cg.GenerateModel();
             var modified = cg.SaveIfModified();
             this.LogMessage("  " + (modified ? "UPDATED: " : "") + file);
         }

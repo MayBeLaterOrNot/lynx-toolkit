@@ -1,6 +1,6 @@
 ﻿//-----------------------------------------------------------------------
 // <copyright file="Program.cs" company="Lynx">
-//     Copyright © LynxToolkit. All rights reserved.
+//     Copyright © Lynx Toolkit.
 // </copyright>
 //-----------------------------------------------------------------------
 
@@ -114,7 +114,7 @@ namespace PropertyCG
                 return;
             }
 
-            pcg.Generate();
+            pcg.GenerateModel();
             if (pcg.SaveIfModified())
             {
                 Console.WriteLine("  " + pcg.PropertiesFileName.Replace(Folder, string.Empty));

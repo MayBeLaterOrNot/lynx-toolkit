@@ -1,22 +1,52 @@
+// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="Property.cs" company="Lynx">
+//   Copyright © Lynx Toolkit.
+// </copyright>
+// <summary>
+//   The property.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
 namespace PropertyCG
 {
     using System.Collections.Generic;
     using System.Globalization;
     using System.Text;
 
+    /// <summary>
+    /// The property.
+    /// </summary>
     public class Property
     {
-        public bool IsReference { get; set; }
-        public string Type { get; private set; }
-        public string Name { get; private set; }
-        public string Description { get; private set; }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Property"/> class.
+        /// </summary>
+        /// <param name="type">
+        /// The type.
+        /// </param>
+        /// <param name="name">
+        /// The name.
+        /// </param>
+        /// <param name="attributes">
+        /// The attributes.
+        /// </param>
+        /// <param name="description">
+        /// The description.
+        /// </param>
+        public Property(string type, string name, IEnumerable<string> attributes, string description)
+        {
+            this.Type = type;
+            this.Name = name;
+            this.Description = description;
+            this.Dependencies = new List<string>();
+            this.Attributes = new List<string>(attributes);
+        }
 
-        public IList<string> Dependencies { get; private set; }
+        /// <summary>
+        /// Gets the attributes.
+        /// </summary>
+        /// <value>The attributes.</value>
         public IList<string> Attributes { get; private set; }
-
-        public bool ReadOnly { get; set; }
-        public bool PropertyChangeCallback { get; set; }
-        public bool ValidateCallback { get; set; }
 
         /// <summary>
         /// Gets the name of the backing field.
@@ -29,6 +59,77 @@ namespace PropertyCG
                 return this.Name[0].ToString(CultureInfo.InvariantCulture).ToLower() + this.Name.Substring(1);
             }
         }
+
+        /// <summary>
+        /// Gets the dependencies.
+        /// </summary>
+        /// <value>The dependencies.</value>
+        public IList<string> Dependencies { get; private set; }
+
+        /// <summary>
+        /// Gets the description.
+        /// </summary>
+        /// <value>The description.</value>
+        public string Description { get; private set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this instance is reference.
+        /// </summary>
+        /// <value><c>true</c> if this instance is reference; otherwise, <c>false</c>.</value>
+        public bool IsReference { get; set; }
+
+        /// <summary>
+        /// Gets the name.
+        /// </summary>
+        /// <value>The name.</value>
+        public string Name { get; private set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether a property change callback should be included.
+        /// </summary>
+        public bool PropertyChangeCallback { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the property is read only.
+        /// </summary>
+        /// <value><c>true</c> if [read only]; otherwise, <c>false</c>.</value>
+        public bool ReadOnly { get; set; }
+
+        /// <summary>
+        /// Gets the summary description.
+        /// </summary>
+        /// <value>The summary.</value>
+        public string Summary
+        {
+            get
+            {
+                string description = string.IsNullOrEmpty(this.Description)
+                                         ? this.GetDescription(this.Name)
+                                         : this.Description;
+                string longDescription;
+                if (this.Type == "bool")
+                {
+                    longDescription = "a value indicating whether the " + description + " should be on or off";
+                }
+                else
+                {
+                    longDescription = "the " + description;
+                }
+
+                return string.Format(this.ReadOnly ? "Gets {0}." : "Gets or sets {0}.", longDescription);
+            }
+        }
+
+        /// <summary>
+        /// Gets the type.
+        /// </summary>
+        /// <value>The type.</value>
+        public string Type { get; private set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether a validate callback should be included.
+        /// </summary>
+        public bool ValidateCallback { get; set; }
 
         /// <summary>
         /// Gets the descriptive name of a property.
@@ -90,33 +191,6 @@ namespace PropertyCG
         private char ToLower(char p0)
         {
             return p0.ToString(CultureInfo.InvariantCulture).ToLower()[0];
-        }
-        public string Summary
-        {
-            get
-            {
-                string description = string.IsNullOrEmpty(this.Description) ? this.GetDescription(this.Name) : this.Description;
-                string longDescription;
-                if (this.Type == "bool")
-                {
-                    longDescription = "a value indicating whether the " + description + " should be on or off";
-                }
-                else
-                {
-                    longDescription = "the " + description;
-                }
-
-                return string.Format(this.ReadOnly ? "Gets {0}." : "Gets or sets {0}.", longDescription);
-            }
-        }
-
-        public Property(string type, string name, IEnumerable<string> attributes, string description)
-        {
-            this.Type = type;
-            this.Name = name;
-            this.Description = description;
-            this.Dependencies = new List<string>();
-            this.Attributes = new List<string>(attributes);
         }
     }
 }

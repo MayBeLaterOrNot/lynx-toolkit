@@ -20,10 +20,17 @@ namespace PropertyCG
         {
             this.indent = this.indent.Substring(4);
         }
+
         public void Append(object s)
         {
             this.sb.Append(s);
         }
+
+        public void AppendFormat(string format, params object[] args)
+        {
+            this.sb.AppendFormat(format, args);
+        }
+
         public void AppendLine(string format = null, params object[] args)
         {
             if (format != null)

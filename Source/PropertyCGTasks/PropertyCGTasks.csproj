@@ -48,6 +48,9 @@
     <Compile Include="..\PropertyCG\EnumType.cs">
       <Link>EnumType.cs</Link>
     </Compile>
+    <Compile Include="..\PropertyCG\IPropertyCodeGeneratorOptions.cs">
+      <Link>IPropertyCodeGeneratorOptions.cs</Link>
+    </Compile>
     <Compile Include="..\PropertyCG\Property.cs">
       <Link>Property.cs</Link>
     </Compile>
