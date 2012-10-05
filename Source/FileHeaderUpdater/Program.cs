@@ -12,6 +12,8 @@ namespace FileHeaderUpdater
     using System.Text;
     using System.Text.RegularExpressions;
 
+    using LynxToolkit;
+
     internal class Program
     {
         /// <summary>
@@ -24,15 +26,32 @@ namespace FileHeaderUpdater
         /// </summary>
         private static string openForEditArguments;
 
+        /// <summary>
+        /// Determines whether to replace copyright symbol (C) or not.
+        /// </summary>
         private static bool replaceSymbol;
 
+        /// <summary>
+        /// The number of files cleaned.
+        /// </summary>
+        private static int filesCleaned;
+
+        /// <summary>
+        /// The number of files scanned.
+        /// </summary>
+        private static int fileCount;
+
+        /// <summary>
+        /// Defines the entry point of the application.
+        /// </summary>
+        /// <param name="args">The args.</param>
         private static void Main(string[] args)
         {
             Console.WriteLine(LynxToolkit.Application.Header);
 
             string company = null;
             string copyright = null;
-            string exclude = "AssemblyInfo.cs Packages .Designer.cs obj bin";
+            var exclude = "AssemblyInfo.cs Packages *.Designer.cs obj bin _*";
             string directory = Directory.GetCurrentDirectory();
 
             // command line argument parsing
@@ -71,6 +90,8 @@ namespace FileHeaderUpdater
 
                 var updater = new Updater(copyright, company, exclude);
                 updater.ScanFolder(directory);
+
+                Console.WriteLine("{0} files updated (of {1})", filesCleaned, fileCount);
             }
         }
 
@@ -102,36 +123,32 @@ namespace FileHeaderUpdater
 
             public void ScanFolder(string path)
             {
-                Log(path);
+                if (Utilities.IsExcluded(Exclude, path))
+                {
+                    return;
+                }
+
                 foreach (string file in Directory.GetFiles(path, "*.cs"))
                 {
-                    if (!IsExcluded(file))
-                    {
-                        Log("  " + Path.GetFileName(file));
-                        UpdateFile(file);
-                    }
-                    else
-                    {
-                        Log("  " + Path.GetFileName(file) + " excluded.");
-                    }
+                    this.UpdateFile(file);
                 }
 
-                foreach (string dir in Directory.GetDirectories(path)) if (!IsExcluded(dir)) ScanFolder(dir);
-            }
-
-            private bool IsExcluded(string path)
-            {
-                var name = Path.GetFileName(path);
-                foreach (var item in Exclude.Split(' '))
+                foreach (var dir in Directory.GetDirectories(path))
                 {
-                    if (string.IsNullOrWhiteSpace(item)) continue;
-                    if (name.ToLower().Contains(item.ToLower())) return true;
+                    this.ScanFolder(dir);
                 }
-                return false;
             }
 
+
+            private const string rulerComment =
+                "// --------------------------------------------------------------------------------------------------------------------";
             private void UpdateFile(string file)
             {
+                if (Utilities.IsExcluded(Exclude, file))
+                {
+                    return;
+                }
+
                 var fileName = Path.GetFileName(file);
                 var input = File.ReadAllText(file);
                 var summaryMatch = Regex.Match(
@@ -145,24 +162,23 @@ namespace FileHeaderUpdater
                 }
 
                 var sb = new StringBuilder();
+                sb.AppendLine(rulerComment);
+                sb.AppendFormat("// <copyright file=\"{0}\" company=\"{1}\">", fileName, this.Company);
+                sb.AppendLine();
+                sb.AppendFormat("//   {0}", this.Copyright);
+                sb.AppendLine();
+                sb.AppendLine("// </copyright>");
+                if (!string.IsNullOrWhiteSpace(summary))
+                {
+                    sb.AppendLine("// <summary>");
+                    sb.AppendLine(summary);
+                    sb.AppendLine("// </summary>");
+                }
+
+                sb.AppendLine(rulerComment);
+
                 using (var r = new StreamReader(file))
                 {
-                    sb.AppendLine(
-                        "// --------------------------------------------------------------------------------------------------------------------");
-                    sb.AppendFormat("// <copyright file=\"{0}\" company=\"{1}\">", fileName, this.Company);
-                    sb.AppendLine();
-                    sb.AppendFormat("//   {0}", this.Copyright);
-                    sb.AppendLine();
-                    sb.AppendLine("// </copyright>");
-                    if (!string.IsNullOrWhiteSpace(summary))
-                    {
-                        sb.AppendLine("// <summary>");
-                        sb.AppendLine(summary);
-                        sb.AppendLine("// </summary>");
-                    }
-                    sb.AppendLine(
-                        "// --------------------------------------------------------------------------------------------------------------------");
-                    sb.AppendLine();
                     bool isHeader = true;
                     while (!r.EndOfStream)
                     {
@@ -179,6 +195,7 @@ namespace FileHeaderUpdater
                     }
                 }
 
+                fileCount++;
                 var output = sb.ToString().Trim();
                 var original = File.ReadAllText(file);
                 if (string.Equals(original, output))
@@ -186,26 +203,11 @@ namespace FileHeaderUpdater
                     return;
                 }
 
-                OpenForEdit(file, openForEditExecutable, openForEditArguments);
+                this.Log("  " + file);
+                Utilities.OpenForEdit(file, openForEditExecutable, openForEditArguments);
                 File.WriteAllText(file, output, Encoding.UTF8);
-            }
 
-            /// <summary>
-            /// Opens the specified file for edit.
-            /// </summary>
-            /// <param name="filename">The filename.</param>
-            /// <param name="exe">The executable.</param>
-            /// <param name="argumentFormatString">The argument format string.</param>
-            private static void OpenForEdit(string filename, string exe, string argumentFormatString)
-            {
-                if (exe == null)
-                {
-                    return;
-                }
-
-                var psi = new ProcessStartInfo(exe, string.Format(argumentFormatString, filename)) { CreateNoWindow = true, WindowStyle = ProcessWindowStyle.Hidden };
-                var p = Process.Start(psi);
-                p.WaitForExit();
+                filesCleaned++;
             }
 
             private void Log(string msg)

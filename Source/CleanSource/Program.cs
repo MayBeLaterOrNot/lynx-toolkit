@@ -7,11 +7,12 @@
 namespace CleanSource
 {
     using System;
-    using System.Diagnostics;
     using System.IO;
     using System.Linq;
     using System.Text;
     using System.Text.RegularExpressions;
+
+    using LynxToolkit;
 
     /// <summary>
     /// The 'CleanSource' program.
@@ -59,12 +60,19 @@ namespace CleanSource
         private static string openForEditArguments;
 
         /// <summary>
+        /// The exclude.
+        /// </summary>
+        private static string exclude;
+
+        /// <summary>
         /// The main entry point of the program.
         /// </summary>
         /// <param name="args">The args.</param>
         private static void Main(string[] args)
         {
-            Console.WriteLine(LynxToolkit.Application.Header);
+            Console.WriteLine(Application.Header);
+
+            exclude = "AssemblyInfo.cs Packages *.Designer.cs obj bin _*";
 
             foreach (var arg in args)
             {
@@ -99,6 +107,11 @@ namespace CleanSource
         /// <param name="directory">The directory.</param>
         private static void Scan(string directory)
         {
+            if (Utilities.IsExcluded(exclude, directory))
+            {
+                return;
+            }
+
             Directory.GetDirectories(directory).ToList().ForEach(Scan);
             Directory.GetFiles(directory, "*.cs").ToList().ForEach(Clean);
         }
@@ -109,6 +122,11 @@ namespace CleanSource
         /// <param name="file">The file.</param>
         private static void Clean(string file)
         {
+            if (Utilities.IsExcluded(exclude, file))
+            {
+                return;
+            }
+
             fileCount++;
             var input = File.ReadAllLines(file);
             var output = new StringBuilder();
@@ -207,30 +225,12 @@ namespace CleanSource
                 Console.WriteLine(file);
                 if (openForEditExecutable != null)
                 {
-                    OpenForEdit(file, openForEditExecutable, openForEditArguments);
+                    Utilities.OpenForEdit(file, openForEditExecutable, openForEditArguments);
                 }
 
                 File.WriteAllText(file, output.ToString(), Encoding.UTF8);
                 filesCleaned++;
             }
-        }
-
-        /// <summary>
-        /// Opens the specified file for edit.
-        /// </summary>
-        /// <param name="filename">The filename.</param>
-        /// <param name="exe">The executable.</param>
-        /// <param name="argumentFormatString">The argument format string.</param>
-        private static void OpenForEdit(string filename, string exe, string argumentFormatString)
-        {
-            if (exe == null)
-            {
-                return;
-            }
-
-            var psi = new ProcessStartInfo(exe, string.Format(argumentFormatString, filename)) { CreateNoWindow = true, WindowStyle = ProcessWindowStyle.Hidden };
-            var p = Process.Start(psi);
-            p.WaitForExit();
         }
     }
 }
