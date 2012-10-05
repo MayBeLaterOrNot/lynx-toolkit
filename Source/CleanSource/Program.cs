@@ -150,7 +150,7 @@ namespace CleanSource
                 if (cleanRegions && RegionExpression.Match(thisline).Success)
                 {
                     modified = true;
- 
+
                     // skip the following blank line
                     if (string.IsNullOrWhiteSpace(nextline))
                     {
@@ -180,8 +180,8 @@ namespace CleanSource
                     i++;
                     continue;
                 }
-                
-                if (Regex.IsMatch(thisline,@"^\s*///\s*<remarks>\s*</remarks>\s*$"))
+
+                if (Regex.IsMatch(thisline, @"^\s*///\s*<remarks>\s*</remarks>\s*$"))
                 {
                     continue;
                 }
@@ -210,7 +210,7 @@ namespace CleanSource
                     OpenForEdit(file, openForEditExecutable, openForEditArguments);
                 }
 
-                File.WriteAllText(file, output.ToString());
+                File.WriteAllText(file, output.ToString(), Encoding.UTF8);
                 filesCleaned++;
             }
         }

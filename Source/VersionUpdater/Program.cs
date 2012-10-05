@@ -32,7 +32,7 @@ namespace VersionUpdater
     // See also
     // http://www.codeproject.com/KB/XML/vrt.aspx
 
-    class Program
+    internal class Program
     {
         private static void Main(string[] args)
         {
@@ -85,153 +85,142 @@ namespace VersionUpdater
 
             updater.ScanFolder(directory);
         }
-    }
 
-    public class Updater
-    {
-        public Updater(string version, string informationalVersion, string copyright, string company)
+        public class Updater
         {
-            Copyright = copyright;
-            Company = company;
-
-            version = version.Replace("yyyy", DateTime.Now.Year.ToString(CultureInfo.InvariantCulture));
-            version = version.Replace("MM", DateTime.Now.Month.ToString(CultureInfo.InvariantCulture));
-            version = version.Replace("dd", DateTime.Now.Day.ToString(CultureInfo.InvariantCulture));
-
-            version = To16BitVersionNumbers(version);
-            Version = version;
-            InformationalVersion = informationalVersion ?? version;
-
-            string nuSpecVersion = version.Replace(".*", ".0");
-
-            FileVersion = nuSpecVersion;
-
-            NuSpecReplacements = new Dictionary<Regex, string>
-                                     {
-                                         {
-                                             new Regex(@"<version>.*</version>"),
-                                             string.Format(@"<version>{0}</version>", nuSpecVersion)
-                                             }
-                                     };
-            AssemblyInfoReplacements = new Dictionary<Regex, string>
-                                           {
-                                               {
-                                                   new Regex(@"AssemblyVersion\(.*\)"),
-                                                   string.Format("AssemblyVersion(\"{0}\")", Version)
-                                                   },
-                                               {
-                                                   new Regex(@"AssemblyInformationalVersion\(.*\)"),
-                                                   string.Format("AssemblyInformationalVersion(\"{0}\")", InformationalVersion)
-                                                   },
-                                               {
-                                                   new Regex(@"AssemblyFileVersion\(.*\)"),
-                                                   string.Format("AssemblyFileVersion(\"{0}\")", FileVersion)
-                                                   }
-                                           };
-            if (Company != null)
+            public Updater(string version, string informationalVersion, string copyright, string company)
             {
-                AssemblyInfoReplacements.Add(new Regex(@"AssemblyCompany\(.*\)"), string.Format("AssemblyCompany(\"{0}\")", Company));
-            }
+                Copyright = copyright;
+                Company = company;
 
-            if (Copyright != null)
-            {
-                AssemblyInfoReplacements.Add(new Regex(@"AssemblyCopyright\(.*\)"),
-                                             string.Format("AssemblyCopyright(\"{0}\")", Copyright));
-            }
-        }
+                version = version.Replace("yyyy", DateTime.Now.Year.ToString(CultureInfo.InvariantCulture));
+                version = version.Replace("MM", DateTime.Now.Month.ToString(CultureInfo.InvariantCulture));
+                version = version.Replace("dd", DateTime.Now.Day.ToString(CultureInfo.InvariantCulture));
 
-        /// <summary>
-        /// Modifies the version numbers to be within 16-bit boundaries.
-        /// </summary>
-        /// <param name="version">The version.</param>
-        /// <returns>The modified version number.</returns>
-        private static string To16BitVersionNumbers(string version)
-        {
-            var vs = version.Split('.');
-            var sb = new StringBuilder();
-            foreach (var s in vs)
-            {
-                if (sb.Length > 0)
+                version = To16BitVersionNumbers(version);
+                Version = version;
+                InformationalVersion = informationalVersion ?? version;
+
+                string nuSpecVersion = version.Replace(".*", ".0");
+
+                FileVersion = nuSpecVersion;
+
+                NuSpecReplacements = new Dictionary<Regex, string> { { new Regex(@"<version>.*</version>"), string.Format(@"<version>{0}</version>", nuSpecVersion) } };
+                AssemblyInfoReplacements = new Dictionary<Regex, string>
+                    {
+                        { new Regex(@"AssemblyVersion\(.*\)"), string.Format("AssemblyVersion(\"{0}\")", Version) },
+                        {
+                            new Regex(@"AssemblyInformationalVersion\(.*\)"),
+                            string.Format("AssemblyInformationalVersion(\"{0}\")", InformationalVersion)
+                        },
+                        {
+                            new Regex(@"AssemblyFileVersion\(.*\)"),
+                            string.Format("AssemblyFileVersion(\"{0}\")", FileVersion)
+                        }
+                    };
+                if (Company != null)
                 {
-                    sb.Append(".");
+                    AssemblyInfoReplacements.Add(
+                        new Regex(@"AssemblyCompany\(.*\)"), string.Format("AssemblyCompany(\"{0}\")", Company));
                 }
 
-                long i;
-                if (long.TryParse(s, out i) || long.TryParse(s, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out i))
+                if (Copyright != null)
                 {
-                    if (i > 65534)
+                    AssemblyInfoReplacements.Add(
+                        new Regex(@"AssemblyCopyright\(.*\)"), string.Format("AssemblyCopyright(\"{0}\")", Copyright));
+                }
+            }
+
+            /// <summary>
+            /// Modifies the version numbers to be within 16-bit boundaries.
+            /// </summary>
+            /// <param name="version">The version.</param>
+            /// <returns>The modified version number.</returns>
+            private static string To16BitVersionNumbers(string version)
+            {
+                var vs = version.Split('.');
+                var sb = new StringBuilder();
+                foreach (var s in vs)
+                {
+                    if (sb.Length > 0)
                     {
-                        // only use the last 4 digts
-                        i = i % 10000;
+                        sb.Append(".");
                     }
 
-                    sb.Append(i);
+                    long i;
+                    if (long.TryParse(s, out i)
+                        || long.TryParse(s, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out i))
+                    {
+                        if (i > 65534)
+                        {
+                            // only use the last 4 digts
+                            i = i % 10000;
+                        }
+
+                        sb.Append(i);
+                    }
+                    else
+                    {
+                        sb.Append(s);
+                    }
                 }
-                else
+
+                return sb.ToString();
+            }
+
+            public string Copyright { get; set; }
+
+            public string Company { get; set; }
+
+            public string Version { get; set; }
+
+            public string InformationalVersion { get; set; }
+
+            public string FileVersion { get; set; }
+
+            public Dictionary<Regex, string> NuSpecReplacements { get; set; }
+
+            public Dictionary<Regex, string> AssemblyInfoReplacements { get; set; }
+
+            public void ScanFolder(string path)
+            {
+                foreach (string file in Directory.GetFiles(path, "*AssemblyInfo.cs"))
                 {
-                    sb.Append(s);
+                    UpdateFile(file, AssemblyInfoReplacements);
                 }
-            }
 
-            return sb.ToString();
-        }
-
-        public string Copyright { get; set; }
-
-        public string Company { get; set; }
-
-        public string Version { get; set; }
-
-        public string InformationalVersion { get; set; }
-
-        public string FileVersion { get; set; }
-
-        public Dictionary<Regex, string> NuSpecReplacements { get; set; }
-
-        public Dictionary<Regex, string> AssemblyInfoReplacements { get; set; }
-
-        public void ScanFolder(string path)
-        {
-            foreach (string file in Directory.GetFiles(path, "*AssemblyInfo.cs"))
-            {
-                UpdateFile(file, AssemblyInfoReplacements);
-            }
-
-            foreach (string file in Directory.GetFiles(path, "*.nuspec"))
-            {
-                UpdateFile(file, NuSpecReplacements);
-            }
-
-            foreach (string dir in Directory.GetDirectories(path))
-                ScanFolder(dir);
-        }
-
-        private void UpdateFile(string file, Dictionary<Regex, string> replacements)
-        {
-            string text;
-            using (var sr = new StreamReader(file))
-            {
-                text = sr.ReadToEnd();
-
-                foreach (var kvp in replacements)
+                foreach (string file in Directory.GetFiles(path, "*.nuspec"))
                 {
-                    Regex regex = kvp.Key;
-                    string replacement = kvp.Value;
-                    text = regex.Replace(text, replacement);
+                    UpdateFile(file, NuSpecReplacements);
                 }
+
+                foreach (string dir in Directory.GetDirectories(path)) ScanFolder(dir);
             }
 
-            using (var sw = new StreamWriter(file))
+            private void UpdateFile(string file, Dictionary<Regex, string> replacements)
             {
-                sw.Write(text);
+                string text;
+                using (var sr = new StreamReader(file))
+                {
+                    text = sr.ReadToEnd();
+
+                    foreach (var kvp in replacements)
+                    {
+                        Regex regex = kvp.Key;
+                        string replacement = kvp.Value;
+                        text = regex.Replace(text, replacement);
+                    }
+                }
+
+                File.WriteAllText(file, text, Encoding.UTF8);
+
+                this.Log(file);
             }
 
-            Log(file);
-        }
-
-        private void Log(string msg)
-        {
-            Console.WriteLine(msg);
+            private void Log(string msg)
+            {
+                Console.WriteLine(msg);
+            }
         }
     }
 }

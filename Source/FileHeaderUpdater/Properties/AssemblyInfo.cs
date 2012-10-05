@@ -8,4 +8,4 @@ using System.Reflection;
 
 [assembly: AssemblyProduct("FileHeaderUpdater")]
 [assembly: AssemblyTitle("Updates file headers in all .cs files")]
-[assembly: AssemblyDescription("Syntax: FileHeaderUpdater.exe /Directory=dir /Company=companyName [/Copyright=copyrightNotice] [/Exclude=filestoExclude]")]
+[assembly: AssemblyDescription("Syntax: FileHeaderUpdater.exe /company=companyName [/copyright=copyrightNotice] [/exclude=filestoExclude] directory")]
