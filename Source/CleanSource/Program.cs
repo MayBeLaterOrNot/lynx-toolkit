@@ -45,6 +45,11 @@ namespace CleanSource
         private static bool cleanSummary;
 
         /// <summary>
+        /// Indents summaries.
+        /// </summary>
+        private static bool indentSummary;
+
+        /// <summary>
         /// Remove regions.
         /// </summary>
         private static bool cleanRegions;
@@ -60,7 +65,7 @@ namespace CleanSource
         private static string openForEditArguments;
 
         /// <summary>
-        /// The exclude.
+        /// The exclude list.
         /// </summary>
         private static string exclude;
 
@@ -81,6 +86,9 @@ namespace CleanSource
                 {
                     case "/cleansummary":
                         cleanSummary = true;
+                        continue;
+                    case "/indentsummary":
+                        indentSummary = true;
                         continue;
                     case "/cleanregions":
                         cleanRegions = true;
@@ -204,8 +212,15 @@ namespace CleanSource
                     continue;
                 }
 
+                // trim whitespace
+                var trimmed1 = Regex.Replace(thisline, @"///\s+(?=[^<])", indentSummary ? "///   " : "/// ");
+                if (!string.Equals(trimmed1, thisline))
+                {
+                    modified = true;
+                }
+
                 // trim the end
-                var trimmed = thisline.TrimEnd();
+                var trimmed = trimmed1.TrimEnd();
                 if (!string.Equals(trimmed, thisline))
                 {
                     modified = true;
