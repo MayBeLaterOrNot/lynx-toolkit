@@ -15,8 +15,6 @@ namespace PropertyCG
     /// </summary>
     public class Program
     {
-        #region Public Methods and Operators
-
         public static string OpenForEditExecutable { get; set; }
         public static string OpenForEditArguments { get; set; }
         public static string SearchPattern { get; set; }
@@ -83,13 +81,15 @@ namespace PropertyCG
                 Console.WriteLine();
             }
 
-            Console.WriteLine("  {0} files changed.", filesChanged);
+            Console.WriteLine("  {0} {1} files found.", filesFound, SearchPattern.Replace("*", string.Empty));
+            Console.WriteLine("  {0} cs files changed.", filesChanged);
             Console.WriteLine("  {0} projects changed.", projectsChanged);
             Console.WriteLine();
             Console.WriteLine("  Finished in {0} ms", stopwatch.ElapsedMilliseconds);
             Console.WriteLine();
         }
 
+        private static int filesFound = 0;
         private static int filesChanged = 0;
         private static int projectsChanged = 0;
 
@@ -108,6 +108,7 @@ namespace PropertyCG
 
         private static void Process(string file)
         {
+            filesFound++;
             var pcg = new PropertyCodeGenerator(file) { OpenForEditExecutable = OpenForEditExecutable, OpenForEditArguments = OpenForEditArguments };
             if (pcg.IsUpToDate() && !Force)
             {
@@ -132,8 +133,5 @@ namespace PropertyCG
                 projectsChanged++;
             }
         }
-
-        #endregion
-
     }
 }
