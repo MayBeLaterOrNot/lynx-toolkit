@@ -33,6 +33,7 @@ namespace PropertyCG
             this.ReferencePropertySetter = "this.SetReference(ref this.{0}, value, \"{1}\")";
             this.RaisePropertyChanged = "this.RaisePropertyChanged(\"{0}\")";
             this.ReferencePropertyType = "Reference<{0}>";
+            this.ReferenceResolve = "this.ResolveReference(ref this.{0})";
             this.PropertyChangeCallback = "this.On{0}Changed(oldValue, value)";
             this.ValidateCallback = "this.Validate{0}(value)";
             this.CreateRegions = false;
@@ -120,6 +121,11 @@ namespace PropertyCG
         /// </summary>
         /// <value>The type of the reference property.</value>
         public string ReferencePropertyType { get; set; }
+
+        /// <summary>
+        /// Gets the format string for the reference resolve statement.
+        /// </summary>
+        public string ReferenceResolve { get; set; }
 
         /// <summary>
         /// Gets or sets the format string for the validation callback statement.

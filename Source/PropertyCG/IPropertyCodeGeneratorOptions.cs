@@ -70,5 +70,10 @@ namespace PropertyCG
         /// </summary>
         /// <value>The name of the properties file.</value>
         string PropertiesFileName { get; }
+
+        /// <summary>
+        /// Gets the format string for the reference resolve statement.
+        /// </summary>
+        string ReferenceResolve { get; }
     }
 }

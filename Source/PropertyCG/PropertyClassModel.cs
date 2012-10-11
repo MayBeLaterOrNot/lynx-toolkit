@@ -255,7 +255,7 @@ $",
         public string ToString(IPropertyCodeGeneratorOptions options)
         {
             var sb = new StringBuilderEx();
-            sb.AppendFormat(this.FileHeader.ToString(), options.PropertiesFileName);
+            sb.AppendFormat(this.FileHeader.ToString(), Path.GetFileName(options.PropertiesFileName));
             sb.AppendLine("namespace {0}", this.Namespace);
             sb.AppendLine("{");
             string previousUsing = null;
@@ -273,6 +273,9 @@ $",
 
             sb.AppendLine();
 
+            sb.AppendLine("/// <summary>");
+            sb.AppendLine("/// Defines the properties for the {0} class. This file is auto-generated.", this.Name);
+            sb.AppendLine("/// </summary>");
             sb.AppendLine("{0} partial class {1}", this.AccessModifier, this.Name);
             sb.AppendLine("{");
             sb.Indent();
@@ -304,8 +307,12 @@ $",
                 sb.AppendLine();
             }
 
+            int i = 0;
             foreach (var p in this.Properties.Values)
             {
+                i++;
+                bool isLast = i == this.Properties.Count;
+
                 sb.AppendLine("/// <summary>");
                 sb.AppendLine("/// {0}", p.Summary);
                 sb.AppendLine("/// </summary>");
@@ -320,6 +327,12 @@ $",
                 sb.AppendLine("get");
                 sb.AppendLine("{");
                 sb.Indent();
+
+                if (p.IsReference && !string.IsNullOrEmpty(options.ReferenceResolve))
+                {
+                    sb.AppendLine(options.ReferenceResolve + ";", p.BackingFieldName, p.Name);
+                }
+
                 sb.AppendLine("return this.{0};", p.BackingFieldName);
                 sb.Unindent();
                 sb.AppendLine("}");
@@ -366,7 +379,10 @@ $",
                 sb.AppendLine("}");
                 sb.Unindent();
                 sb.AppendLine("}");
-                sb.AppendLine();
+                if (!isLast)
+                {
+                    sb.AppendLine();
+                }
             }
 
             if (options.CreateRegions)
@@ -386,9 +402,9 @@ $",
                 sb.AppendLine("public enum {0}", type.Name);
                 sb.AppendLine("{");
                 sb.Indent();
-                for (int i = 0; i < type.Values.Count; i++)
+                for (int j = 0; j < type.Values.Count; j++)
                 {
-                    sb.AppendLine(type.Values[i] + (i + 1 < type.Values.Count ? "," : string.Empty));
+                    sb.AppendLine(type.Values[j] + (j + 1 < type.Values.Count ? "," : string.Empty));
                 }
 
                 sb.Unindent();
