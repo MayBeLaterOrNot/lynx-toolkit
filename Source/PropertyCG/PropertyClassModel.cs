@@ -211,7 +211,7 @@ $",
                     if (supportsIsEnabled)
                     {
                         var isEnabledPropertyName = string.Format("Is{0}Enabled", p.Name);
-                        attributes.Add("Browsable(false)");
+                        attributes.Add("[Browsable(false)]");
                         var isEnabledDescription = string.Format("flag if {0} is enabled", p.Name);
                         var isEnabledProperty = new Property("bool", isEnabledPropertyName, attributes, isEnabledDescription);
                         this.Properties.Add(isEnabledProperty.Name, isEnabledProperty);
@@ -221,7 +221,7 @@ $",
                     if (supportsIsVisible)
                     {
                         var isVisiblePropertyName = string.Format("Is{0}Visible", p.Name);
-                        attributes.Add("Browsable(false)");
+                        attributes.Add("[Browsable(false)]");
                         var isVisibleDescription = string.Format("flag if {0} is visible", p.Name);
                         var isVisibleProperty = new Property("bool", isVisiblePropertyName, attributes, isVisibleDescription);
                         this.Properties.Add(isVisibleProperty.Name, isVisibleProperty);

@@ -71,7 +71,7 @@ namespace PropertyCG
                 Folder += "\\";
             }
 
-            Console.WriteLine("  Searching for {0} files in {1} and sub-folders.", SearchPattern, Folder);
+            Console.WriteLine("  Searching for {0} files in {1} and sub-folders.", SearchPattern, Path.GetFullPath(Folder));
             Console.WriteLine();
 
             Search(Folder, SearchPattern, Process);
