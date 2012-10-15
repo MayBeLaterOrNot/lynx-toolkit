@@ -43,6 +43,7 @@ namespace PropertyCG
                     SearchPattern = arg;
                     continue;
                 }
+
                 var argx = arg.Split('=');
                 switch (argx[0].ToLower())
                 {
@@ -83,6 +84,7 @@ namespace PropertyCG
 
             Console.WriteLine("  {0} {1} files found.", filesFound, SearchPattern.Replace("*", string.Empty));
             Console.WriteLine("  {0} cs files changed.", filesChanged);
+            Console.WriteLine("  {0} project files found.", projectsFound);
             Console.WriteLine("  {0} projects changed.", projectsChanged);
             Console.WriteLine();
             Console.WriteLine("  Finished in {0} ms", stopwatch.ElapsedMilliseconds);
@@ -91,6 +93,7 @@ namespace PropertyCG
 
         private static int filesFound = 0;
         private static int filesChanged = 0;
+        private static int projectsFound = 0;
         private static int projectsChanged = 0;
 
         private static void Search(string folder, string searchPattern, Action<string> process)
@@ -125,6 +128,7 @@ namespace PropertyCG
 
         private static void ProcessProject(string file)
         {
+            projectsFound++;
             var ext = Path.GetExtension(SearchPattern);
             var pcg = new ProjectUpdater(file, ext) { OpenForEditExecutable = OpenForEditExecutable, OpenForEditArguments = OpenForEditArguments };
             if (pcg.Update())

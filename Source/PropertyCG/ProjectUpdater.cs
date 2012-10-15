@@ -30,6 +30,14 @@ namespace PropertyCG
             const string NamespaceUri = "http://schemas.microsoft.com/developer/msbuild/2003";
             nsmgr.AddNamespace("b", NamespaceUri);
             bool modified = false;
+
+            Func<XmlNode, string, bool> changeInnerText = (node, newValue) =>
+                {
+                    var oldValue = node.InnerText;
+                    node.InnerText = newValue;
+                    return !string.Equals(oldValue, newValue);
+                };
+
             foreach (XmlNode itemGroup in root.SelectNodes("//b:ItemGroup", nsmgr))
             {
                 foreach (XmlNode item in itemGroup.ChildNodes)
@@ -54,20 +62,25 @@ namespace PropertyCG
                             Console.WriteLine(include + " should have build action = None.");
                         }
 
-                        var dependentUponFileName = Path.GetFileName(include.Replace(this.Extension, ".cs"));
                         var dependentUponNode = item.SelectSingleNode("b:DependentUpon", nsmgr);
-                        if (dependentUponNode == null)
+                        if (dependentUponNode != null)
                         {
-                            dependentUponNode = doc.CreateElement("DependentUpon", NamespaceUri);
-                            item.AppendChild(dependentUponNode);
+                            item.RemoveChild(dependentUponNode);
                             modified = true;
                         }
 
-                        modified |= !string.Equals(dependentUponNode.InnerText, dependentUponFileName);
-                        dependentUponNode.InnerText = dependentUponFileName;
+                        // Make property source file dependen upon main class?
+                        //if (dependentUponNode == null)
+                        //{
+                        //    dependentUponNode = doc.CreateElement("DependentUpon", NamespaceUri);
+                        //    item.AppendChild(dependentUponNode);
+                        //    modified = true;
+                        //}
 
-
+                        //var dependentUponFileName = Path.GetFileName(include.Replace(this.Extension, ".cs"));
+                        //modified |= ChangeInnerText(dependentUponNode, dependentUponFileName);
                     }
+
                     if (include.Contains(".Properties.cs"))
                     {
                         if (item.Name != "Compile")
@@ -75,7 +88,7 @@ namespace PropertyCG
                             Console.WriteLine(include + " should have build action = Compile.");
                         }
 
-                        var dependentUponFileName = Path.GetFileName(include.Replace(".Properties.cs", ".cs"));
+                        var dependentUponFileName = Path.GetFileName(include.Replace(".Properties.cs", this.Extension));
                         var dependentUponNode = item.SelectSingleNode("b:DependentUpon", nsmgr);
                         if (dependentUponNode == null)
                         {
@@ -83,9 +96,8 @@ namespace PropertyCG
                             item.AppendChild(dependentUponNode);
                             modified = true;
                         }
+                        modified |= changeInnerText(dependentUponNode, dependentUponFileName);
 
-                        modified |= !string.Equals(dependentUponNode.InnerText, dependentUponFileName);
-                        dependentUponNode.InnerText = dependentUponFileName;
                         var autogenNode = item.SelectSingleNode("b:AutoGen", nsmgr);
                         if (autogenNode == null)
                         {
@@ -93,8 +105,7 @@ namespace PropertyCG
                             item.AppendChild(autogenNode);
                             modified = true;
                         }
-                        modified |= !string.Equals(autogenNode.InnerText, "True");
-                        autogenNode.InnerText = "True";
+                        modified |= changeInnerText(autogenNode, "True");
                     }
 
                 }
