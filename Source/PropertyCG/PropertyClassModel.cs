@@ -337,7 +337,8 @@ $",
                 sb.Unindent();
                 sb.AppendLine("}");
                 sb.AppendLine();
-                sb.AppendLine("set");
+                var setModifier = p.ReadOnly ? "private " : string.Empty;
+                sb.AppendLine("{0}set", setModifier);
                 sb.AppendLine("{");
                 sb.Indent();
 
