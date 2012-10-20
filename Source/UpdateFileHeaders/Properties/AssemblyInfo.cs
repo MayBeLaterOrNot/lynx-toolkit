@@ -6,6 +6,6 @@
 
 using System.Reflection;
 
-[assembly: AssemblyProduct("FileHeaderUpdater")]
+[assembly: AssemblyProduct("UpdateFileHeaders")]
 [assembly: AssemblyTitle("Updates file headers in all .cs files")]
-[assembly: AssemblyDescription("Syntax: FileHeaderUpdater.exe /company=companyName [/copyright=copyrightNotice] [/copyright-file=path] [/exclude=filestoExclude] directory")]
+[assembly: AssemblyDescription("Syntax: UpdateFileHeaders.exe /company=companyName [/copyright=copyrightNotice] [/copyright-file=path] [/exclude=filestoExclude] directory")]

@@ -8,8 +8,8 @@
     <ProjectGuid>{B159B388-4C92-4B7D-A22B-DE649D6457CA}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FileHeaderUpdater</RootNamespace>
-    <AssemblyName>FileHeaderUpdater</AssemblyName>
+    <RootNamespace>UpdateFileHeaders</RootNamespace>
+    <AssemblyName>UpdateFileHeaders</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>

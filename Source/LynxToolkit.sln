@@ -5,7 +5,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VersionUpdater", "VersionUp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XmlDocT", "XmlDocT\XmlDocT.csproj", "{E68CCC23-168F-45D0-81F5-94B1326B7992}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileHeaderUpdater", "FileHeaderUpdater\FileHeaderUpdater.csproj", "{B159B388-4C92-4B7D-A22B-DE649D6457CA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UpdateFileHeaders", "UpdateFileHeaders\UpdateFileHeaders.csproj", "{B159B388-4C92-4B7D-A22B-DE649D6457CA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FindObsoleteFiles", "FindObsoleteFiles\FindObsoleteFiles.csproj", "{616BF3AD-3674-4302-A6DB-D8B59D5D0D4F}"
 EndProject

@@ -41,7 +41,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\FileHeaderUpdater\Utilities.cs">
+    <Compile Include="..\UpdateFileHeaders\Utilities.cs">
       <Link>Utilities.cs</Link>
     </Compile>
     <Compile Include="..\GlobalAssemblyInfo.cs">

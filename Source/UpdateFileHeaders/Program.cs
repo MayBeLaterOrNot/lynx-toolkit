@@ -4,7 +4,7 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-namespace FileHeaderUpdater
+namespace UpdateFileHeaders
 {
     using System;
     using System.Diagnostics;
