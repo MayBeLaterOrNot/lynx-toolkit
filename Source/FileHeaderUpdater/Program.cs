@@ -75,6 +75,9 @@ namespace FileHeaderUpdater
                     case "/copyright":
                         copyright = kv[1];
                         continue;
+                    case "/copyright-file":
+                        copyright = File.ReadAllText(kv[1]);
+                        continue;
                     case "/scc":
                         if (string.Equals(kv[1], "p4", StringComparison.InvariantCultureIgnoreCase))
                         {
@@ -110,9 +113,9 @@ namespace FileHeaderUpdater
                     copyright = copyright.Replace("(C)", "©");
                 }
 
-                Copyright = copyright;
-                Company = company;
-                Exclude = exclude;
+                this.Copyright = copyright;
+                this.Company = company;
+                this.Exclude = exclude;
             }
 
             public string Copyright { get; set; }
@@ -165,8 +168,11 @@ namespace FileHeaderUpdater
                 sb.AppendLine(rulerComment);
                 sb.AppendFormat("// <copyright file=\"{0}\" company=\"{1}\">", fileName, this.Company);
                 sb.AppendLine();
-                sb.AppendFormat("//   {0}", this.Copyright);
-                sb.AppendLine();
+                foreach (var line in this.Copyright.Split('\n'))
+                {
+                    sb.AppendLine(string.Format("//   {0}", line.Trim()).Trim());
+                }
+
                 sb.AppendLine("// </copyright>");
                 if (!string.IsNullOrWhiteSpace(summary))
                 {
@@ -203,16 +209,11 @@ namespace FileHeaderUpdater
                     return;
                 }
 
-                this.Log("  " + file);
+                Console.WriteLine("  " + file);
                 Utilities.OpenForEdit(file, openForEditExecutable, openForEditArguments);
                 File.WriteAllText(file, output, Encoding.UTF8);
 
                 filesCleaned++;
-            }
-
-            private void Log(string msg)
-            {
-                Console.WriteLine(msg);
             }
         }
     }
