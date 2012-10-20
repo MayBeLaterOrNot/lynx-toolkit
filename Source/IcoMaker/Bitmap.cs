@@ -1,4 +1,33 @@
-﻿using System;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="Bitmap.cs" company="Lynx">
+//   The MIT License (MIT)
+//
+//   Copyright (c) 2012 Oystein Bjorke
+//
+//   Permission is hereby granted, free of charge, to any person obtaining a
+//   copy of this software and associated documentation files (the
+//   "Software"), to deal in the Software without restriction, including
+//   without limitation the rights to use, copy, modify, merge, publish,
+//   distribute, sublicense, and/or sell copies of the Software, and to
+//   permit persons to whom the Software is furnished to do so, subject to
+//   the following conditions:
+//
+//   The above copyright notice and this permission notice shall be included
+//   in all copies or substantial portions of the Software.
+//
+//   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+//   OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+//   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+//   IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+//   CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+//   TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+//   SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// </copyright>
+// <summary>
+//   Gets the size of the BMP file in bytes.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+using System;
 
 namespace IcoMaker
 {
@@ -7,7 +36,6 @@ namespace IcoMaker
 
     public class Bitmap
     {
-        #region FILE HEADER
         public ushort Type { get; set; }
 
         /// <summary>
@@ -29,24 +57,20 @@ namespace IcoMaker
         /// the offset, i.e. starting address, of the byte where the bitmap image data (pixel array) can be found.
         /// </summary>
         public uint OffBits { get; set; }
-        #endregion
-
-        #region INFO HEADER
-
         public int Width { get; private set; }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <remarks>
         /// Unless BITMAPCOREHEADER is used, uncompressed Windows bitmaps also can be stored from the top to bottom, when the Image Height value is negative.
         /// </remarks>
         public int Height { get; private set; }
-        
+
         public ushort Planes { get; private set; }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <remarks>
         /// Contemporary DIB Headers allow pixel formats with 1, 2, 4, 8, 16, 24 and 32 bits per pixel (bpp).
@@ -58,8 +82,6 @@ namespace IcoMaker
         public int YPelsPerMeter { get; private set; }
         public uint ColorsUsed { get; private set; }
         public uint ColorsImportant { get; private set; }
-        #endregion
-
         private RGBQUAD[] Colors;
 
         private byte[] PixelArray;

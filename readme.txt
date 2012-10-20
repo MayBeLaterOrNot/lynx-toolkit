@@ -1,8 +1,8 @@
 Lynx Toolkit
 ================================================================================
-A collection of small command line developer tools.
+A collection of small command line tools.
 
-License:       Ms-PL
+License:       The MIT License (MIT)
 Project page:  http://lynx.codeplex.com
 Hg:            https://hg.codeplex.com/lynx
 

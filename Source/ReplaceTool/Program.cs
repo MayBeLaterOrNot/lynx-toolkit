@@ -1,9 +1,32 @@
-﻿//-----------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="Program.cs" company="Lynx">
-//     Copyright © Lynx Toolkit.
+//   The MIT License (MIT)
+//
+//   Copyright (c) 2012 Oystein Bjorke
+//
+//   Permission is hereby granted, free of charge, to any person obtaining a
+//   copy of this software and associated documentation files (the
+//   "Software"), to deal in the Software without restriction, including
+//   without limitation the rights to use, copy, modify, merge, publish,
+//   distribute, sublicense, and/or sell copies of the Software, and to
+//   permit persons to whom the Software is furnished to do so, subject to
+//   the following conditions:
+//
+//   The above copyright notice and this permission notice shall be included
+//   in all copies or substantial portions of the Software.
+//
+//   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+//   OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+//   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+//   IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+//   CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+//   TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+//   SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // </copyright>
-//-----------------------------------------------------------------------
-
+// <summary>
+//   The main program.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 namespace ReplaceTool
 {
     using System;
@@ -13,36 +36,30 @@ namespace ReplaceTool
     using System.Text.RegularExpressions;
 
     /// <summary>
-    ///   The main program.
+    /// The main program.
     /// </summary>
     public class Program
     {
-        #region Constants and Fields
-
         /// <summary>
-        ///   Valid text file types.
+        /// Valid text file types.
         /// </summary>
         public static string ValidTextFileTypes { get; set; }
 
         /// <summary>
-        ///   The expression.
+        /// The expression.
         /// </summary>
         private static Regex expression;
 
         /// <summary>
-        ///   The replacement string.
+        /// The replacement string.
         /// </summary>
         private static string replacement;
-
-        #endregion
-
-        #region Public Methods and Operators
 
         /// <summary>
         /// The main program.
         /// </summary>
         /// <param name="args">
-        /// The args. 
+        /// The args.
         /// </param>
         public static void Main(string[] args)
         {
@@ -76,18 +93,14 @@ namespace ReplaceTool
             Search(source);
         }
 
-        #endregion
-
-        #region Methods
-
         /// <summary>
         /// Determines whether the specified path is a textfile .
         /// </summary>
         /// <param name="path">
-        /// The path. 
+        /// The path.
         /// </param>
         /// <returns>
-        /// <c>true</c> if the specified path is text; otherwise, <c>false</c> . 
+        /// <c>true</c> if the specified path is text; otherwise, <c>false</c> .
         /// </returns>
         /// <remarks>
         /// See http://stackoverflow.com/questions/910873/how-can-i-determine-if-a-file-is-binary-or-text-in-c
@@ -102,16 +115,16 @@ namespace ReplaceTool
         /// Detect if a file is text and detect the encoding.
         /// </summary>
         /// <param name="encoding">
-        /// The detected encoding. 
+        /// The detected encoding.
         /// </param>
         /// <param name="fileName">
-        /// The file name. 
+        /// The file name.
         /// </param>
         /// <param name="windowSize">
-        /// The number of characters to use for testing. 
+        /// The number of characters to use for testing.
         /// </param>
         /// <returns>
-        /// true if the file is text. 
+        /// true if the file is text.
         /// </returns>
         private static bool IsText(out Encoding encoding, string fileName, int windowSize)
         {
@@ -181,7 +194,7 @@ namespace ReplaceTool
         /// Searches the specified folder.
         /// </summary>
         /// <param name="folder">
-        /// The folder. 
+        /// The folder.
         /// </param>
         private static void Search(string folder)
         {
@@ -244,6 +257,5 @@ namespace ReplaceTool
             }
         }
 
-        #endregion
     }
 }
