@@ -1,0 +1,144 @@
+﻿= EasyWiki =
+== Introduction ==
+=== Objective ===
+# Easy to parse
+# Easy source code
+
+== Examples ==
+=== Paragraphs ===
+Lorem ipsum dolor sit amet,
+consectetuer adipiscing elit,
+sed diam nonummy nibh euismod
+tincidunt ut laoreet dolore
+magna aliquam erat volutpat.
+
+Ut wisi enim ad minim veniam,
+quis nostrud exerci tation
+ullamcorper suscipit lobortis
+nisl ut aliquip ex ea commodo
+consequat.
+
+=== Line breaks ===
+Lorem ipsum dolor sit amet,\\
+consectetuer adipiscing
+elit,\\
+sed diam nonummy
+
+=== Horizontal ruler ===
+----
+
+=== Emphasized ===
+Lorem //ipsum// dolor sit amet
+
+=== Strong ===
+Lorem **ipsum** dolor sit amet
+
+=== Links ===
+The syntax is
+{{[url|text|title]}}\\
+[[http://www.google.com|www.google.com]]\\
+[[http://www.google.com|google]]\\
+[[http://www.google.com|google]]
+
+=== ¤name1¤ Anchor ===
+¤name2¤ Anchors are defined as
+{{#name1}}\\
+[[#name1|Go to
+anchor]]
+
+=== Image ===
+The syntax is
+{{{source|alt|link}}}\\
+{{image.png}}\\
+{{image.png|alternative
+text}}\\
+{{image.png|alternative text}}
+
+=== Unordered List ===
+- lorem ipsum   dolor sit amet
+- consectetuer adipiscing elit
+- sed diam nonummy
+- nibh euismod tincidunt
+- ut laoreet dolore magna aliquam erat volutpat
+
+=== Ordered list ===
+# First
+# Second
+# Third
+# Fourth
+# Fifth
+
+=== Table ===
+||header1||header2||header 3|
+|cell 1a|cell 2a|cell 3a|
+|cell 1b|cell 2b|cell 3b|
+
+=== Quote ===
+///
+Line 1 Line 2
+///
+
+=== Code ===
+{{{
+code line 1
+code line 2
+}}}
+
+Lorem {{ipsum}} dolor sit amet
+
+=== Special characters ===
+© Copyright\\
+® Registered
+trademark\\
+™ Trademark\\
+3>2 Greater than\\
+2<3 Less
+than\\
+AT&T Ampersand\\
+…
+Ellipsis\\
+↔ → ← Arrows\\
+⇔
+⇒ ⇐ Double arrows\\
+1024×768
+or 1024 × 768\\
+Long dashes:
+– —
+
+=== Smileys ===
+:) :(  
+
+=== Symbols ===
+(*) (i) (\) (x) (!) (+) (-)
+(?) (_) (y) (n) (on) (off) (h)
+
+=== Escaped ===
+*Not emphasized*\\
+**Not
+bold**\\
+[Not link](not
+link)\\
+----\\
+### Not
+header\\
+- not list\\
+1. not
+ordered list\\
+||Not a
+table|\\
+|Not a cell|  
+
+=== Other ===
+==== //Emphasized// title ====
+=== Syntax links ===
+- [[http://en.wikipedia.org/wiki/Lightweight_markup_language|en.wikipedia.org/wiki/Lightweight_markup_language]]
+- [[http://daringfireball.net/projects/markdown|daringfireball.net/projects/markdown]]
+- [[http://github.github.com/github-flavored-markdown|github.github.com/github-flavored-markdown]]
+- [[https://confluence.atlassian.com/display/BITBUCKET/Using+Wiki+Markup|https://confluence.atlassian.com/display/BITBUCKET/Using+Wiki+Markup]]
+- [[http://codeplex.codeplex.com/wikipage?title=CodePlex%20Wiki%20Markup%20Guide|codeplex.codeplex.com/wikipage?title=CodePlex%20Wiki%20Markup%20Guide]]
+- [[http://wikicreole.org|wikicreole.org]]
+- [[http://en.wikipedia.org/wiki/Creole_%28markup%29|en.wikipedia.org/wiki/Creole_%28markup%29]]
+- [[http://code.google.com/p/support/wiki/WikiSyntax|code.google.com/p/support/wiki/WikiSyntax]]
+- [[http://www.mediawiki.org/wiki/Help:Contents|www.mediawiki.org/wiki/Help:Contents]]
+- [[http://en.wikipedia.org/wiki/Wikipedia:Cheatsheet|en.wikipedia.org/wiki/Wikipedia:Cheatsheet]]
+- [[https://confluence.atlassian.com/display/DOC/Confluence+Wiki+Markup|https://confluence.atlassian.com/display/DOC/Confluence+Wiki+Markup]]
