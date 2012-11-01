@@ -9,6 +9,7 @@ namespace XmlDocT
     using System;
     using System.IO;
     using System.Linq;
+    using System.Text.RegularExpressions;
 
     /// <summary>
     /// Utility to generate "MSDN-style" documentation in Codeplex wiki format.

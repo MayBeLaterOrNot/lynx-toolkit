@@ -1,0 +1,160 @@
+﻿@title Lynx Toolkit Document model
+@description Example file
+@keywords document model, wiki, syntax, example
+@syntax owiki
+
+Lynx Toolkit Document model
+===========================
+
+Introduction
+------------
+- Simplified document model influenced by HTML and FlowDocument
+- Should be easy to write parsers and formatters for it
+
+### Supported parsers
+- OWiki
+- Markdown*
+- Creole*
+- XHtml*
+
+\* Not complete
+
+### Supported formatters
+- OWiki
+- Markdown
+- Creole
+- Confluence
+- Codeplex wiki
+- XHtml
+- FlowDocument
+
+### OWiki syntax
+1. Easy to parse
+2. Easy to read source code
+
+Influenced by Markdown and Creole.
+
+Examples
+--------
+### Headers
+OWiki uses Markdown syntax.
+
+### Paragraphs
+Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam
+nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat
+volutpat.
+
+Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper
+suscipit lobortis nisl ut aliquip ex ea commodo consequat.
+
+### Line breaks
+Lorem ipsum dolor sit amet,  
+consectetuer adipiscing elit,  
+sed diam nonummy
+
+### Horizontal ruler
+- - -   
+
+### Emphasized (italic) text
+Lorem *ipsum* dolor sit amet
+
+### Strong (bold) text
+Lorem **ipsum** dolor sit amet
+
+### Links
+[http://www.google.com]  
+[http://www.google.com|google]  
+[http://www.google.com|google|search with google]
+
+### #name1 Anchors
+Anchor defined #name2 in text
+[#name1|Go to anchor]
+
+### Images
+{image.png}  
+{image.png|alternative text}  
+{image.png|alternative text|http://www.google.com}
+
+### Unordered List
+- consectetuer adipiscing elit
+- sed diam nonummy
+- Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam
+  nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat
+  volutpat.
+- Lorem ipsum dolor sit amet,  
+  consectetuer adipiscing elit,  
+  sed diam nonummy
+
+### Ordered list
+1. First
+2. Second
+3. Third
+
+### Definition list
+; term : description
+; second term : more descriptions
+
+### Table
+|| header1 ||  header2  ||  header 3 |
+| cell 1a  |   cell 2a  |    cell 3a |
+| cell 1b  |   cell 2b  |    cell 3b |
+
+### Quote
+> Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy
+> nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.
+>
+> Lorem ipsum dolor sit amet,  
+> consectetuer adipiscing elit,  
+> sed diam nonummy
+
+### Code
+```cs
+code line 1
+code line 2
+```
+
+Lorem `ipsum` dolor sit amet
+
+### Special characters
+(C)/(c) Copyright  
+(R)/(r) Registered trademark  
+(TM)/(tm) Trademark  
+3>2 Greater than  
+2<3 Less than  
+& is not Ampère's and  
+... Ellipsis  
+<-> -> <- Arrows  
+<=> => <= Double arrows  
+1024x768 or 1024 x 768  
+Long dashes: -- ---
+
+### Smileys
+:) :( :P :D ;)
+
+### Symbols
+(*) (i) (/) (x) (!) (+) (-) (?) (_) (y) (n) (on) (off) (h)
+
+### Escaped characters
+\*Not emphasized\*  
+\*\*Not bold\*\*  
+\[Not link|not link]  
+\- - -  
+\### Not a header  
+\- Not a list  
+\1. Not a ordered list  
+\||Not a table|  
+\|Not a cell|  
+
+### Syntax links
+- [http://en.wikipedia.org/wiki/Lightweight_markup_language]
+- [http://daringfireball.net/projects/markdown]
+- [http://github.github.com/github-flavored-markdown]
+- [https://confluence.atlassian.com/display/BITBUCKET/Using+Wiki+Markup]
+- [http://codeplex.codeplex.com/wikipage?title=CodePlex%20Wiki%20Markup%20Guide]
+- [http://wikicreole.org]
+- [http://en.wikipedia.org/wiki/Creole_%28markup%29]
+- [http://code.google.com/p/support/wiki/WikiSyntax]
+- [http://www.mediawiki.org/wiki/Help:Contents]
+- [http://en.wikipedia.org/wiki/Wikipedia:Cheatsheet]
+- [https://confluence.atlassian.com/display/DOC/Confluence+Wiki+Markup]
+- [http://en.wikipedia.org/wiki/Textile_(markup_language)]

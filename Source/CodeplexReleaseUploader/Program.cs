@@ -29,6 +29,7 @@ namespace CodeplexReleaseUploader
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
 
     using Codeplex.Services;
 
@@ -88,23 +89,18 @@ namespace CodeplexReleaseUploader
                         password = value;
                         break;
                     case "/Upload":
-                        //// RuntimeBinary, SourceCode, Documentation, Example
-                        string fileType = "RuntimeBinary";
-                        var uploadValues = value.Split(',');
-                        string path = uploadValues[0];
-                        string fileName = Path.GetFileName(path);
-                        string name = uploadValues[1];
-                        if (name.IndexOf("example", StringComparison.OrdinalIgnoreCase) >= 0)
+                        if (value.Contains("*"))
                         {
-                            fileType = "Example";
+                            AddFiles(files, value);
+                        }
+                        else
+                        {
+                            var uploadValues = value.Split(',');
+                            string path = uploadValues[0];
+                            string name = uploadValues.Length > 1 ? uploadValues[1] : null;
+                            AddFile(files, path, name);
                         }
 
-                        if (name.IndexOf("doc", StringComparison.OrdinalIgnoreCase) >= 0)
-                        {
-                            fileType = "Documentation";
-                        }
-
-                        files.Add(new ReleaseFile { FileData = File.ReadAllBytes(path), FileName = fileName, Name = name, FileType = fileType });
                         break;
                 }
             }
@@ -136,6 +132,7 @@ namespace CodeplexReleaseUploader
             {
                 Console.WriteLine("  " + e1.Message);
             }
+
             if (files.Count > 0)
             {
                 var recommendedFileName = files[0].FileName;
@@ -157,6 +154,46 @@ namespace CodeplexReleaseUploader
                     Console.WriteLine("  " + e1.Message);
                 }
             }
+        }
+
+        private static void AddFiles(List<ReleaseFile> files, string path)
+        {
+            var dir = Path.GetDirectoryName(path);
+            var searchPattern = Path.GetFileName(path);
+            foreach (var file in Directory.GetFiles(dir, searchPattern))
+            {
+                AddFile(files, file);
+            }
+        }
+
+        private static void AddFile(List<ReleaseFile> files, string path, string name = null)
+        {
+            string fileName = Path.GetFileName(path);
+            if (string.IsNullOrEmpty(fileName) || files.FirstOrDefault(f => f.FileName == fileName) != null)
+            {
+                return;
+            }
+
+            if (name == null)
+            {
+                name = fileName;
+            }
+
+            string fileType = "RuntimeBinary";
+            if (name.IndexOf("example", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                fileType = "Example";
+            }
+
+            if (name.IndexOf("doc", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                fileType = "Documentation";
+            }
+
+            //// FileType { RuntimeBinary, SourceCode, Documentation, Example }
+
+            files.Add(
+                new ReleaseFile { FileData = File.ReadAllBytes(path), FileName = fileName, Name = name, FileType = fileType });
         }
     }
 }
