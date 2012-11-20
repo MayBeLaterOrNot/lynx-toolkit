@@ -52,6 +52,7 @@ namespace PropertyCG
 
         public string Namespace { get; set; }
         public string AccessModifier { get; set; }
+        public bool IsAbstract { get; set; }
         public string Name { get; set; }
         public IList<string> Using { get; private set; }
         public Dictionary<string, Property> Properties { get; private set; }
@@ -79,7 +80,7 @@ namespace PropertyCG
             var fileNameExpression = new Regex(@"(?<file>file=""(.*?)"")", RegexOptions.Compiled);
             var usingExpression = new Regex(@"using\s+([\w.]+);", RegexOptions.Compiled);
             var namespaceExpression = new Regex(@"namespace\s+([\w.]*)", RegexOptions.Compiled);
-            var classExpression = new Regex(@"(\w+)\s+(partial)?\s+class\s+(\w+)", RegexOptions.Compiled);
+            var classExpression = new Regex(@"(\w+)\s+(abstract\s)?(partial\s)\s*class\s+([\w\<\>]+?)[\s:]", RegexOptions.Compiled);
             foreach (var line in File.ReadAllLines(classFileName))
             {
                 var fileHeaderMatch = fileHeaderExpression.Match(line);
@@ -105,8 +106,9 @@ namespace PropertyCG
                 if (classMatch.Success && this.Name == null)
                 {
                     this.AccessModifier = classMatch.Groups[1].Value;
-                    this.Name = classMatch.Groups[3].Value;
-                    if (!classMatch.Groups[2].Success)
+                    this.IsAbstract = !string.IsNullOrEmpty(classMatch.Groups[2].Value);
+                    this.Name = classMatch.Groups[4].Value;
+                    if (!classMatch.Groups[4].Success)
                     {
                         Console.WriteLine("  partial is missing in " + classFileName);
                     }
@@ -303,7 +305,7 @@ $",
             sb.AppendLine();
 
             sb.AppendLine("/// <summary>");
-            sb.AppendLine("/// Defines the properties for the {0} class. This file is auto-generated.", this.Name);
+            sb.AppendLine("/// Defines the properties for the {0} class. This file is auto-generated.", EncodeComment(this.Name));
             sb.AppendLine("/// </summary>");
             sb.AppendLine("{0} partial class {1}", this.AccessModifier, this.Name);
             sb.AppendLine("{");
@@ -445,6 +447,23 @@ $",
             sb.Unindent();
             sb.AppendLine("}");
             return sb.ToString();
+        }
+
+        /// <summary>
+        /// Encodes the specified string for use in XML comments.
+        /// </summary>
+        /// <param name="name">The input string.</param>
+        /// <returns>The encoded string.</returns>
+        private string EncodeComment(string name)
+        {
+            if (name == null)
+            {
+                return null;
+            }
+
+            name = name.Replace("<", "&lt;");
+            name = name.Replace(">", "&gt;");
+            return name;
         }
 
         /// <summary>
