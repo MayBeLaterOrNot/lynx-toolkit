@@ -236,7 +236,7 @@ namespace CleanSource
                 }
 
                 // trim whitespace
-                var trimmed1 = Regex.Replace(thisline, @"///\s+(?=[^<])", indentSummary ? "/// " : "/// ");
+                var trimmed1 = Regex.Replace(thisline, @"///\s+(?=[^<])", indentSummary ? "///     " : "/// ");
                 if (!string.Equals(trimmed1, thisline))
                 {
                     modified = true;
@@ -266,8 +266,15 @@ namespace CleanSource
                     Utilities.OpenForEdit(file, openForEditExecutable, openForEditArguments);
                 }
 
-                File.WriteAllText(file, output.ToString(), Encoding.UTF8);
-                filesCleaned++;
+                try
+                {
+                    File.WriteAllText(file, output.ToString(), Encoding.UTF8);
+                    filesCleaned++;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
             }
         }
     }
