@@ -114,10 +114,10 @@ namespace PropertyCG
             Console.WriteLine();
         }
 
-        private static int filesFound = 0;
-        private static int filesChanged = 0;
-        private static int projectsFound = 0;
-        private static int projectsChanged = 0;
+        private static int filesFound;
+        private static int filesChanged;
+        private static int projectsFound;
+        private static int projectsChanged;
 
         private static void Search(string folder, string searchPattern, Action<string> process)
         {

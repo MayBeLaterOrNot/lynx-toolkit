@@ -43,6 +43,8 @@ _ReSharper*/
 _TeamCity*/
 [Pp]ackages/
 *.dotCover
+*.ncrunchproject
+*.ncrunchsolution
 
 [Tt]est[Rr]esult*
 [Bb]uild[Ll]og.*

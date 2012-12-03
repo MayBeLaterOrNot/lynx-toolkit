@@ -38,8 +38,8 @@ using System.Runtime.InteropServices;
 
 [assembly: ComVisible(false)]
 
-[assembly: AssemblyVersion("2012.1.1.*")]
-[assembly: AssemblyFileVersion("2012.1.1.0")]
+[assembly: AssemblyVersion("2012.2.1.*")]
+[assembly: AssemblyFileVersion("2012.2.1.0")]
 
 namespace LynxToolkit
 {

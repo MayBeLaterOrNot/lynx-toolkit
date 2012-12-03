@@ -46,7 +46,7 @@ namespace PropertyCG
         /// </summary>
         /// <value>The file header.</value>
         /// <remarks>
-        /// The {0} should be replaceed by the filename.
+        /// The {0} will be replaced by the filename.
         /// </remarks>
         public StringBuilder FileHeader { get; set; }
 
@@ -151,7 +151,7 @@ namespace PropertyCG
 :?(?<Name>\w*)
 (?<Enum>\{.+\})?
 \s*
-(?<Flags>[\|\=\!\#\+\*rpi]*)?
+(?<Flags>[\|\=\!\#\+\*$rpi]*)?
 \s*
 (?<Desc>'.*')?
 $",
@@ -197,18 +197,14 @@ $",
                 if (propertyMatch.Success)
                 {
                     var flags = propertyMatch.Groups["Flags"].Value;
-                    bool affectsRender = flags.Contains("+");
                     bool supportsIsEnabled = flags.Contains("=");
                     bool supportsIsVisible = flags.Contains("^");
                     bool includeValidateCallback = flags.Contains("!");
                     bool includePropertyChangeCallback = flags.Contains("#");
                     bool isReadOnly = flags.Contains("r");
 
-                    if (affectsRender && options.AffectsRenderAttribute != null)
-                    {
-                        attributes.Add(options.AffectsRenderAttribute);
-                    }
-
+                    var propertyChangedFlags = options.Flags.Where(f => flags.Contains(f.Key)).Select(f => f.Value).FormatList(" | ");
+                    
                     var type = propertyMatch.Groups["Type"].Success ? propertyMatch.Groups["Type"].Value : null;
                     var name = propertyMatch.Groups["Name"].Success ? propertyMatch.Groups["Name"].Value : type;
                     if (string.IsNullOrEmpty(name))
@@ -228,7 +224,8 @@ $",
                             IsReference = isReference,
                             ValidateCallback = includeValidateCallback,
                             PropertyChangeCallback = includePropertyChangeCallback,
-                            ReadOnly = isReadOnly
+                            ReadOnly = isReadOnly,
+                            PropertyChangedFlags = propertyChangedFlags
                         };
 
                     if (propertyMatch.Groups["Enum"].Success)
@@ -263,14 +260,21 @@ $",
 
             foreach (var d in dependencies)
             {
-                if (!this.Properties.ContainsKey(d.Target))
+                if (options.ValidateDependencies)
                 {
-                    throw new InvalidOperationException("Invalid dependency relation. The target property " + this.Name + "." + d.Target + " is not defined.");
-                }
+                    if (!this.Properties.ContainsKey(d.Target))
+                    {
+                        throw new InvalidOperationException(
+                            "Invalid dependency relation. The target property " + this.Name + "." + d.Target
+                            + " is not defined.");
+                    }
 
-                if (!this.Properties.ContainsKey(d.Source))
-                {
-                    throw new InvalidOperationException("Invalid dependency relation. The source property " + this.Name + "." + d.Source + " is not defined.");
+                    if (!this.Properties.ContainsKey(d.Source))
+                    {
+                        throw new InvalidOperationException(
+                            "Invalid dependency relation. The source property " + this.Name + "." + d.Source
+                            + " is not defined.");
+                    }
                 }
 
                 var source = this.Properties[d.Source];
@@ -311,30 +315,12 @@ $",
             sb.AppendLine("{");
             sb.Indent();
 
-            if (options.CreateRegions)
-            {
-                sb.AppendLine("#region Fields");
-                sb.AppendLine();
-            }
-
             foreach (var p in this.Properties.Values)
             {
                 sb.AppendLine("/// <summary>");
                 sb.AppendLine("/// The backing field for the {0} property.", p.Name);
                 sb.AppendLine("/// </summary>");
                 sb.AppendLine("private {0} {1};", p.Type, p.BackingFieldName);
-                sb.AppendLine();
-            }
-
-            if (options.CreateRegions)
-            {
-                sb.AppendLine("#endregion");
-                sb.AppendLine();
-            }
-
-            if (options.CreateRegions)
-            {
-                sb.AppendLine("#region Public properties");
                 sb.AppendLine();
             }
 
@@ -378,6 +364,10 @@ $",
                     sb.AppendLine(options.ValidateCallback + ";", p.Name);
                 }
 
+                var propertyChangedFlags = string.IsNullOrEmpty(p.PropertyChangedFlags)
+                                               ? string.Empty
+                                               : ", " + p.PropertyChangedFlags;
+
                 var setterFormatString = p.IsReference ? options.ReferencePropertySetter : options.PropertySetter;
                 if (p.Dependencies.Count > 0 || p.PropertyChangeCallback)
                 {
@@ -386,7 +376,7 @@ $",
                         sb.AppendLine("var oldValue = this.{0};", p.BackingFieldName);
                     }
 
-                    sb.AppendLine("if ({0})", string.Format(setterFormatString, p.BackingFieldName, p.Name));
+                    sb.AppendLine("if ({0})", string.Format(setterFormatString, p.BackingFieldName, p.Name, propertyChangedFlags));
                     sb.AppendLine("{");
                     sb.Indent();
                     foreach (var dp in p.Dependencies)
@@ -404,7 +394,7 @@ $",
                 }
                 else
                 {
-                    sb.AppendLine(setterFormatString + ";", p.BackingFieldName, p.Name);
+                    sb.AppendLine(setterFormatString + ";", p.BackingFieldName, p.Name, propertyChangedFlags);
                 }
 
                 sb.Unindent();
@@ -415,11 +405,6 @@ $",
                 {
                     sb.AppendLine();
                 }
-            }
-
-            if (options.CreateRegions)
-            {
-                sb.AppendLine("#endregion");
             }
 
             sb.Unindent();

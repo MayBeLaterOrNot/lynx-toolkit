@@ -29,20 +29,18 @@
 // --------------------------------------------------------------------------------------------------------------------
 namespace PropertyCG
 {
+    using System.Collections.Generic;
+
     /// <summary>
     /// Provides preferences for the property code generation.
     /// </summary>
     public interface IPropertyCodeGeneratorOptions
     {
         /// <summary>
-        /// Gets the "affects render" attribute.
+        /// Gets the property change flags dictionary.
         /// </summary>
-        string AffectsRenderAttribute { get; }
-
-        /// <summary>
-        /// Gets a value indicating whether to create regions.
-        /// </summary>
-        bool CreateRegions { get; }
+        /// <value>The property change flags.</value>
+        Dictionary<string, string> Flags { get; }
 
         /// <summary>
         /// Gets the format string for the property setter.
@@ -104,5 +102,12 @@ namespace PropertyCG
         /// Gets the format string for the reference resolve statement.
         /// </summary>
         string ReferenceResolve { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether to validate dependency names.
+        /// </summary>
+        /// <value><c>true</c> if dependency names should be validated; otherwise, <c>false</c>.</value>
+        /// <remarks>Disabling this feature will make it possible to set dependencies to properties that are not auto-generated.</remarks>
+        bool ValidateDependencies { get; }
     }
 }

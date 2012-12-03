@@ -5,15 +5,13 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{F81B554E-080E-48F6-87B0-DEEEE7D2E1DD}</ProjectGuid>
+    <ProjectGuid>{4E46D92E-92A2-4C3E-A9D9-870BFD3E78C2}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PropertyCGTasks</RootNamespace>
-    <AssemblyName>PropertyCGTasks</AssemblyName>
+    <RootNamespace>PropertyCG.Tests</RootNamespace>
+    <AssemblyName>PropertyCG.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile>
-    </TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -27,54 +25,39 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\Output\</OutputPath>
+    <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup>
-    <ApplicationIcon>..\Lynx.ico</ApplicationIcon>
-  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.Build.Framework" />
-    <Reference Include="Microsoft.Build.Utilities.v4.0" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\GlobalAssemblyInfo.cs">
-      <Link>Properties\GlobalAssemblyInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\PropertyCG\EnumType.cs">
-      <Link>EnumType.cs</Link>
-    </Compile>
-    <Compile Include="..\PropertyCG\ExtensionMethods.cs">
-      <Link>ExtensionMethods.cs</Link>
-    </Compile>
-    <Compile Include="..\PropertyCG\IPropertyCodeGeneratorOptions.cs">
-      <Link>IPropertyCodeGeneratorOptions.cs</Link>
-    </Compile>
-    <Compile Include="..\PropertyCG\Property.cs">
-      <Link>Property.cs</Link>
-    </Compile>
-    <Compile Include="..\PropertyCG\PropertyClassModel.cs">
-      <Link>PropertyClassModel.cs</Link>
-    </Compile>
-    <Compile Include="..\PropertyCG\PropertyCodeGenerator.cs">
-      <Link>PropertyCodeGenerator.cs</Link>
-    </Compile>
-    <Compile Include="..\PropertyCG\StringBuilderEx.cs">
-      <Link>StringBuilderEx.cs</Link>
-    </Compile>
-    <Compile Include="GenerateCodeTask.cs" />
+    <Compile Include="Color.cs" />
+    <Compile Include="Observable.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PropertyChangedEventArgsEx.cs" />
+    <Compile Include="Reference.cs" />
+    <Compile Include="TestObject.cs" />
+    <Compile Include="TestObject.Properties.cs">
+      <DependentUpon>TestObject.oml</DependentUpon>
+      <AutoGen>True</AutoGen>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
-    <CodeAnalysisDictionary Include="..\Lynx.ico">
-      <Link>Lynx.ico</Link>
-    </CodeAnalysisDictionary>
+    <None Include="TestObject.oml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="BeforeBuild">
+    <Exec Command="$(SolutionDir)\..\Output\PropertyCG.exe . /type=oml" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

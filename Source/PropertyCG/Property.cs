@@ -116,6 +116,12 @@ namespace PropertyCG
         public bool ReadOnly { get; set; }
 
         /// <summary>
+        /// Gets or sets the property changed flags.
+        /// </summary>
+        /// <value>The property changed flags.</value>
+        public string PropertyChangedFlags { get; set; }
+
+        /// <summary>
         /// Gets the summary description.
         /// </summary>
         /// <value>The summary.</value>

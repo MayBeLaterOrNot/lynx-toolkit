@@ -29,6 +29,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 namespace PropertyCG
 {
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
 
@@ -49,33 +50,35 @@ namespace PropertyCG
             this.ClassFileName = Path.ChangeExtension(this.FileName, ".cs");
             this.PropertiesFileName = Path.ChangeExtension(this.FileName, ".Properties.cs");
             this.PropertyClassModel = new PropertyClassModel();
-            this.AffectsRenderAttribute = "[AffectsRender]";
-            this.PropertySetter = "this.SetValue(ref this.{0}, value, \"{1}\")";
-            this.ReferencePropertySetter = "this.SetReference(ref this.{0}, value, \"{1}\")";
+            this.Flags = new Dictionary<string, string>();
+            this.Flags.Add("+", "PropertyChangedFlags.AffectsRender");
+            this.Flags.Add("$", "PropertyChangedFlags.AffectsResults");
+
+            this.PropertySetter = "this.SetValue(ref this.{0}, value, \"{1}\"{2})";
+            this.ReferencePropertySetter = "this.SetReference(ref this.{0}, value, \"{1}\"{2})";
             this.RaisePropertyChanged = "this.RaisePropertyChanged(\"{0}\")";
             this.ReferencePropertyType = "Reference<{0}>";
             this.ReferenceResolve = "this.ResolveReference(ref this.{0})";
             this.PropertyChangeCallback = "this.On{0}Changed(oldValue, value)";
             this.ValidateCallback = "this.Validate{0}(value)";
-            this.CreateRegions = false;
+            this.ValidateDependencies = false;
         }
 
         /// <summary>
-        /// Gets or sets the 'affects render' attribute.
+        /// Gets the property changed flags.
         /// </summary>
-        public string AffectsRenderAttribute { get; set; }
+        public Dictionary<string, string> Flags { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the 'affects results' attribute.
+        /// </summary>
+        public string AffectsResultsFlag { get; set; }
 
         /// <summary>
         /// Gets the name of the class file.
         /// </summary>
         /// <value>The name of the class file.</value>
         public string ClassFileName { get; private set; }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether to create regions.
-        /// </summary>
-        /// <value><c>true</c> if regions should be created; otherwise, <c>false</c>.</value>
-        public bool CreateRegions { get; set; }
 
         /// <summary>
         /// Gets the name of the input file.
@@ -149,6 +152,13 @@ namespace PropertyCG
         public string ReferenceResolve { get; set; }
 
         /// <summary>
+        /// Gets a value indicating whether to validate dependency names.
+        /// </summary>
+        /// <value><c>true</c> if dependency names should be validated; otherwise, <c>false</c>.</value>
+        /// <remarks>Disabling this feature will make it possible to set dependencies to properties that are not auto-generated.</remarks>
+        public bool ValidateDependencies { get; private set; }
+
+        /// <summary>
         /// Gets or sets the format string for the validation callback statement.
         /// </summary>
         /// <value>The format string.</value>
@@ -176,7 +186,8 @@ namespace PropertyCG
 
             var psi = new ProcessStartInfo(exe, string.Format(argumentFormatString, filename))
                 {
-                   CreateNoWindow = true, WindowStyle = ProcessWindowStyle.Hidden
+                    CreateNoWindow = true,
+                    WindowStyle = ProcessWindowStyle.Hidden
                 };
             var p = Process.Start(psi);
             p.WaitForExit();
