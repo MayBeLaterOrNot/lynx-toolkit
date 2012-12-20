@@ -75,6 +75,15 @@ namespace PropertyCG
         string RaisePropertyChanged { get; }
 
         /// <summary>
+        /// Gets the format string for the raise property changed statement.
+        /// </summary>
+        /// <value>The format string.</value>
+        /// <remarks>
+        /// Use {0} for the name of the property.
+        /// </remarks>
+        string RaisePropertyChangedByExpression { get; }
+
+        /// <summary>
         /// Gets the format string for the property change callback statement.
         /// </summary>
         /// <value>The format string.</value>

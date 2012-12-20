@@ -57,6 +57,7 @@ namespace PropertyCG
             this.PropertySetter = "this.SetValue(ref this.{0}, value, \"{1}\"{2})";
             this.ReferencePropertySetter = "this.SetReference(ref this.{0}, value, \"{1}\"{2})";
             this.RaisePropertyChanged = "this.RaisePropertyChanged(\"{0}\")";
+            this.RaisePropertyChangedByExpression = "this.RaisePropertyChanged(() => this.{0})";
             this.ReferencePropertyType = "Reference<{0}>";
             this.ReferenceResolve = "this.ResolveReference(ref this.{0})";
             this.PropertyChangeCallback = "this.On{0}Changed(oldValue, value)";
@@ -131,6 +132,13 @@ namespace PropertyCG
         /// <value>The format string.</value>
         /// <remarks>Use {0} for the name of the property.</remarks>
         public string RaisePropertyChanged { get; set; }
+
+        /// <summary>
+        /// Gets or sets the format string for the raise property changed statement with an expression.
+        /// </summary>
+        /// <value>The format string.</value>
+        /// <remarks>Use {0} for the name of the property.</remarks>
+        public string RaisePropertyChangedByExpression { get; set; }
 
         /// <summary>
         /// Gets or sets the format string for the reference property setter.
