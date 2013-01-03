@@ -21,6 +21,10 @@ namespace LynxToolkit.Documents
             Write(Repeat("=", header.Level), " ");
             WriteInlines(header.Content);
             WriteLine(" ", Repeat("=", header.Level));
+            if (header.Level < 3)
+            {
+                WriteLine();
+            }
         }
 
         

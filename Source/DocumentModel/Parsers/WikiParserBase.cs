@@ -181,14 +181,14 @@ namespace LynxToolkit.Documents
         {
             var h = new Header { Level = level };
             ParseInlines(text, h.Content);
-            doc.Add(h);
+            doc.Blocks.Add(h);
         }
 
         protected virtual void AddParagraph(string text)
         {
             var pa = new Paragraph();
             ParseInlines(text, pa.Content);
-            doc.Add(pa);
+            doc.Blocks.Add(pa);
         }
 
         private static char[] newlineChars = new char[] { '\r', '\n' };

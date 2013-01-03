@@ -16,7 +16,7 @@ namespace LynxToolkit.Documents
         private XmlWriter w;
         private MemoryStream ms;
 
-        public HtmlFormatter(Document doc)
+        protected HtmlFormatter(Document doc)
             : base(doc)
         {
             ms = new MemoryStream();

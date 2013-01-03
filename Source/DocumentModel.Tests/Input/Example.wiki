@@ -8,14 +8,17 @@ Lynx Toolkit Document model
 
 Introduction
 ------------
-- Simplified document model influenced by HTML and FlowDocument
-- Should be easy to write parsers and formatters for it
+### Objective
+- Create a simplified document model influenced by HTML and FlowDocument
+- It should be easy to write parsers and formatters for the model
 
 ### Supported parsers
 - OWiki
 - Markdown*
 - Creole*
 - XHtml*
+- Confluence**
+- Codeplex**
 
 \* Not complete
 
@@ -27,6 +30,7 @@ Introduction
 - Codeplex wiki
 - XHtml
 - FlowDocument
+- OpenXML (Word)
 
 ### OWiki syntax
 1. Easy to parse

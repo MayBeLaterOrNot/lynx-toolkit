@@ -82,18 +82,18 @@
             var prefix = "";
             foreach (var t in c.InheritedTypes)
             {
-                p.Add(new Run(prefix));
-                p.Add(this.CreateTypeLink(t, t == c.Type));
-                p.Add(new LineBreak());
+                p.Content.Add(new Run(prefix));
+                p.Content.Add(this.CreateTypeLink(t, t == c.Type));
+                p.Content.Add(new LineBreak());
                 prefix += "  ";
             }
             foreach (var t in c.DerivedTypes)
             {
-                p.Add(new Run(prefix));
-                p.Add(CreateTypeLink(t.Type));
-                p.Add(new LineBreak());
+                p.Content.Add(new Run(prefix));
+                p.Content.Add(CreateTypeLink(t.Type));
+                p.Content.Add(new LineBreak());
             }
-            doc.Add(p);
+            doc.Blocks.Add(p);
 
             this.AddNamespaceInfo(c.Type);
 
@@ -101,7 +101,7 @@
             if (syntax != null)
             {
                 AddHeader("Syntax", 2);
-                doc.Add(new CodeBlock { Text = syntax });
+                doc.Blocks.Add(new CodeBlock { Text = syntax });
             }
 
             this.AddTable("Constructors", c.Constructors, c.Type);
@@ -124,7 +124,7 @@
             if (syntax != null)
             {
                 AddHeader("Syntax", 2);
-                doc.Add(new CodeBlock { Text = syntax });
+                doc.Blocks.Add(new CodeBlock { Text = syntax });
             }
 
             this.AddRemarks(c);
@@ -160,24 +160,24 @@
             var c = Model.Find(type);
             if (c != null)
             {
-                p.Add(this.CreateLink(c, true));
-                p.Add(new LineBreak());
+                p.Content.Add(this.CreateLink(c, true));
+                p.Content.Add(new LineBreak());
             }
 
-            p.Add(this.CreateNamespaceLink(type.Namespace, "{0} Namespace"));
-            p.Add(new LineBreak());
-            this.doc.Add(p);
+            p.Content.Add(this.CreateNamespaceLink(type.Namespace, "{0} Namespace"));
+            p.Content.Add(new LineBreak());
+            this.doc.Blocks.Add(p);
         }
 
         private void AddNamespaceInfo(Type type)
         {
-            var p2 = new Paragraph();
-            p2.Add(new Strong().Add(new Run("Namespace:")));
-            p2.Add(this.CreateNamespaceLink(type.Namespace));
-            p2.Add(new LineBreak());
-            p2.Add(new Strong().Add(new Run("Assembly: ")));
-            p2.Add(new Run(type.Assembly.GetName().Name + " (in " + type.Assembly.GetName().Name + ".dll)"));
-            this.doc.Add(p2);
+            var p = new Paragraph();
+            p.Content.Add(new Strong().Add(new Run("Namespace:")));
+            p.Content.Add(this.CreateNamespaceLink(type.Namespace));
+            p.Content.Add(new LineBreak());
+            p.Content.Add(new Strong().Add(new Run("Assembly: ")));
+            p.Content.Add(new Run(type.Assembly.GetName().Name + " (in " + type.Assembly.GetName().Name + ".dll)"));
+            this.doc.Blocks.Add(p);
         }
 
         private Hyperlink CreateTypeLink(Type t, bool strong = false)
@@ -278,7 +278,7 @@
 
         private void AddTable(Table table)
         {
-            doc.Add(table);
+            doc.Blocks.Add(table);
         }
 
         private void AddText(string text)
@@ -286,8 +286,8 @@
             if (string.IsNullOrWhiteSpace(text))
                 return;
             var para = new Paragraph();
-            para.Add(new Run(text));
-            doc.Add(para);
+            para.Content.Add(new Run(text));
+            doc.Blocks.Add(para);
         }
 
         private void AddHeader(string text, int level)
@@ -296,7 +296,7 @@
                 return;
             var h = new Header { Level = level };
             h.Content.Add(new Run(text));
-            doc.Add(h);
+            doc.Blocks.Add(h);
         }
 
         private void CreateNamespacesPage(Model model)

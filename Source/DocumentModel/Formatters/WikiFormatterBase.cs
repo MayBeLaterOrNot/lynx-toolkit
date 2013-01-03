@@ -6,7 +6,7 @@ namespace LynxToolkit.Documents
     {
         protected StringBuilder sb;
 
-        public WikiFormatterBase(Document doc)
+        protected WikiFormatterBase(Document doc)
             : base(doc)
         {
             this.sb = new StringBuilder();

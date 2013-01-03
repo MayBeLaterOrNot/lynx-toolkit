@@ -6,6 +6,11 @@ namespace LynxToolkit.Documents
 
     public class Document
     {
+        public string Creator { get; set; }
+        public string Subject { get; set; }
+        public string Category { get; set; }
+        public string Version { get; set; }
+        public string Revision { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
         public string Keywords { get; set; }
@@ -26,12 +31,6 @@ namespace LynxToolkit.Documents
         {
             this.Blocks = new BlockCollection();
             this.StyleSheet = new StyleSheet();
-        }
-
-        public Block Add(Block block)
-        {
-            this.Blocks.Add(block);
-            return block;
         }
     }
 
@@ -95,12 +94,6 @@ namespace LynxToolkit.Documents
         {
             this.Content = new InlineCollection();
         }
-
-        public Inline Add(Inline inline)
-        {
-            this.Content.Add(inline);
-            return inline;
-        }
     }
 
     public class HorizontalRuler : Block { }
@@ -112,7 +105,7 @@ namespace LynxToolkit.Documents
 
     public class Paragraph : ContentBlock { }
 
-    public enum Language { Cs, Js, Xml, Unknown }
+    public enum Language { Cs = 1, Js = 2, Xml = 3, Unknown = 0 }
 
     public class CodeBlock : Block
     {

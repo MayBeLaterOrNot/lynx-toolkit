@@ -5,6 +5,8 @@ using LynxToolkit.Documents;
 
 namespace DocumentBrowser
 {
+    using DocumentModel.Wpf;
+
     public class MainViewModel : Observable
     {
         public MainViewModel()

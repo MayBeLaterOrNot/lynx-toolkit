@@ -32,6 +32,7 @@ namespace LynxToolkit
     using System;
     using System.Diagnostics;
     using System.IO;
+    using System.Reflection;
 
     public static class Utilities
     {
@@ -99,6 +100,54 @@ namespace LynxToolkit
             var psi = new ProcessStartInfo(exe, string.Format(argumentFormatString, filename)) { CreateNoWindow = true, WindowStyle = ProcessWindowStyle.Hidden };
             var p = Process.Start(psi);
             p.WaitForExit();
+        }
+    }
+
+    /// <summary>
+    /// Provides utility methods for the Lynx toolkit console applications.
+    /// </summary>
+    /// <remarks></remarks>
+    public static class Application
+    {
+        /// <summary>
+        /// Gets the application header (product name, version number and copyright notice).
+        /// </summary>
+        public static string Header
+        {
+            get
+            {
+                var sb = new System.Text.StringBuilder();
+                var fvi = FileVersionInfo.GetVersionInfo(typeof(Application).Assembly.Location);
+                sb.AppendLine(fvi.ProductName);
+                sb.AppendFormat("Version {0}.{1} (build {2})", fvi.ProductMajorPart, fvi.ProductMinorPart, fvi.ProductBuildPart);
+                sb.AppendLine();
+                sb.AppendLine(fvi.LegalCopyright);
+                return sb.ToString();
+            }
+        }
+
+        /// <summary>
+        /// Gets the application description.
+        /// </summary>
+        /// <remarks></remarks>
+        public static string Description
+        {
+            get
+            {
+                return FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly().Location).FileDescription;
+            }
+        }
+
+        /// <summary>
+        /// Gets the application comments.
+        /// </summary>
+        /// <remarks></remarks>
+        public static string Comments
+        {
+            get
+            {
+                return FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly().Location).Comments;
+            }
         }
     }
 }

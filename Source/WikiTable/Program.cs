@@ -42,6 +42,7 @@ namespace WikiTable
                 Console.WriteLine("No text on clipboard.");
                 return 1;
             }
+
             var output = Convert(input);
             Clipboard.SetText(output);
             return 0;
@@ -53,7 +54,11 @@ namespace WikiTable
             foreach (var l in text.Split('\r'))
             {
                 var line = l.Trim();
-                if (line.Length == 0) continue;
+                if (line.Length == 0)
+                {
+                    continue;
+                }
+
                 var fields = line.Split('\t');
                 sb.Append(includeHeader ? "||" : "|");
                 foreach (var field in fields)
@@ -62,9 +67,11 @@ namespace WikiTable
                     sb.Append(field.Trim());
                     sb.Append(includeHeader ? " ||" : " |");
                 }
+
                 sb.AppendLine();
                 includeHeader = false;
             }
+
             return sb.ToString();
         }
     }

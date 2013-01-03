@@ -22,4 +22,14 @@ namespace DocumentBrowser
             this.DataContext = new MainViewModel();
         }
     }
+    public static class ApplicationCommands
+    {
+        static ApplicationCommands()
+        {
+            Exit = new RoutedUICommand() { Text = "Exit" };
+            Exit.InputGestures.Add(new KeyGesture(Key.X, ModifierKeys.Control));
+        }
+
+        public static RoutedUICommand Exit { get; private set; }
+    }
 }

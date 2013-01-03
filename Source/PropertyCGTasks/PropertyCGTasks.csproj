@@ -66,6 +66,9 @@
     <Compile Include="..\PropertyCG\StringBuilderEx.cs">
       <Link>StringBuilderEx.cs</Link>
     </Compile>
+    <Compile Include="..\UpdateFileHeaders\Utilities.cs">
+      <Link>Utilities.cs</Link>
+    </Compile>
     <Compile Include="GenerateCodeTask.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

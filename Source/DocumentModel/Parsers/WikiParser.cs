@@ -30,14 +30,26 @@ namespace LynxToolkit.Documents
                 m =>
                 {
                     if (m.Groups["titleContent"].Success)
+                    {
                         title = m.Groups["titleContent"].Value;
+                    }
+
                     if (m.Groups["descriptionContent"].Success)
+                    {
                         description = m.Groups["descriptionContent"].Value;
+                    }
+
                     if (m.Groups["keywordsContent"].Success)
+                    {
                         keywords = m.Groups["keywordsContent"].Value;
+                    }
+
                     if (m.Groups["syntaxContent"].Success)
+                    {
                         syntax = m.Groups["syntaxContent"].Value;
-                    return "";
+                    }
+
+                    return string.Empty;
                 });
 
             Document doc;

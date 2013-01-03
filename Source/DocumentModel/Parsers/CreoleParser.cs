@@ -4,10 +4,10 @@ namespace LynxToolkit.Documents
     {
         private CreoleParser()
         {
-            TableRowExpression = CreateRegex(@"(\|{1,2})(.+?)(?=\|)");
-            ListItemExpression = CreateRegex(@"(?<=^)(\s*)([-+*#])\s.*?");
+            this.TableRowExpression = CreateRegex(@"(\|{1,2})(.+?)(?=\|)");
+            this.ListItemExpression = CreateRegex(@"(?<=^)(\s*)([-+*#])\s.*?");
 
-            BlocksExpression = CreateRegex(@"(
+            this.BlocksExpression = CreateRegex(@"(
 (?<h> ^(?<hlevel>\={1,5})\s+(?<hcontent>[^\n]+)\s*\=*$)|
 (?<table>  ^(?<tablecontent>\|.+?)(?:\n\n|\z))|
 (?<quote>  ^(?<quotecontent>\>.+?)(?:\n\n|\z))|
@@ -17,7 +17,7 @@ namespace LynxToolkit.Documents
 (?<hr>  ^----\n)
 )");
 
-            InlineExpression = CreateRegex(@"(?<=[^\\]|^)     # Not escaped
+            this.InlineExpression = CreateRegex(@"(?<=[^\\]|^)     # Not escaped
 (?:
 (?<strong>\*\*(.+?[^\\])\*\*)
 |(?<em>//(.+?[^\\])//)

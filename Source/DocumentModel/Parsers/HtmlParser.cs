@@ -73,7 +73,7 @@ namespace LynxToolkit.Documents
                         this.ParseQuote(element);
                         break;
                     case "hr":
-                        doc.Add(new HorizontalRuler());
+                        doc.Blocks.Add(new HorizontalRuler());
                         break;
                 }
             }
@@ -82,34 +82,34 @@ namespace LynxToolkit.Documents
         private void ParseQuote(XElement element)
         {
             var quote = new Quote();
-            doc.Add(quote);
+            doc.Blocks.Add(quote);
         }
 
         private void ParseTable(XElement element)
         {
             var table = new Table();
-            doc.Add(table);
+            doc.Blocks.Add(table);
         }
 
         private void ParseCode(XElement element)
         {
             var code = new CodeBlock();
             code.Text = element.Value;
-            doc.Add(code);
+            doc.Blocks.Add(code);
         }
 
         private void ParseOrderedList(XElement element)
         {
             List list = new OrderedList();
             this.ParseListItems(element, list);
-            doc.Add(list);
+            doc.Blocks.Add(list);
         }
 
         private void ParseUnorderedList(XElement element)
         {
             List list = new UnorderedList();
             this.ParseListItems(element, list);
-            doc.Add(list);
+            doc.Blocks.Add(list);
         }
 
         private void ParseListItems(XElement element, List list)
@@ -145,21 +145,21 @@ namespace LynxToolkit.Documents
                 }
             }
 
-            doc.Add(list);
+            doc.Blocks.Add(list);
         }
 
         private void ParseParagraph(XElement element)
         {
             var p = new Paragraph();
             this.ParseInlines(element, p.Content);
-            doc.Add(p);
+            doc.Blocks.Add(p);
         }
 
         private void ParseHeader(XElement element, int level)
         {
             var h = new Header { Level = level };
             this.ParseInlines(element, h.Content);
-            doc.Add(h);
+            doc.Blocks.Add(h);
         }
 
         private void ParseInlines(XElement element, InlineCollection ic)

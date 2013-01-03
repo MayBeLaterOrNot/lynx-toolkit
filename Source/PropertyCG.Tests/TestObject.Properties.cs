@@ -18,16 +18,6 @@ namespace PropertyCG.Tests
         private string name;
 
         /// <summary>
-        /// The backing field for the Included property.
-        /// </summary>
-        private bool included;
-
-        /// <summary>
-        /// The backing field for the Length property.
-        /// </summary>
-        private double length;
-
-        /// <summary>
         /// The backing field for the Color property.
         /// </summary>
         private Color color;
@@ -70,42 +60,6 @@ namespace PropertyCG.Tests
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the included should be on or off.
-        /// </summary>
-        public bool Included
-        {
-            get
-            {
-                return this.included;
-            }
-
-            set
-            {
-                var oldValue = this.included;
-                if (this.SetValue(ref this.included, value, "Included", PropertyChangedFlags.AffectsResults))
-                {
-                    this.OnIncludedChanged(oldValue, value);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the length.
-        /// </summary>
-        public double Length
-        {
-            get
-            {
-                return this.length;
-            }
-
-            set
-            {
-                this.SetValue(ref this.length, value, "Length", PropertyChangedFlags.AffectsRender | PropertyChangedFlags.AffectsResults);
-            }
-        }
-
-        /// <summary>
         /// Gets or sets the color.
         /// </summary>
         public Color Color
@@ -117,7 +71,7 @@ namespace PropertyCG.Tests
 
             set
             {
-                this.SetValue(ref this.color, value, "Color", PropertyChangedFlags.AffectsRender);
+                this.SetValue(ref this.color, value, "Color");
             }
         }
 

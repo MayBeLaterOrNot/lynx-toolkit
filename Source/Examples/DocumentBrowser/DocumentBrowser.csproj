@@ -33,6 +33,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>..\..\Lynx.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\packages\Newtonsoft.Json.4.5.10\lib\net40\Newtonsoft.Json.dll</HintPath>
@@ -71,7 +74,6 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="FlowDocumentFormatter.cs" />
     <Compile Include="MainViewModel.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
@@ -93,6 +95,12 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Resource Include="..\..\Lynx.ico">
+      <Link>Lynx.ico</Link>
+    </Resource>
+    <Resource Include="..\..\..\Images\Lynx_64.png">
+      <Link>Lynx_64.png</Link>
+    </Resource>
     <Content Include="image.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -199,6 +207,14 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\DocumentModel.OpenXml\DocumentModel.OpenXml.csproj">
+      <Project>{a4e4a901-66d5-45ba-b8de-14e4ae6d66e9}</Project>
+      <Name>DocumentModel.OpenXml</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\DocumentModel.Wpf\DocumentModel.Wpf.csproj">
+      <Project>{08e223e5-a9ee-472e-9ced-4ab424d04d57}</Project>
+      <Name>DocumentModel.Wpf</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\DocumentModel\DocumentModel.csproj">
       <Project>{3C23AABF-5CCB-4000-8D1C-1FE055CCBC5E}</Project>
       <Name>DocumentModel</Name>

@@ -43,6 +43,9 @@
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\UpdateFileHeaders\Utilities.cs">
+      <Link>Utilities.cs</Link>
+    </Compile>
     <Compile Include="Bitmap.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="..\GlobalAssemblyInfo.cs">

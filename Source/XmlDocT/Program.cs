@@ -13,7 +13,7 @@ namespace XmlDocT
     /// <summary>
     /// Utility to generate "MSDN-style" documentation in Codeplex wiki format.
     ///   - Reads XML comments from the XML documentation files
-    ///   - Reflects the assemblies to find inheritance hierarchy
+    ///   - Reflects the assemblies to find inheritance hierarchy and syntax
     /// Limitations
     ///   - Does not create cross references (yet)
     /// </summary>
@@ -83,22 +83,22 @@ namespace XmlDocT
                         model.Add(fileName);
                     }
                 }
-
             }
 
             if (!Directory.Exists(outputDirectory))
+            {
                 Directory.CreateDirectory(outputDirectory);
-            
+            }
+
             if (stylesheet != null)
             {
                 var destStylesheet = Path.Combine(outputDirectory, Path.GetFileName(stylesheet));
-                File.Copy(stylesheet, destStylesheet,true);
+                File.Copy(stylesheet, destStylesheet, true);
             }
 
             // Create the documentation pages
             DocFormatter.CreatePages(model, outputDirectory, format, stylesheet, singlePage);
         }
-
     }
 
 #if OLD

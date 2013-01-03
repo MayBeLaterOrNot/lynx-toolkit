@@ -34,20 +34,20 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\GlobalAssemblyInfo.cs">
+      <Link>Properties\GlobalAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="Formatters\CodeplexFormatter.cs" />
     <Compile Include="Formatters\ConfluenceFormatter.cs" />
     <Compile Include="Formatters\MarkdownFormatter.cs" />
     <Compile Include="Formatters\CreoleFormatter.cs" />
     <Compile Include="Formatters\DocumentFormatter.cs" />
-    <Compile Include="Formatters\SymbolResolver.cs" />
+    <Compile Include="Utilities\SymbolResolver.cs" />
     <Compile Include="Formatters\WikiFormatterBase.cs" />
-    <Compile Include="Parsers\CharacterReplacements.cs" />
+    <Compile Include="Utilities\CharacterReplacements.cs" />
     <Compile Include="Parsers\CreoleParser.cs" />
     <Compile Include="Parsers\DocumentParser.cs" />
     <Compile Include="Formatters\HtmlFormatter.cs" />
