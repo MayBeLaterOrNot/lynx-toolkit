@@ -84,6 +84,19 @@ namespace LynxToolkit
             return false;
         }
 
+        public static void OpenForEdit(string filename, string scc)
+        {
+            switch (scc)
+            {
+                case "p4":
+                    OpenForEdit(filename, "p4.exe", "edit {0}");
+                    break;
+                default:
+                    return;
+            }
+
+        }
+
         /// <summary>
         /// Opens the specified file for edit.
         /// </summary>
@@ -93,6 +106,11 @@ namespace LynxToolkit
         public static void OpenForEdit(string filename, string exe, string argumentFormatString)
         {
             if (exe == null)
+            {
+                return;
+            }
+
+            if (!File.Exists(filename))
             {
                 return;
             }

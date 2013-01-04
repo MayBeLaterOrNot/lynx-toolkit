@@ -10,6 +10,7 @@ namespace LynxToolkit.Documents
         public string Subject { get; set; }
         public string Category { get; set; }
         public string Version { get; set; }
+        public string Date { get; set; }
         public string Revision { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
@@ -31,6 +32,14 @@ namespace LynxToolkit.Documents
         {
             this.Blocks = new BlockCollection();
             this.StyleSheet = new StyleSheet();
+        }
+
+        public void Append(Document doc)
+        {
+            foreach (var block in doc.Blocks)
+            {
+                this.Blocks.Add(block);
+            }
         }
     }
 
@@ -114,6 +123,10 @@ namespace LynxToolkit.Documents
     }
 
     public class Quote : ContentBlock { }
+    
+    public class TableOfContents : Block {}
+    
+    public class Index : Block { }
 
     public class Section : Block
     {

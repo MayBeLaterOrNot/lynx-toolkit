@@ -3,6 +3,11 @@ using System.Collections.Generic;
 
 namespace LynxToolkit.Documents
 {
+    public class DocumentFormatterOptions
+    {
+        public string SymbolDirectory { get; set; }
+    }
+
     public abstract class DocumentFormatter
     {
         protected Document doc;

@@ -42,20 +42,20 @@ namespace WikiToHtml
         private static string unlockArguments;
         private static CreoleWikiEngine.CreoleConverter.Options options;
 
-        private static void Main(string[] args)
+        private static int Main(string[] args)
         {
             Console.WriteLine(LynxToolkit.Application.Header);
 
             if (args.Length == 0)
             {
                 Console.WriteLine(
-                    "Arguments: [-Syntax=creole|markdown] [-LocalLinks=formatString] [-UnlockProgram=program] [-UnlockArguments=args] [-LocalLinks=formatstring] [Template] [searchPattern] [InputFolder]");
+                    "Arguments: [-Syntax=creole|markdown] [-LocalLinks=formatString] [-UnlockProgram=program] [-UnlockArguments=args] [Template] [searchPattern] [InputFolder]");
                 Console.WriteLine(
                     "Example: wiki2html.exe -LocalLinks={0}/{1}.html -UnlockProgram=p4.exe \"-UnlockArguments=edit {0}\" Template.html *.wiki ..\\Help");
                 Console.WriteLine("  The 'unlock' program will be executed for each output file. {0} is replaced by the output file name.");
                 Console.WriteLine("  The template should contain \"$content\" where the wiki content should be placed.");
                 Console.WriteLine("  Local links like [[space:link]] will be converted to \"href=space/link.html\".");
-                return;
+                return -1;
             }
 
             options = new CreoleWikiEngine.CreoleConverter.Options();
@@ -123,6 +123,8 @@ namespace WikiToHtml
                 Console.WriteLine();
                 SearchDirectory(".");
             }
+
+            return 0;
         }
 
         private static bool directoryPrinted;

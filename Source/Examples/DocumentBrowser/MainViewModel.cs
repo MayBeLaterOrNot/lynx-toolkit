@@ -30,19 +30,19 @@ namespace DocumentBrowser
 
         private void Update()
         {
-            var doc = WikiParser.Parse(Input);
+            var doc = WikiParser.Parse(Input, null, null, null);
 
             Wiki = OWikiFormatter.Format(doc);
             WikiCreole = CreoleFormatter.Format(doc);
             WikiMarkdown = MarkdownFormatter.Format(doc);
             WikiConfluence = ConfluenceFormatter.Format(doc);
             WikiCodeplex = CodeplexFormatter.Format(doc);
+            var options = new HtmlFormatterOptions { Css = "style.css", SymbolDirectory = "images" };
+            Html = HtmlFormatter.Format(doc, options);
 
-            Html = HtmlFormatter.Format(doc, "style.css", "images");
-            
             //File.WriteAllText("temp.txt", Html, Encoding.UTF8);
             //System.Diagnostics.Process.Start("temp.txt");
-            
+
             var doc2 = HtmlParser.Parse(Html);
             Wiki2 = OWikiFormatter.Format(doc2);
 

@@ -41,7 +41,8 @@
             var name = fileName.Replace('<', '~').Replace('>', '~');
 
             var path = Path.Combine(this.OutputDirectory, name + ".html");
-            var html = HtmlFormatter.Format(doc, StyleSheet);
+            var options = new HtmlFormatterOptions { Css = this.StyleSheet };
+            var html = HtmlFormatter.Format(doc, options);
             File.WriteAllText(path, html);
 
             doc = null;

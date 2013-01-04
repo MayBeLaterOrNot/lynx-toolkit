@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace DocumentModel.OpenXml
+﻿namespace LynxToolkit.Documents.OpenXml
 {
     using System.Globalization;
+    using System;
 
     using DocumentFormat.OpenXml;
     using DocumentFormat.OpenXml.Packaging;
@@ -15,6 +11,11 @@ namespace DocumentModel.OpenXml
 
     using Document = DocumentFormat.OpenXml.Wordprocessing.Document;
     using Run = DocumentFormat.OpenXml.Wordprocessing.Run;
+
+    public class WordFormatterOptions : DocumentFormatterOptions
+    {
+        public string Template { get; set; }
+    }
 
     public class WordFormatter : LynxToolkit.Documents.DocumentFormatter
     {
@@ -205,7 +206,6 @@ namespace DocumentModel.OpenXml
             p.PackageProperties.Keywords = doc.Keywords;
             p.PackageProperties.Version = doc.Version;
             p.PackageProperties.Revision = doc.Revision;
-
             p.PackageProperties.Created = DateTime.Now;
             p.PackageProperties.Modified = DateTime.Now;
             p.PackageProperties.LastModifiedBy = doc.Creator;
@@ -404,7 +404,7 @@ namespace DocumentModel.OpenXml
         private MainDocumentPart mainPart;
         private Document document;
 
-        public static WordprocessingDocument Format(LynxToolkit.Documents.Document doc, string filePath, string symbolDirectory = null)
+        public static WordprocessingDocument Format(LynxToolkit.Documents.Document doc, string filePath, string template, string symbolDirectory = null)
         {
             var wf = new WordFormatter(doc, filePath);
             wf.FormatCore();

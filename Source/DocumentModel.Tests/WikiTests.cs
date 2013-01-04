@@ -76,8 +76,7 @@ namespace LynxToolkit.Documents.Tests
         [Test]
         public void FormatAndParseCreole()
         {
-            var input = File.ReadAllText(@"Input\Example.wiki");
-            var doc = WikiParser.Parse(input);
+            var doc = WikiParser.ParseFile(@"Input\Example.wiki");
             var output = CreoleFormatter.Format(doc);
             var expected = File.ReadAllText(@"ExpectedOutput\Example.creole");
             CompareLines(expected, output, "CreoleFormatter");
@@ -195,8 +194,7 @@ namespace LynxToolkit.Documents.Tests
         /// <returns>The document.</returns>
         private static Document ParseInputDocument()
         {
-            var input = File.ReadAllText(@"Input\Example.wiki");
-            var doc = WikiParser.Parse(input);
+            var doc = WikiParser.ParseFile(@"Input\Example.wiki");
             return doc;
         }
     }
