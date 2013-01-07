@@ -12,7 +12,7 @@ namespace LynxToolkit.Documents
         public static string Format(Document doc)
         {
             var wf = new MarkdownFormatter(doc);
-            wf.FormatCore();
+            wf.Format();
             return wf.ToString();
         }
 
@@ -38,7 +38,7 @@ namespace LynxToolkit.Documents
             }
         }
 
-        protected override void Write(List list)
+        protected override void Write(UnorderedList list)
         {
             WriteItems(list.Items, "- ");
             WriteLine();

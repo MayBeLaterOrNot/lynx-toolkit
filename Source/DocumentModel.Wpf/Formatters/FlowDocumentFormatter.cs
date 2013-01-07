@@ -111,7 +111,7 @@ namespace DocumentModel.Wpf
         public static FlowDocument Format(LynxToolkit.Documents.Document doc, string symbolDirectory = null)
         {
             var wf = new FlowDocumentFormatter(doc) { SymbolDirectory = symbolDirectory };
-            wf.FormatCore();
+            wf.Format();
             return wf.Document;
         }
 
@@ -147,7 +147,7 @@ namespace DocumentModel.Wpf
 
         private Stack<List> listStack = new Stack<List>();
 
-        protected override void Write(LynxToolkit.Documents.List list)
+        protected override void Write(LynxToolkit.Documents.UnorderedList list)
         {
             var p = new List();
             listStack.Push(p);
@@ -180,18 +180,9 @@ namespace DocumentModel.Wpf
             listStack.Peek().ListItems.Add(li);
         }
 
-        public string SymbolDirectory { get; set; }
-
         protected override void Write(LynxToolkit.Documents.Symbol symbol, object parent)
         {
-            var file = SymbolResolver.Decode(symbol.Name);
-            var dir = SymbolDirectory ?? string.Empty;
-            if (dir.Length > 0 && !dir.EndsWith("/"))
-            {
-                dir += "/";
-            }
-            var path = dir + file;
-
+            var path = this.ResolveSymbolPath(symbol);
             var img = new LynxToolkit.Documents.Image { Source = path };
             Write(img, parent);
         }

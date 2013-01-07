@@ -119,7 +119,7 @@ namespace LynxToolkit.Documents
             }
 
             var wf = new HtmlFormatter(doc, options);
-            wf.FormatCore();
+            wf.Format();
             var html = wf.ToString();
 
             if (options.Template != null)
@@ -147,10 +147,10 @@ namespace LynxToolkit.Documents
             return html;
         }
 
-        public override void FormatCore()
+        public override void Format()
         {
             this.WriteStartDocument();
-            base.FormatCore();
+            base.Format();
             if (!string.IsNullOrEmpty(this.Options.Footer))
             {
                 this.w.WriteElementString("footer", this.Options.Footer);
@@ -165,7 +165,7 @@ namespace LynxToolkit.Documents
         {
             if (this.ms.Length == 0)
             {
-                this.FormatCore();
+                this.Format();
             }
 
             return Encoding.UTF8.GetString(this.ms.ToArray());
@@ -234,7 +234,7 @@ namespace LynxToolkit.Documents
             this.w.WriteEndElement();
         }
 
-        protected override void Write(List list)
+        protected override void Write(UnorderedList list)
         {
             this.w.WriteStartElement("ul");
             this.WriteAttributes(list);

@@ -45,6 +45,7 @@
     <Compile Include="Formatters\MarkdownFormatter.cs" />
     <Compile Include="Formatters\CreoleFormatter.cs" />
     <Compile Include="Formatters\DocumentFormatter.cs" />
+    <Compile Include="Formatters\XmlFormatter.cs" />
     <Compile Include="Utilities\SymbolResolver.cs" />
     <Compile Include="Formatters\WikiFormatterBase.cs" />
     <Compile Include="Utilities\CharacterReplacements.cs" />

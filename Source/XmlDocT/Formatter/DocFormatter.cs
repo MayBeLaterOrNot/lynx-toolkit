@@ -47,9 +47,13 @@ namespace XmlDocT
 
         public string OutputDirectory { get; private set; }
 
+        public string OutputExtension { get; private set; }
+
         public bool SinglePage { get; private set; }
 
         public string StyleSheet { get; private set; }
+
+        public string Template { get; private set; }
 
         private NamespaceCollection NamespaceCollection { get; set; }
 
@@ -61,15 +65,17 @@ namespace XmlDocT
         // Utilities.CreateDirectoryIfMissing(outputDirectory);
         // Console.WriteLine("Output:             {0}", Path.GetFileName(docPath));
         // }
-        public static void CreatePages(NamespaceCollection namespaceCollection, string outputdir, string format, string styleSheet, bool singlePage)
+        public static void CreatePages(NamespaceCollection namespaceCollection, string outputdir, string format, string outputExtension, string styleSheet, string template, bool singlePage)
         {
             var f = new DocFormatter
                         {
                             NamespaceCollection = namespaceCollection,
                             OutputDirectory = outputdir,
+                            OutputExtension = outputExtension,
                             Format = format,
                             SinglePage = singlePage,
-                            StyleSheet = styleSheet
+                            StyleSheet = styleSheet,
+                            Template = template
                         };
 
             f.CreateNamespacesPage(namespaceCollection);
@@ -558,8 +564,9 @@ namespace XmlDocT
             {
                 case "html":
                     {
-                        var path = Path.Combine(this.OutputDirectory, fileName + ".html");
-                        var options = new HtmlFormatterOptions { Css = this.StyleSheet };
+                        var ext = OutputExtension ?? ".html";
+                        var path = Path.Combine(this.OutputDirectory, fileName + ext);
+                        var options = new HtmlFormatterOptions { Css = this.StyleSheet, Template = this.Template };
                         if (this.SinglePage)
                         {
                             options.LocalLinkFormatString = "#{0}";
@@ -570,10 +577,29 @@ namespace XmlDocT
                         break;
                     }
 
+                case "owiki":
+                    {
+                        var ext = OutputExtension ?? ".wiki";
+                        var path = Path.Combine(this.OutputDirectory, fileName + ext);
+                        var src = OWikiFormatter.Format(this.doc);
+                        File.WriteAllText(path, src);
+                        break;
+                    }
+
+                case "xml":
+                    {
+                        var ext = OutputExtension ?? ".xml";
+                        var path = Path.Combine(this.OutputDirectory, fileName + ext);
+                        var src = XmlFormatter.Format(this.doc);
+                        File.WriteAllText(path, src);
+                        break;
+                    }
+
                 case "docx":
                     {
-                        var path = Path.Combine(this.OutputDirectory, fileName + ".docx");
-                        var options = new WordFormatterOptions { Template = null };
+                        var ext = OutputExtension ?? ".docx";
+                        var path = Path.Combine(this.OutputDirectory, fileName + ext);
+                        var options = new WordFormatterOptions { Template = this.Template };
                         if (this.SinglePage)
                         {
                             // options.LocalLinkFormatString = "#{0}";

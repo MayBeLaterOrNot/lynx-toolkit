@@ -5,7 +5,7 @@ namespace LynxToolkit.Documents
         public static string Format(Document doc)
         {
             var wf = new CodeplexFormatter(doc);
-            wf.FormatCore();
+            wf.Format();
             return wf.ToString();
         }
 

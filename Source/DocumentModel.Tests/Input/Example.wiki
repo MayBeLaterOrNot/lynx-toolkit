@@ -9,8 +9,9 @@ Lynx Toolkit Document model
 Introduction
 ------------
 ### Objective
-- Create a simplified document model influenced by HTML and FlowDocument
-- It should be easy to write parsers and formatters for the model
+- Simple
+- Easy to parse and format
+The current model is influenced by HTML and FlowDocument.
 
 ### Supported parsers
 - OWiki
@@ -33,15 +34,13 @@ Introduction
 - OpenXML (Word)
 
 ### OWiki syntax
-1. Easy to parse
-2. Easy to read source code
 
-Influenced by Markdown and Creole.
+Influenced by Markdown and Creole. The syntax is stricter and should be easier to parse.
 
 Examples
 --------
 ### Headers
-OWiki uses Markdown syntax.
+Using Markdown syntax.
 
 ### Paragraphs
 Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam
@@ -52,6 +51,7 @@ Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper
 suscipit lobortis nisl ut aliquip ex ea commodo consequat.
 
 ### Line breaks
+Insert line breaks by adding two spaces at the end of the line.  
 Lorem ipsum dolor sit amet,  
 consectetuer adipiscing elit,  
 sed diam nonummy

@@ -50,18 +50,7 @@ namespace DocumentBrowser
             //  var docCreole = CreoleParser.Parse(WikiCreole);
             //  var docMarkdown = MarkdownParser.Parse(WikiCreole);
 
-            var serializer = new XmlSerializer(
-                typeof(Document),
-                new[] {
-                    typeof(BlockCollection), typeof(InlineCollection),
-                    typeof(Header),typeof(Paragraph),typeof(CodeBlock), typeof(Quote),typeof(Section),typeof(HorizontalRuler),
-                    typeof(UnorderedList),typeof(OrderedList),typeof(ListItem),typeof(ListItemCollection),
-                    typeof(Table),typeof(TableRowCollection), typeof(TableRow),typeof(TableCellCollection), typeof(TableCell),typeof(TableHeaderCell),
-                    typeof(LineBreak),typeof(Run),typeof(Emphasized),typeof(Strong),typeof(Symbol),typeof(InlineCode),typeof(Anchor),typeof(Hyperlink),typeof(Image)});
-
-            var ms = new MemoryStream();
-            serializer.Serialize(ms, doc);
-            Document = Encoding.UTF8.GetString(ms.ToArray());
+            Document = XmlFormatter.Format(doc);
             FlowDocument = FlowDocumentFormatter.Format(doc, "images");
             var js = new Newtonsoft.Json.JsonSerializer();
             var s = new StringWriter();

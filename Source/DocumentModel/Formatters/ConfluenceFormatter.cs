@@ -10,7 +10,7 @@ namespace LynxToolkit.Documents
         public static new string Format(Document doc)
         {
             var wf = new ConfluenceFormatter(doc);
-            wf.FormatCore();
+            wf.Format();
             return wf.ToString();
         }
 

@@ -12,7 +12,7 @@ namespace LynxToolkit.Documents
         public static string Format(Document doc)
         {
             var wf = new CreoleFormatter(doc);
-            wf.FormatCore();
+            wf.Format();
             return wf.ToString();
         }
 

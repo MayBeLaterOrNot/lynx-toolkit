@@ -154,7 +154,7 @@ namespace LynxToolkit.Documents
         }
 
 
-        protected override void Write(List list)
+        protected override void Write(UnorderedList list)
         {
             WriteItems(list.Items, "- ");
             WriteLine();

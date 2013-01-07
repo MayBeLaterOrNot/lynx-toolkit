@@ -82,9 +82,10 @@ namespace LynxToolkit.Documents
     {
         public StyleSheet()
         {
-            this.Header1Style = new Style { FontFamily = "Arial", FontSize = 28, FontWeight = FontWeight.Bold };
-            this.Header2Style = new Style { FontFamily = "Arial", FontSize = 20, FontWeight = FontWeight.Bold };
-            this.Header3Style = new Style { FontFamily = "Arial", FontWeight = FontWeight.Bold };
+            this.HeaderStyles = new Style[5];
+            this.HeaderStyles[0] = new Style { FontFamily = "Arial", FontSize = 28, FontWeight = FontWeight.Bold, PageBreakBefore = true };
+            this.HeaderStyles[1] = new Style { FontFamily = "Arial", FontSize = 20, FontWeight = FontWeight.Bold };
+            this.HeaderStyles[2] = new Style { FontFamily = "Arial", FontWeight = FontWeight.Bold };
             this.ParagraphStyle = null;
             this.CodeStyle = new Style { FontFamily = "Consolas" };
             this.InlineCodeStyle = new Style { FontFamily = "Consolas" };
@@ -97,19 +98,12 @@ namespace LynxToolkit.Documents
             this.UnorderedListStyle = null;
             this.OrderedListStyle = null;
             this.TableStyle = null;
+            this.TableHeaderStyle = new Style { FontWeight = FontWeight.Bold };
         }
 
         public Style CodeStyle { get; set; }
 
-        public Style Header1Style { get; set; }
-
-        public Style Header2Style { get; set; }
-
-        public Style Header3Style { get; set; }
-
-        public Style Header4Style { get; set; }
-
-        public Style Header5Style { get; set; }
+        public Style[] HeaderStyles { get; set; }
 
         public Style HyperlinkStyle { get; set; }
 
@@ -124,6 +118,8 @@ namespace LynxToolkit.Documents
         public Style QuoteStyle { get; set; }
 
         public Style TableStyle { get; set; }
+
+        public Style TableHeaderStyle { get; set; }
 
         public Style UnorderedListStyle { get; set; }
     }
@@ -175,7 +171,12 @@ namespace LynxToolkit.Documents
 
     public class Header : ContentBlock
     {
-        public Header(int level = 1, params Inline[] inlines)
+        public Header()
+        {
+            this.Level = 1;
+        }
+
+        public Header(int level, params Inline[] inlines)
         {
             this.Level = level;
             this.Content.AddRange(inlines);
@@ -186,6 +187,10 @@ namespace LynxToolkit.Documents
 
     public class Paragraph : ContentBlock
     {
+        public Paragraph()
+        {            
+        }
+
         public Paragraph(params Inline[] inlines)
         {
             this.Content.AddRange(inlines);
@@ -448,6 +453,8 @@ namespace LynxToolkit.Documents
         public Thickness? Padding { get; set; }
 
         public VerticalAlignment VerticalAlignment { get; set; }
+
+        public bool PageBreakBefore { get; set; }
     }
 
     public abstract class Inline : Element
@@ -524,7 +531,11 @@ namespace LynxToolkit.Documents
 
     public class Hyperlink : InlineContent
     {
-        public Hyperlink(string url = null, params Inline[] inlines)
+        public Hyperlink()
+        {            
+        }
+
+        public Hyperlink(string url, params Inline[] inlines)
             : base(inlines)
         {
             this.Url = url;
@@ -536,7 +547,7 @@ namespace LynxToolkit.Documents
     public class Image : Inline
     {
         public Image()
-        {            
+        {
         }
 
         public Image(string source, string alt = null, string link = null)

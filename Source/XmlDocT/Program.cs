@@ -54,7 +54,9 @@ namespace XmlDocT
 
             var outputDirectory = string.Empty;
             var format = "html";
-            var stylesheet = "style.css";
+            string outputExtension = null;
+            string stylesheet = null;
+            string template = null;
             var singlePage = false;
 
             var model = new NamespaceCollection();
@@ -75,8 +77,14 @@ namespace XmlDocT
                         case "/stylesheet":
                             stylesheet = kv[1];
                             continue;
+                        case "/template":
+                            template = kv[1];
+                            continue;
                         case "/format":
                             format = kv[1].ToLower();
+                            continue;
+                        case "/outputextension":
+                            outputExtension = kv[1].ToLower();
                             continue;
                         case "/ignore":
                             model.IgnoreAttributes.Add(kv[1]);
@@ -143,7 +151,7 @@ namespace XmlDocT
             Console.WriteLine("  Writing documentation output files...");
 
             // Write the documentation pages
-            DocFormatter.CreatePages(model, outputDirectory, format, stylesheet, singlePage);
+            DocFormatter.CreatePages(model, outputDirectory, format, outputExtension, stylesheet, template, singlePage);
 
             Console.WriteLine();
             Console.WriteLine(

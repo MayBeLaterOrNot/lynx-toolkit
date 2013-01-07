@@ -52,28 +52,16 @@ namespace LynxToolkit.Documents
             }
         }
 
-        public virtual void FormatCore()
+        public string SymbolDirectory { get; set; }
+
+        public virtual void Format()
         {
             this.WriteBlocks(this.doc.Blocks);
         }
 
         protected Style GetStyle(Header header)
         {
-            switch (header.Level)
-            {
-                case 1:
-                    return this.StyleSheet.Header1Style;
-                case 2:
-                    return this.StyleSheet.Header2Style;
-                case 3:
-                    return this.StyleSheet.Header3Style;
-                case 4:
-                    return this.StyleSheet.Header4Style;
-                case 5:
-                    return this.StyleSheet.Header5Style;
-            }
-
-            return null;
+            return this.StyleSheet.HeaderStyles[header.Level - 1];
         }
 
         protected Style GetStyle(Paragraph p)
@@ -125,7 +113,7 @@ namespace LynxToolkit.Documents
 
         protected abstract void Write(Paragraph paragraph);
 
-        protected abstract void Write(List list);
+        protected abstract void Write(UnorderedList list);
 
         protected abstract void Write(OrderedList list);
 
@@ -208,7 +196,7 @@ namespace LynxToolkit.Documents
                 return;
             }
 
-            if (this.WriteBlock<List>(block, this.Write))
+            if (this.WriteBlock<UnorderedList>(block, this.Write))
             {
                 return;
             }
@@ -310,5 +298,19 @@ namespace LynxToolkit.Documents
                 this.WriteInline(inline, parent);
             }
         }
+
+        protected string ResolveSymbolPath(Symbol symbol)
+        {
+            var file = SymbolResolver.Decode(symbol.Name);
+            var dir = this.SymbolDirectory ?? string.Empty;
+            if (dir.Length > 0 && !dir.EndsWith("/"))
+            {
+                dir += "/";
+            }
+            var path = dir + file;
+            return path;
+        }
+
+
     }
 }
