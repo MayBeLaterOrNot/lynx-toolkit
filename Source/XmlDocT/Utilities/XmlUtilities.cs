@@ -182,10 +182,9 @@ namespace XmlDocT
         /// <returns>
         ///     The 'nice' type name.
         /// </returns>
-        public static string GetNiceTypeName(Type type)
+        public static string GetNiceTypeName(Type type, bool fullName = false)
         {
-            string name = type.Name;
-            name = GetSimpleTypeName(name);
+            string name = fullName ? GetFullName(type) : GetSimpleTypeName(type.Name);
 
             if (!type.IsGenericType)
             {
@@ -210,6 +209,12 @@ namespace XmlDocT
 
             sb.Append(">");
             return sb.ToString();
+        }
+
+        private static string GetFullName(Type type)
+        {
+            if (type.FullName != null) return type.FullName;
+            return type.Namespace + "." + type.Name;
         }
 
         public static string GetParameterDescription(XmlNode node, string parameterName)

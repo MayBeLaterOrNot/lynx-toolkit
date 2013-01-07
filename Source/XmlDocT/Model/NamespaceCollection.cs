@@ -57,6 +57,7 @@ namespace XmlDocT
             string assemblyPath = Path.GetFullPath(assemblyFile);
 
             string xmlPath = Path.ChangeExtension(assemblyPath, ".xml");
+
             string assemblyDirectory = Path.GetDirectoryName(assemblyPath) ?? string.Empty;
 
             AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
@@ -78,6 +79,13 @@ namespace XmlDocT
             Console.WriteLine();
             Console.WriteLine("  Assembly: {0}", Path.GetFullPath(assemblyPath));
             Console.WriteLine("  Xml comments: {0}", Path.GetFullPath(xmlPath));
+
+            if (!File.Exists(xmlPath))
+            {
+                Console.WriteLine("  Xml comments file not found. Skipping assembly.");
+                return;
+            }
+
             var assembly = Assembly.LoadFile(assemblyPath);
             var xmldoc = new XmlDocument();
             xmldoc.Load(xmlPath);
@@ -240,6 +248,11 @@ namespace XmlDocT
         private bool IsTypeDocumentable(Type type)
         {
             if (!type.IsClass && !type.IsInterface && !type.IsEnum && !type.IsValueType)
+            {
+                return false;
+            }
+            
+            if (!type.IsPublic)
             {
                 return false;
             }

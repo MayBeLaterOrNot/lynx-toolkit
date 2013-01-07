@@ -52,7 +52,7 @@ namespace XmlDocT
             var w = Stopwatch.StartNew();
             Console.WriteLine(Application.Header);
 
-            var outputDirectory = string.Empty;
+            var output = ".";
             var format = "html";
             string outputExtension = null;
             string stylesheet = null;
@@ -76,7 +76,7 @@ namespace XmlDocT
                             createMemberPages = true;
                             break;
                         case "/output":
-                            outputDirectory = kv[1];
+                            output = kv[1];
                             continue;
                         case "/stylesheet":
                             stylesheet = kv[1];
@@ -129,6 +129,9 @@ namespace XmlDocT
 
             Console.WriteLine();
             Console.WriteLine("Output");
+
+            var outputDirectory = singlePage ? Path.GetDirectoryName(output) : output;
+
             if (!Directory.Exists(outputDirectory))
             {
                 Console.WriteLine("  Creating output directory: {0}", Path.GetFullPath(outputDirectory));
@@ -138,11 +141,16 @@ namespace XmlDocT
             {
                 Console.WriteLine("  Output directory: {0}", Path.GetFullPath(outputDirectory));
             }
+            
+            if (singlePage)
+            {
+                Console.WriteLine("  Output file: {0}", Path.GetFullPath(output));                
+            }
 
             if (stylesheet != null)
             {
                 Console.WriteLine("  Copying stylesheet: {0}", Path.GetFullPath(stylesheet));
-                var destStylesheet = Path.Combine(outputDirectory, Path.GetFileName(stylesheet));
+                var destStylesheet = Path.Combine(output, Path.GetFileName(stylesheet));
                 File.Copy(stylesheet, destStylesheet, true);
             }
 
@@ -155,7 +163,7 @@ namespace XmlDocT
             Console.WriteLine("  Writing documentation output files...");
 
             // Write the documentation pages
-            DocFormatter.CreatePages(model, outputDirectory, format, outputExtension, stylesheet, template, singlePage, createMemberPages);
+            DocFormatter.CreatePages(model, output, format, outputExtension, stylesheet, template, singlePage, createMemberPages);
 
             Console.WriteLine();
             Console.WriteLine(

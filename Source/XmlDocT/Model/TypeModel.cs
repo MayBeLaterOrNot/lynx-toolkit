@@ -230,6 +230,11 @@ namespace XmlDocT
                 sb.Append("class ");
             }
 
+            if (this.Type.IsInterface)
+            {
+                sb.Append("interface ");
+            }
+
             if (this.Type.IsEnum)
             {
                 sb.Append("enum ");
@@ -271,6 +276,11 @@ namespace XmlDocT
             if (this.Type.IsClass)
             {
                 return string.Format("{0} Class", this);
+            }
+
+            if (this.Type.IsInterface)
+            {
+                return string.Format("{0} Interface", this);
             }
 
             if (this.Type.IsEnum)
