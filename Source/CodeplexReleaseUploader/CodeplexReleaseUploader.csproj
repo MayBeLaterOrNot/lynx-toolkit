@@ -46,7 +46,7 @@
     <Compile Include="..\GlobalAssemblyInfo.cs">
       <Link>Properties\GlobalAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="..\UpdateFileHeaders\Utilities.cs">
+    <Compile Include="..\Utilities.cs">
       <Link>Utilities.cs</Link>
     </Compile>
     <Compile Include="Program.cs" />

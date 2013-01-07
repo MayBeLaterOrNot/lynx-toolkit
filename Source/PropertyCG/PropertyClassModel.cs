@@ -36,6 +36,8 @@ namespace PropertyCG
     using System.Text;
     using System.Text.RegularExpressions;
 
+    using LynxToolkit;
+
     /// <summary>
     /// Provides a model of a class.
     /// </summary>

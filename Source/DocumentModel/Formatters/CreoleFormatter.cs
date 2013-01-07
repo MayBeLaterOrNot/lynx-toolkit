@@ -27,13 +27,13 @@ namespace LynxToolkit.Documents
             }
         }
 
-        
-        protected override void Write(Anchor anchor)
+
+        protected override void Write(Anchor anchor, object parent)
         {
             Write("¤", anchor.Name, "¤");
         }
 
-        protected override void Write(Hyperlink hyperlink)
+        protected override void Write(Hyperlink hyperlink, object parent)
         {
             Write("[[", hyperlink.Url);
             if (hyperlink.Content.Count > 0)
@@ -44,7 +44,7 @@ namespace LynxToolkit.Documents
             Write("]]");
         }
 
-        protected override void Write(Image image)
+        protected override void Write(Image image, object parent)
         {
             Write("{{", image.Source);
             if (!string.IsNullOrEmpty(image.AlternateText))

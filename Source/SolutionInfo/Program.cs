@@ -34,6 +34,8 @@ namespace SolutionInfo
     using System.Text.RegularExpressions;
     using System.Xml;
 
+    using LynxToolkit;
+
     class Program
     {
         static void Main(string[] args)
@@ -304,7 +306,7 @@ namespace SolutionInfo
 
                 if (clean)
                 {
-                    modified |= SetAttribute(node, "Include", SubstringUntil(r.Include, ','));
+                    modified |= SetAttribute(node, "Include", r.Include.SubstringTo(","));
                     modified |= this.SetValue(node, "b:RequiredTargetFramework", null);
                     modified |= this.SetValue(node, "b:SpecificVersion", null);
                 }
@@ -325,7 +327,7 @@ namespace SolutionInfo
 
                 if (clean)
                 {
-                    modified |= SetAttribute(node, "Include", SubstringUntil(pr.Include, ','));
+                    modified |= SetAttribute(node, "Include", pr.Include.SubstringTo(","));
                 }
             }
 
@@ -381,13 +383,6 @@ namespace SolutionInfo
                 Console.WriteLine("  Saving changes.");
                 doc.Save(path);
             }
-        }
-
-        private string SubstringUntil(string include, char c)
-        {
-            int i = include.IndexOf(c);
-            if (i <= 0) return include;
-            return include.Substring(0, i);
         }
 
         private bool SetAttribute(XmlNode node, string attributeName, string s)

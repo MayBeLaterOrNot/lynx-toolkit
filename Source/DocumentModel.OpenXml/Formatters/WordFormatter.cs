@@ -10,6 +10,7 @@
     using LynxToolkit.Documents;
 
     using Document = DocumentFormat.OpenXml.Wordprocessing.Document;
+    using Paragraph = DocumentFormat.OpenXml.Wordprocessing.Paragraph;
     using Run = DocumentFormat.OpenXml.Wordprocessing.Run;
 
     public class WordFormatterOptions : DocumentFormatterOptions
@@ -25,11 +26,16 @@
             : base(doc)
         {
             this.Package = WordprocessingDocument.Create(filePath, WordprocessingDocumentType.Document);
-            this.mainPart = this.Package.AddMainDocumentPart();
-            this.stylePart = this.mainPart.AddNewPart<StyleDefinitionsPart>();
             this.SetPackageProperties(this.Package);
+
+            this.mainPart = this.Package.AddMainDocumentPart();
+            this.stylePart = this.CreateStylePart(this.mainPart, doc.StyleSheet);
+
             this.document = this.CreateDocument();
             this.body = new Body();
+            this.document.Append(this.body);
+
+            this.mainPart.Document = this.document;
         }
 
         /// <summary>
@@ -58,22 +64,33 @@
             return d;
         }
 
-        private void AddStyles(StyleDefinitionsPart sdp, LynxToolkit.Documents.StyleSheet style)
+        private StyleDefinitionsPart CreateStylePart(MainDocumentPart mainPart, LynxToolkit.Documents.StyleSheet style)
         {
+            var sdp = mainPart.AddNewPart<StyleDefinitionsPart>();
+
             sdp.Styles = new Styles();
 
-            sdp.Styles.Append(CreateStyle(style.ParagraphStyle, BodyTextID, BodyTextName, null, null, true, false));
-            sdp.Styles.Append(CreateStyle(style.Header1Style, string.Format(HeaderID, 1), string.Format(HeaderName, 1), "Heading1", BodyTextID, false, false));
+            AppendStyle(sdp, style.ParagraphStyle, BodyTextID, BodyTextName, null, null, true, false);
+            AppendStyle(sdp, style.Header1Style, string.Format(HeaderID, 1), string.Format(HeaderName, 1), "Heading1", BodyTextID, false, false);
+            AppendStyle(sdp, style.Header2Style, string.Format(HeaderID, 2), string.Format(HeaderName, 2), "Heading1", BodyTextID, false, false);
+            AppendStyle(sdp, style.Header3Style, string.Format(HeaderID, 3), string.Format(HeaderName, 3), "Heading1", BodyTextID, false, false);
+            AppendStyle(sdp, style.Header4Style, string.Format(HeaderID, 4), string.Format(HeaderName, 4), "Heading1", BodyTextID, false, false);
+            AppendStyle(sdp, style.Header5Style, string.Format(HeaderID, 5), string.Format(HeaderName, 5), "Heading1", BodyTextID, false, false);
 
             //sdp.Styles.Append(CreateStyle(style.TableTextStyle, TableTextID, TableTextName, null, null));
             //sdp.Styles.Append(CreateStyle(style.TableHeaderStyle, TableHeaderID, TableHeaderName, null, null));
             //sdp.Styles.Append(CreateStyle(style.TableCaptionStyle, TableCaptionID, TableCaptionName, null, null));
 
             //sdp.Styles.Append(CreateStyle(style.FigureTextStyle, FigureTextID, FigureTextName, null, null));
+
+            sdp.Styles.Save();
+
+            return sdp;
         }
 
-        private static DocumentFormat.OpenXml.Wordprocessing.Style CreateStyle(
-           LynxToolkit.Documents.Style ps,
+        private static void AppendStyle(
+            StyleDefinitionsPart part,
+           LynxToolkit.Documents.Style documentStyle,
            string styleID,
            string styleName,
            string basedOnStyleID,
@@ -81,66 +98,62 @@
            bool isDefault = false,
            bool isCustomStyle = true)
         {
+            if (documentStyle == null) return;
+
             // todo: add font to FontTable?
-            var rPr = new StyleRunProperties();
+            var runProperties = new StyleRunProperties();
 
             // http://msdn.microsoft.com/en-us/library/documentformat.openxml.wordprocessing.color.aspx
-            var color = new DocumentFormat.OpenXml.Wordprocessing.Color { Val = ps.Foreground.ToString().Trim('#').Substring(2) };
-            rPr.Append(color);
+            if (documentStyle.Foreground != null)
+            {
+                var color = new DocumentFormat.OpenXml.Wordprocessing.Color { Val = documentStyle.Foreground.ToString().Trim('#').Substring(2) };
+                runProperties.Append(color);
+            }
 
             // http://msdn.microsoft.com/en-us/library/cc850848.aspx
-            rPr.Append(new RunFonts { Ascii = ps.FontFamily, HighAnsi = ps.FontFamily });
-            if (ps.FontSize.HasValue)
+            runProperties.Append(new RunFonts { Ascii = documentStyle.FontFamily, HighAnsi = documentStyle.FontFamily });
+            if (documentStyle.FontSize.HasValue)
             {
-                rPr.Append(
+                runProperties.Append(
                     new FontSize
                         {
-                            Val = new StringValue((ps.FontSize.Value * 2).ToString(CultureInfo.InvariantCulture))
+                            Val = new StringValue((documentStyle.FontSize.Value * 2).ToString(CultureInfo.InvariantCulture))
                         });
-                rPr.Append(
+                runProperties.Append(
                     new FontSizeComplexScript
                         {
                             Val =
                                 new StringValue(
-                                (ps.FontSize.Value * 2).ToString(CultureInfo.InvariantCulture))
+                                (documentStyle.FontSize.Value * 2).ToString(CultureInfo.InvariantCulture))
                         });
             }
 
-            if (ps.FontWeight == FontWeight.Bold)
+            if (documentStyle.FontWeight == FontWeight.Bold)
             {
-                rPr.Append(new Bold());
+                runProperties.Append(new Bold());
             }
 
-            if (ps.FontStyle == FontStyle.Italic)
+            if (documentStyle.FontStyle == FontStyle.Italic)
             {
-                rPr.Append(new Italic());
+                runProperties.Append(new Italic());
             }
 
             var pPr = new StyleParagraphProperties();
-            var spacingBetweenLines2 = new SpacingBetweenLines
-            {
-                After = string.Format(CultureInfo.InvariantCulture, "{0}", ps.Margin.Value.Bottom * 20),
-                Before = string.Format(CultureInfo.InvariantCulture, "{0}", ps.Margin.Value.Top * 20),
-                // Line = string.Format(CultureInfo.InvariantCulture, "{0}", ps.LineSpacing * 240),
-                LineRule = LineSpacingRuleValues.Auto
-            };
-            var indentation = new Indentation
-            {
-                Left = string.Format(CultureInfo.InvariantCulture, "{0}", ps.Margin.Value.Left * 20),
-                Right = string.Format(CultureInfo.InvariantCulture, "{0}", ps.Margin.Value.Right * 20)
-            };
+            var spacingBetweenLines2 = new SpacingBetweenLines();
+            var indentation = new Indentation();
             var contextualSpacing1 = new ContextualSpacing();
+            if (documentStyle.Margin.HasValue)
+            {
+                spacingBetweenLines2.After = string.Format(CultureInfo.InvariantCulture, "{0}", documentStyle.Margin.Value.Bottom * 20);
+                spacingBetweenLines2.Before = string.Format(CultureInfo.InvariantCulture, "{0}", documentStyle.Margin.Value.Top * 20);
+                indentation.Left = string.Format(CultureInfo.InvariantCulture, "{0}", documentStyle.Margin.Value.Left * 20);
+                indentation.Right = string.Format(CultureInfo.InvariantCulture, "{0}", documentStyle.Margin.Value.Right * 20);
+            }
+            spacingBetweenLines2.LineRule = LineSpacingRuleValues.Auto;
 
             pPr.Append(spacingBetweenLines2);
             pPr.Append(contextualSpacing1);
             pPr.Append(indentation);
-
-            // StyleRunProperties styleRunProperties7 = new StyleRunProperties();
-            // RunFonts runFonts8 = new RunFonts() { Ascii = "Verdana", HighAnsi = "Verdana" };
-            // Color color7 = new Color() { Val = "000000" };
-
-            // styleRunProperties7.Append(runFonts8);
-            // styleRunProperties7.Append(color7);
 
             // http://msdn.microsoft.com/en-us/library/documentformat.openxml.wordprocessing.style.aspx
             var style = new DocumentFormat.OpenXml.Wordprocessing.Style
@@ -167,9 +180,9 @@
                 style.Append(new NextParagraphStyle { Val = nextStyleID });
             }
 
-            style.Append(rPr);
+            style.Append(runProperties);
             style.Append(pPr);
-            return style;
+            part.Styles.Append(style);
         }
 
         /// <summary>
@@ -177,11 +190,6 @@
         /// </summary>
         public void Save()
         {
-            //this.SetPackageProperties(this.package);
-            this.document.Append(this.body);
-            this.mainPart.Document = this.document;
-
-            this.stylePart.Styles.Save();
             this.mainPart.Document.Save();
         }
 
@@ -209,54 +217,6 @@
             p.PackageProperties.Created = DateTime.Now;
             p.PackageProperties.Modified = DateTime.Now;
             p.PackageProperties.LastModifiedBy = doc.Creator;
-        }
-
-        /// <summary>
-        /// The create paragraph.
-        /// </summary>
-        /// <param name="content">
-        /// The content.
-        /// </param>
-        /// <param name="styleID">
-        /// The style id.
-        /// </param>
-        /// <returns>
-        /// </returns>
-        private static DocumentFormat.OpenXml.Wordprocessing.Paragraph CreateParagraph(InlineCollection content, string styleID = null)
-        {
-            var p = new DocumentFormat.OpenXml.Wordprocessing.Paragraph();
-
-            if (styleID != null)
-            {
-                var pp = new ParagraphProperties { ParagraphStyleId = new ParagraphStyleId { Val = styleID } };
-                p.Append(pp);
-            }
-
-
-            WriteInlines(p, content);
-            return p;
-        }
-
-        private static void WriteInlines(OpenXmlCompositeElement compositeElement, InlineCollection content)
-        {
-            foreach (var inline in content)
-            {
-                var run = inline as LynxToolkit.Documents.Run;
-                if (run != null)
-                {
-                    var text = new Text(run.Text);
-                    compositeElement.Append(new Run(text));
-                }
-
-                var strong = inline as LynxToolkit.Documents.Strong;
-                if (strong != null)
-                {
-                    var r = new Run();
-                    r.RunProperties = new RunProperties(new Bold() { Val = new OnOffValue { Value = true } });
-                    WriteInlines(r, strong.Content);
-                    compositeElement.Append(r);
-                }
-            }
         }
 
         /// <summary>
@@ -321,12 +281,25 @@
 
         protected override void Write(LynxToolkit.Documents.Header header)
         {
-            this.body.AppendChild(CreateParagraph(header.Content, string.Format(HeaderID, header.Level)));
+            var headerID = string.Format(HeaderID, header.Level);
+            var p = CreateParagraph(headerID);
+            WriteInlines(header.Content, p);
+            this.body.AppendChild(p);
         }
 
         protected override void Write(LynxToolkit.Documents.Paragraph paragraph)
         {
-            this.body.AppendChild(CreateParagraph(paragraph.Content));
+            var p = CreateParagraph(BodyTextID);
+            WriteInlines(paragraph.Content, p);
+            this.body.AppendChild(p);
+        }
+
+        private static Paragraph CreateParagraph(string styleID)
+        {
+            var p = new Paragraph();
+            var pp = new ParagraphProperties { ParagraphStyleId = new ParagraphStyleId { Val = styleID } };
+            p.Append(pp);
+            return p;
         }
 
         protected override void Write(LynxToolkit.Documents.List list)
@@ -354,47 +327,59 @@
 
         }
 
-        protected override void Write(LynxToolkit.Documents.Run run)
+        protected override void Write(NonBreakingSpace nbsp, object parent)
+        {
+        }
+
+        protected override void Write(LynxToolkit.Documents.Run run, object parent)
+        {
+            var compositeElement = (OpenXmlCompositeElement)parent;
+            var text = new Text(run.Text);
+            compositeElement.Append(new Run(text));
+        }
+
+        protected override void Write(LynxToolkit.Documents.Strong strong, object parent)
+        {
+            var compositeElement = (OpenXmlCompositeElement)parent;
+            var r = new Run { RunProperties = new RunProperties(new Bold { Val = new OnOffValue { Value = true } }) };
+            WriteInlines(strong.Content, r);
+            compositeElement.Append(r);
+        }
+
+        protected override void Write(LynxToolkit.Documents.Emphasized em, object parent)
+        {
+            var compositeElement = (OpenXmlCompositeElement)parent;
+            var r = new Run { RunProperties = new RunProperties(new Italic { Val = new OnOffValue { Value = true } }) };
+            WriteInlines(em.Content, r);
+            compositeElement.Append(r);
+        }
+
+        protected override void Write(LynxToolkit.Documents.LineBreak linebreak, object parent)
         {
 
         }
 
-        protected override void Write(LynxToolkit.Documents.Strong strong)
+        protected override void Write(LynxToolkit.Documents.InlineCode inlineCode, object parent)
         {
 
         }
 
-        protected override void Write(LynxToolkit.Documents.Emphasized em)
+        protected override void Write(LynxToolkit.Documents.Hyperlink hyperlink, object parent)
         {
 
         }
 
-        protected override void Write(LynxToolkit.Documents.LineBreak linebreak)
+        protected override void Write(LynxToolkit.Documents.Image image, object parent)
         {
 
         }
 
-        protected override void Write(LynxToolkit.Documents.InlineCode inlineCode)
+        protected override void Write(LynxToolkit.Documents.Symbol symbol, object parent)
         {
 
         }
 
-        protected override void Write(LynxToolkit.Documents.Hyperlink hyperlink)
-        {
-
-        }
-
-        protected override void Write(LynxToolkit.Documents.Image image)
-        {
-
-        }
-
-        protected override void Write(LynxToolkit.Documents.Symbol symbol)
-        {
-
-        }
-
-        protected override void Write(LynxToolkit.Documents.Anchor anchor)
+        protected override void Write(LynxToolkit.Documents.Anchor anchor, object parent)
         {
 
         }
@@ -404,7 +389,7 @@
         private MainDocumentPart mainPart;
         private Document document;
 
-        public static WordprocessingDocument Format(LynxToolkit.Documents.Document doc, string filePath, string template, string symbolDirectory = null)
+        public static WordprocessingDocument Format(LynxToolkit.Documents.Document doc, string filePath, WordFormatterOptions options)
         {
             var wf = new WordFormatter(doc, filePath);
             wf.FormatCore();

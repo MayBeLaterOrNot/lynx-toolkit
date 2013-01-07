@@ -1,8 +1,35 @@
-using System;
-using System.Collections.Generic;
+// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="DocumentFormatter.cs" company="Lynx">
+//   The MIT License (MIT)
+//   
+//   Copyright (c) 2012 Oystein Bjorke
+//   
+//   Permission is hereby granted, free of charge, to any person obtaining a
+//   copy of this software and associated documentation files (the
+//   "Software"), to deal in the Software without restriction, including
+//   without limitation the rights to use, copy, modify, merge, publish,
+//   distribute, sublicense, and/or sell copies of the Software, and to
+//   permit persons to whom the Software is furnished to do so, subject to
+//   the following conditions:
+//   
+//   The above copyright notice and this permission notice shall be included
+//   in all copies or substantial portions of the Software.
+//   
+//   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+//   OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+//   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+//   IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+//   CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+//   TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+//   SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// </copyright>
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace LynxToolkit.Documents
 {
+    using System;
+    using System.Collections.Generic;
+
     public class DocumentFormatterOptions
     {
         public string SymbolDirectory { get; set; }
@@ -11,11 +38,23 @@ namespace LynxToolkit.Documents
     public abstract class DocumentFormatter
     {
         protected Document doc;
-        protected StyleSheet StyleSheet { get { return doc.StyleSheet; } }
 
         public DocumentFormatter(Document doc)
         {
             this.doc = doc;
+        }
+
+        protected StyleSheet StyleSheet
+        {
+            get
+            {
+                return this.doc.StyleSheet;
+            }
+        }
+
+        public virtual void FormatCore()
+        {
+            this.WriteBlocks(this.doc.Blocks);
         }
 
         protected Style GetStyle(Header header)
@@ -33,6 +72,7 @@ namespace LynxToolkit.Documents
                 case 5:
                     return this.StyleSheet.Header5Style;
             }
+
             return null;
         }
 
@@ -81,65 +121,6 @@ namespace LynxToolkit.Documents
             return this.StyleSheet.ImageStyle;
         }
 
-        public virtual void FormatCore()
-        {
-            WriteBlocks(doc.Blocks);
-        }
-
-        protected virtual void WriteBlocks(IList<Block> blocks)
-        {
-            foreach (var block in blocks)
-            {
-                WriteBlock(block);
-            }
-        }
-
-        protected virtual void WriteBlock(Block block)
-        {
-            if (WriteBlock<Header>(block, Write)) return;
-            if (WriteBlock<Quote>(block, Write)) return;
-            if (WriteBlock<Paragraph>(block, Write)) return;
-            if (WriteBlock<HorizontalRuler>(block, Write)) return;
-            if (WriteBlock<OrderedList>(block, Write)) return;
-            if (WriteBlock<List>(block, Write)) return;
-            if (WriteBlock<Table>(block, Write)) return;
-            WriteBlock<CodeBlock>(block, Write);
-        }
-
-        protected virtual void WriteInlines(IList<Inline> inlines)
-        {
-            foreach (var inline in inlines) WriteInline(inline);
-        }
-
-        protected virtual void WriteInline(Inline inline)
-        {
-            if (WriteInline<Strong>(inline, Write)) return;
-            if (WriteInline<Emphasized>(inline, Write)) return;
-            if (WriteInline<Symbol>(inline, Write)) return;
-            if (WriteInline<Run>(inline, Write)) return;
-            if (WriteInline<LineBreak>(inline, Write)) return;
-            if (WriteInline<InlineCode>(inline, Write)) return;
-            if (WriteInline<Hyperlink>(inline, Write)) return;
-            if (WriteInline<Anchor>(inline, Write)) return;
-            WriteInline<Image>(inline, Write);
-        }
-
-        protected bool WriteInline<T>(Inline inline, Action<T> writer) where T : Inline
-        {
-            var i = inline as T;
-            if (i == null) return false;
-            writer(i);
-            return true;
-        }
-
-        protected bool WriteBlock<T>(Block block, Action<T> writer) where T : Block
-        {
-            var i = block as T;
-            if (i == null) return false;
-            writer(i);
-            return true;
-        }
-
         protected abstract void Write(Header header);
 
         protected abstract void Write(Paragraph paragraph);
@@ -154,27 +135,32 @@ namespace LynxToolkit.Documents
 
         protected abstract void Write(HorizontalRuler ruler);
 
-        protected abstract void Write(Run run);
+        protected abstract void Write(NonBreakingSpace nbsp, object parent);
 
-        protected abstract void Write(Strong strong);
+        protected abstract void Write(Run run, object parent);
 
-        protected abstract void Write(Emphasized em);
+        protected abstract void Write(Strong strong, object parent);
 
-        protected abstract void Write(LineBreak linebreak);
+        protected abstract void Write(Emphasized em, object parent);
 
-        protected abstract void Write(InlineCode inlineCode);
+        protected abstract void Write(LineBreak linebreak, object parent);
 
-        protected abstract void Write(Hyperlink hyperlink);
+        protected abstract void Write(InlineCode inlineCode, object parent);
 
-        protected abstract void Write(Image image);
+        protected abstract void Write(Hyperlink hyperlink, object parent);
 
-        protected abstract void Write(Symbol symbol);
+        protected abstract void Write(Image image, object parent);
 
-        protected abstract void Write(Anchor anchor);
+        protected abstract void Write(Symbol symbol, object parent);
+
+        protected abstract void Write(Anchor anchor, object parent);
 
         protected virtual void Write(Table table)
         {
-            foreach (var row in table.Rows) Write(row);
+            foreach (var row in table.Rows)
+            {
+                Write(row);
+            }
         }
 
         protected virtual void Write(TableRow row)
@@ -187,12 +173,142 @@ namespace LynxToolkit.Documents
 
         protected virtual void Write(TableCell cell)
         {
-            WriteInlines(cell.Content);
+            this.WriteInlines(cell.Content);
         }
 
         protected virtual void Write(ListItem item)
         {
-            WriteInlines(item.Content);
+            this.WriteInlines(item.Content);
+        }
+
+        protected virtual void WriteBlock(Block block)
+        {
+            if (this.WriteBlock<Header>(block, this.Write))
+            {
+                return;
+            }
+
+            if (this.WriteBlock<Quote>(block, this.Write))
+            {
+                return;
+            }
+
+            if (this.WriteBlock<Paragraph>(block, this.Write))
+            {
+                return;
+            }
+
+            if (this.WriteBlock<HorizontalRuler>(block, this.Write))
+            {
+                return;
+            }
+
+            if (this.WriteBlock<OrderedList>(block, this.Write))
+            {
+                return;
+            }
+
+            if (this.WriteBlock<List>(block, this.Write))
+            {
+                return;
+            }
+
+            if (this.WriteBlock<Table>(block, this.Write))
+            {
+                return;
+            }
+
+            this.WriteBlock<CodeBlock>(block, this.Write);
+        }
+
+        protected bool WriteBlock<T>(Block block, Action<T> writer) where T : Block
+        {
+            var i = block as T;
+            if (i == null)
+            {
+                return false;
+            }
+
+            writer(i);
+            return true;
+        }
+
+        protected virtual void WriteBlocks(IList<Block> blocks)
+        {
+            foreach (var block in blocks)
+            {
+                this.WriteBlock(block);
+            }
+        }
+
+        protected virtual void WriteInline(Inline inline, object parent)
+        {
+            if (this.WriteInline<Strong>(inline, parent, this.Write))
+            {
+                return;
+            }
+
+            if (this.WriteInline<Emphasized>(inline, parent, this.Write))
+            {
+                return;
+            }
+
+            if (this.WriteInline<Symbol>(inline, parent, this.Write))
+            {
+                return;
+            }
+
+            if (this.WriteInline<Run>(inline, parent, this.Write))
+            {
+                return;
+            }
+
+            if (this.WriteInline<NonBreakingSpace>(inline, parent, this.Write))
+            {
+                return;
+            }
+
+            if (this.WriteInline<LineBreak>(inline, parent, this.Write))
+            {
+                return;
+            }
+
+            if (this.WriteInline<InlineCode>(inline, parent, this.Write))
+            {
+                return;
+            }
+
+            if (this.WriteInline<Hyperlink>(inline, parent, this.Write))
+            {
+                return;
+            }
+
+            if (this.WriteInline<Anchor>(inline, parent, this.Write))
+            {
+                return;
+            }
+
+            this.WriteInline<Image>(inline, parent, this.Write);
+        }
+
+        protected bool WriteInline<Ti>(Inline inline, object parent, Action<Ti, object> writer) where Ti : Inline
+        {
+            var i = inline as Ti;
+            if (i == null)
+            {
+                return false;
+            }
+
+            writer(i, parent);
+            return true;
+        }
+
+        protected virtual void WriteInlines(IList<Inline> inlines, object parent = null)
+        {
+            foreach (var inline in inlines)
+            {
+                this.WriteInline(inline, parent);
+            }
         }
     }
 }

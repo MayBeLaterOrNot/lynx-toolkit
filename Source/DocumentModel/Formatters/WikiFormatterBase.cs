@@ -194,37 +194,42 @@ namespace LynxToolkit.Documents
             WriteLine();
         }
 
-        protected override void Write(Run run)
+        protected override void Write(NonBreakingSpace nbsp, object parent)
+        {
+            Write(" ");
+        }
+
+        protected override void Write(Run run, object parent)
         {
             var text = Encode(run.Text);
             Write(text);
         }
 
-        protected override void Write(Symbol symbol)
+        protected override void Write(Symbol symbol, object parent)
         {
             Write(symbol.Name);
         }
 
-        protected override void Write(Strong strong)
+        protected override void Write(Strong strong, object parent)
         {
             Write("**");
             WriteInlines(strong.Content);
             Write("**");
         }
 
-        protected override void Write(Emphasized em)
+        protected override void Write(Emphasized em, object parent)
         {
             Write("//");
             WriteInlines(em.Content);
             Write("//");
         }
 
-        protected override void Write(LineBreak linebreak)
+        protected override void Write(LineBreak linebreak, object parent)
         {
             WriteLine(@"\\");
         }
 
-        protected override void Write(InlineCode inlineCode)
+        protected override void Write(InlineCode inlineCode, object parent)
         {
             Write("{{", inlineCode.Text, "}}");
         }

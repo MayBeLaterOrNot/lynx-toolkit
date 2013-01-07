@@ -50,7 +50,7 @@ namespace LynxToolkit.Documents
             WriteLine();
         }
 
-        protected override void Write(Anchor anchor)
+        protected override void Write(Anchor anchor, object parent)
         {
             Write("#", anchor.Name, " ");
         }
@@ -72,16 +72,17 @@ namespace LynxToolkit.Documents
         }
 
         bool firstInline;
-        string prefix;
+        string prefix = string.Empty;
 
-        protected override void WriteInline(Inline inline)
+        protected override void WriteInline(Inline inline, object parent)
         {
             if (firstInline && prefix != null)
             {
                 Write(prefix);
                 firstInline = false;
             }
-            base.WriteInline(inline);
+
+            base.WriteInline(inline, parent);
             if (inline is LineBreak) firstInline = true;
         }
 
@@ -93,7 +94,7 @@ namespace LynxToolkit.Documents
             var text = Wrap(sb.ToString(), LineLength);
             sb = tmp;
 
-            WriteLines(text,"> ");
+            WriteLines(text, "> ");
             WriteLine();
         }
 
@@ -115,36 +116,36 @@ namespace LynxToolkit.Documents
             WriteLine();
         }
 
-        protected override void Write(Run run)
+        protected override void Write(Run run, object parent)
         {
             Write(Encode(run.Text));
         }
 
-        protected override void Write(Strong strong)
+        protected override void Write(Strong strong, object parent)
         {
             Write("**");
             WriteInlines(strong.Content);
             Write("**");
         }
 
-        protected override void Write(Emphasized em)
+        protected override void Write(Emphasized em, object parent)
         {
             Write("*");
             WriteInlines(em.Content);
             Write("*");
         }
 
-        protected override void Write(LineBreak linebreak)
+        protected override void Write(LineBreak linebreak, object parent)
         {
             WriteLine(@"  ");
         }
 
-        protected override void Write(InlineCode inlineCode)
+        protected override void Write(InlineCode inlineCode, object parent)
         {
             Write("`", inlineCode.Text, "`");
         }
 
-        protected override void Write(Hyperlink hyperlink)
+        protected override void Write(Hyperlink hyperlink, object parent)
         {
             Write("[");
             WriteInlines(hyperlink.Content);
@@ -155,7 +156,7 @@ namespace LynxToolkit.Documents
             Write(")");
         }
 
-        protected override void Write(Image image)
+        protected override void Write(Image image, object parent)
         {
             Write("![", image.Source, "]");
             if (!string.IsNullOrEmpty(image.AlternateText))

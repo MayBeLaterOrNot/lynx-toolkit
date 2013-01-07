@@ -23,31 +23,31 @@ namespace LynxToolkit.Documents
             WriteLine();
         }
 
-        protected override void Write(Strong strong)
+        protected override void Write(Strong strong, object parent)
         {
             Write("*");
             WriteInlines(strong.Content);
             Write("*");
         }
 
-        protected override void Write(Emphasized em)
+        protected override void Write(Emphasized em, object parent)
         {
             Write("_");
             WriteInlines(em.Content);
             Write("_");
         }
 
-        protected override void Write(LineBreak linebreak)
+        protected override void Write(LineBreak linebreak, object parent)
         {
             WriteLine(@"//");
         }
 
-        protected override void Write(InlineCode inlineCode)
+        protected override void Write(InlineCode inlineCode, object parent)
         {
             Write("{{", inlineCode.Text, "}}");
         }
 
-        protected override void Write(Hyperlink hyperlink)
+        protected override void Write(Hyperlink hyperlink, object parent)
         {
             Write("[url:");
             Write(hyperlink.Url);
@@ -59,7 +59,7 @@ namespace LynxToolkit.Documents
             Write("]");
         }
 
-        protected override void Write(Image image)
+        protected override void Write(Image image, object parent)
         {
             Write("[image:", image.Source);
             if (!string.IsNullOrEmpty(image.AlternateText))
@@ -69,7 +69,7 @@ namespace LynxToolkit.Documents
             Write("]");
         }
 
-        protected override void Write(Anchor anchor)
+        protected override void Write(Anchor anchor, object parent)
         {
         }
     }

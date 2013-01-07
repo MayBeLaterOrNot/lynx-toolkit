@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="EventModel.cs" company="Lynx">
+// <copyright file="MemberModel.cs" company="Lynx">
 //   The MIT License (MIT)
 //   
 //   Copyright (c) 2012 Oystein Bjorke
@@ -30,66 +30,64 @@ namespace XmlDocT
     using System;
     using System.Collections.Generic;
     using System.Reflection;
-    using System.Text;
 
-    public class EventModel : MemberModel
+    public abstract class MemberModel : Model
     {
-        public EventModel(TypeModel parent, EventInfo ei)
-            : base(parent, ei)
+        protected MemberModel(TypeModel parent, MemberInfo info)
         {
+            this.Parent = parent;
+            this.Info = info;
         }
 
-        public EventInfo EventInfo
+        public Type DeclaringType
         {
             get
             {
-                return (EventInfo)this.Info;
+                return this.Info.DeclaringType;
             }
         }
 
-        public override string GetXmlMemberName()
+        public MemberInfo Info { get; private set; }
+
+        public bool IsOverloaded { get; set; }
+
+        public string Name
         {
-            return string.Format("E:{0}.{1}", Utilities.GetXmlMemberTypeName(this.Info.DeclaringType), this.Info.Name);
+            get
+            {
+                return this.Info.Name;
+            }
+        }
+
+        public TypeModel Parent { get; private set; }
+
+        public override string GetDescription()
+        {
+            if (this.IsInherited() && this.Info != null)
+            {
+                return string.Format(
+                    "{0} (Inherited from <see cref=\"T:{1}\" />.)", this.Description, this.Info.DeclaringType.FullName);
+            }
+
+            return this.Description;
+        }
+
+        public virtual IEnumerable<ParameterModel> GetParameters()
+        {
+            yield break;
         }
 
         public override IEnumerable<Type> GetRelatedTypes()
         {
-            yield return this.Info.DeclaringType;
-            var mi = (EventInfo)this.Info;
-            yield return mi.EventHandlerType;
-        }
-
-        public override string GetSyntax()
-        {
-            var sb = new StringBuilder();
-            var ei = this.EventInfo;
-
-            sb.Append("event ");
-            Utilities.AppendAttributes(ei.GetCustomAttributes(false), sb);
-            sb.Append(Utilities.GetNiceTypeName(ei.EventHandlerType));
-            sb.Append(" ");
-            sb.Append(ei.Name);
-            return sb.ToString();
-        }
-
-        public override string GetTitle()
-        {
-            return string.Format("{0}.{1} Event", Utilities.GetNiceTypeName(this.DeclaringType), this);
+            if (this.Info != null)
+            {
+                yield return this.Info.DeclaringType;
+            }
         }
 
         public override bool IsInherited()
         {
             return this.Info == null || this.Info.DeclaringType != this.Parent.Type;
-        }
-
-        public override string ToString()
-        {
-            return this.Info.Name;
-        }
-
-        protected override string GetFileNameCore()
-        {
-            return string.Format("{0}.{1}", this.DeclaringType.FullName, this.Name);
         }
     }
 }

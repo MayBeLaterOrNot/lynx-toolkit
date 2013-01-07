@@ -1,18 +1,122 @@
+// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="MethodModel.cs" company="Lynx">
+//   The MIT License (MIT)
+//   
+//   Copyright (c) 2012 Oystein Bjorke
+//   
+//   Permission is hereby granted, free of charge, to any person obtaining a
+//   copy of this software and associated documentation files (the
+//   "Software"), to deal in the Software without restriction, including
+//   without limitation the rights to use, copy, modify, merge, publish,
+//   distribute, sublicense, and/or sell copies of the Software, and to
+//   permit persons to whom the Software is furnished to do so, subject to
+//   the following conditions:
+//   
+//   The above copyright notice and this permission notice shall be included
+//   in all copies or substantial portions of the Software.
+//   
+//   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+//   OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+//   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+//   IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+//   CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+//   TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+//   SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// </copyright>
+// --------------------------------------------------------------------------------------------------------------------
+
 namespace XmlDocT
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using System.Reflection;
     using System.Text;
 
-    public class MethodModel : Content
+    public class MethodModel : MemberModel
     {
-        public MethodModel(MethodInfo mi)
+        public MethodModel(TypeModel parent, MethodInfo mi)
+            : base(parent, mi)
         {
-            this.Info = mi;
+            this.Parameters = new List<ParameterModel>();
         }
 
-        public override string ToString()
+        public MethodInfo MethodInfo
         {
-            return Utilities.GetNiceMethodName((MethodBase)this.Info);
+            get
+            {
+                return (MethodInfo)this.Info;
+            }
+        }
+
+        public IList<ParameterModel> Parameters { get; private set; }
+
+        public Type ReturnType
+        {
+            get
+            {
+                return ((MethodInfo)this.Info).ReturnType;
+            }
+        }
+
+        public string ReturnValueDescription { get; set; }
+
+        public override string GetXmlMemberName()
+        {
+            var memberName = string.Format(
+                "M:{0}.{1}", Utilities.GetXmlMemberTypeName(this.Info.DeclaringType), this.Info.Name);
+
+            IEnumerable<string> methodGenericArgs = null;
+            if (this.MethodInfo.IsGenericMethod)
+            {
+                memberName += "``" + this.MethodInfo.GetGenericArguments().Length;
+                methodGenericArgs = this.MethodInfo.GetGenericArguments().Select(t => t.Name);
+            }
+
+            var memberParameters = string.Format(
+                "({0})", Utilities.GetXmlParameterList(this.MethodInfo, methodGenericArgs));
+            return memberName + memberParameters;
+        }
+
+        public override IEnumerable<Type> GetRelatedTypes()
+        {
+            yield return this.Info.DeclaringType;
+            var mi = (MethodInfo)this.Info;
+            yield return mi.ReturnType;
+            foreach (var p in mi.GetParameters())
+            {
+                yield return p.ParameterType;
+            }
+        }
+
+        public override string GetSyntax()
+        {
+            var sb = new StringBuilder();
+
+            var mb = this.MethodInfo;
+            Utilities.AppendAttributes(mb.GetCustomAttributes(false), sb);
+            if (mb.IsPublic)
+            {
+                sb.Append("public ");
+            }
+
+            if (mb.IsPrivate)
+            {
+                sb.Append("private ");
+            }
+
+            if (mb.IsVirtual)
+            {
+                sb.Append("virtual ");
+            }
+
+            sb.Append(Utilities.GetNiceTypeName(mb.ReturnType));
+            sb.Append(" ");
+            sb.Append(mb.Name);
+            sb.Append("(");
+            sb.Append(Utilities.GetNiceMethodParameters(mb, true));
+            sb.Append(")");
+            return sb.ToString();
         }
 
         public override string GetTitle()
@@ -20,30 +124,19 @@ namespace XmlDocT
             return string.Format("{0}.{1} Method", Utilities.GetNiceTypeName(this.DeclaringType), this);
         }
 
-        public override string GetFileName()
+        public override bool IsInherited()
+        {
+            return this.Info == null || this.Info.DeclaringType != this.Parent.Type;
+        }
+
+        public override string ToString()
+        {
+            return Utilities.GetNiceMethodName((MethodBase)this.Info);
+        }
+
+        protected override string GetFileNameCore()
         {
             return string.Format("{0}.{1}", this.DeclaringType.FullName, this.Name);
         }
-
-        public override string GetSyntax()
-        {
-            var sb = new StringBuilder();
-            var mb = (MethodBase)this.Info;
-            if (mb.IsPublic) sb.Append("public ");
-            if (mb.IsPrivate) sb.Append("private ");
-            if (mb.IsVirtual) sb.Append("virtual ");
-            if (!mb.IsConstructor)
-            {
-                var mi = (MethodInfo)this.Info;
-                sb.Append(Utilities.GetNiceTypeName(mi.ReturnType));
-                sb.Append(" ");
-            }
-            sb.Append(mb.Name);
-            sb.Append("(");
-            sb.Append(Utilities.GetMethodParameters(mb, true));
-            sb.Append(");");
-            return sb.ToString();
-        }
-
     }
 }

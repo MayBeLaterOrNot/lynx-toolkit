@@ -3,11 +3,28 @@ namespace DocumentModel.Wpf
     using System;
     using System.Collections.Generic;
     using System.Windows;
-    using System.Windows.Controls;
     using System.Windows.Documents;
     using System.Windows.Media;
     using System.Windows.Media.Imaging;
     using System.Windows.Shapes;
+
+    using LynxToolkit.Documents;
+
+    using Block = System.Windows.Documents.Block;
+    using Color = System.Windows.Media.Color;
+    using Hyperlink = System.Windows.Documents.Hyperlink;
+    using Image = System.Windows.Controls.Image;
+    using InlineCollection = System.Windows.Documents.InlineCollection;
+    using LineBreak = System.Windows.Documents.LineBreak;
+    using List = System.Windows.Documents.List;
+    using ListItem = System.Windows.Documents.ListItem;
+    using Paragraph = System.Windows.Documents.Paragraph;
+    using Run = System.Windows.Documents.Run;
+    using Style = System.Windows.Style;
+    using Table = System.Windows.Documents.Table;
+    using TableCell = System.Windows.Documents.TableCell;
+    using TableRow = System.Windows.Documents.TableRow;
+    using Thickness = System.Windows.Thickness;
 
     public class FlowDocumentFormatter : LynxToolkit.Documents.DocumentFormatter
     {
@@ -101,33 +118,29 @@ namespace DocumentModel.Wpf
         protected override void Write(LynxToolkit.Documents.Header header)
         {
             var p = new Paragraph();
-            Push(p.Inlines);
-            WriteInlines(header.Content);
-            Pop();
+            WriteInlines(header.Content, p.Inlines);
             p.Style = this.Format(GetStyle(header));
             Document.Blocks.Add(p);
         }
 
         private Stack<InlineCollection> outputStack = new Stack<InlineCollection>();
 
-        InlineCollection Current { get { return outputStack.Peek(); } }
+        //InlineCollection Current { get { return outputStack.Peek(); } }
 
-        private void Push(InlineCollection collection)
-        {
-            outputStack.Push(collection);
-        }
+        //private void Push(InlineCollection collection)
+        //{
+        //    outputStack.Push(collection);
+        //}
 
-        private void Pop()
-        {
-            outputStack.Pop();
-        }
+        //private void Pop()
+        //{
+        //    outputStack.Pop();
+        //}
 
         protected override void Write(LynxToolkit.Documents.Paragraph paragraph)
         {
             var p = new Paragraph();
-            Push(p.Inlines);
-            WriteInlines(paragraph.Content);
-            Pop();
+            WriteInlines(paragraph.Content, p.Inlines);
             Document.Blocks.Add(p);
             p.Style = this.Format(GetStyle(paragraph));
         }
@@ -162,18 +175,16 @@ namespace DocumentModel.Wpf
             var li = new ListItem();
             var p = new Paragraph();
             li.Blocks.Add(p);
-            Push(p.Inlines);
-            WriteInlines(item.Content);
-            Pop();
+            WriteInlines(item.Content, p.Inlines);
             // Write(item.NestedList);
             listStack.Peek().ListItems.Add(li);
         }
 
         public string SymbolDirectory { get; set; }
 
-        protected override void Write(LynxToolkit.Documents.Symbol symbol)
+        protected override void Write(LynxToolkit.Documents.Symbol symbol, object parent)
         {
-            var file = LynxToolkit.Documents.SymbolResolver.Decode(symbol.Name);
+            var file = SymbolResolver.Decode(symbol.Name);
             var dir = SymbolDirectory ?? string.Empty;
             if (dir.Length > 0 && !dir.EndsWith("/"))
             {
@@ -181,14 +192,13 @@ namespace DocumentModel.Wpf
             }
             var path = dir + file;
 
-            var img = new LynxToolkit.Documents.Image();
-            img.Source = path;
-            Write(img);
+            var img = new LynxToolkit.Documents.Image { Source = path };
+            Write(img, parent);
         }
 
-        protected override void Write(LynxToolkit.Documents.Anchor anchor)
+        protected override void Write(LynxToolkit.Documents.Anchor anchor, object parent)
         {
-            Current.Add(new Run { Name = anchor.Name });
+            ((InlineCollection)parent).Add(new Run { Name = anchor.Name });
         }
 
         protected override void Write(LynxToolkit.Documents.Table table)
@@ -217,9 +227,7 @@ namespace DocumentModel.Wpf
 
                     var p = new Paragraph();
                     td.Blocks.Add(p);
-                    Push(p.Inlines);
-                    WriteInlines(cell.Content);
-                    Pop();
+                    WriteInlines(cell.Content, p.Inlines);
                     if (cell.HorizontalAlignment == LynxToolkit.Documents.HorizontalAlignment.Center)
                         td.TextAlignment = TextAlignment.Center;
                     if (cell.HorizontalAlignment == LynxToolkit.Documents.HorizontalAlignment.Right)
@@ -235,9 +243,7 @@ namespace DocumentModel.Wpf
         protected override void Write(LynxToolkit.Documents.Quote quote)
         {
             var p = new Paragraph();
-            Push(p.Inlines);
-            WriteInlines(quote.Content);
-            Pop();
+            WriteInlines(quote.Content, p.Inlines);
             Document.Blocks.Add(p);
             p.Style = this.Format(GetStyle(quote));
         }
@@ -245,9 +251,7 @@ namespace DocumentModel.Wpf
         protected override void Write(LynxToolkit.Documents.CodeBlock codeBlock)
         {
             var p = new Paragraph();
-            Push(p.Inlines);
-            Write(new LynxToolkit.Documents.Run(codeBlock.Text));
-            Pop();
+            Write(new LynxToolkit.Documents.Run(codeBlock.Text), p.Inlines);
             Document.Blocks.Add(p);
             p.Style = this.Format(GetStyle(codeBlock));
         }
@@ -258,55 +262,54 @@ namespace DocumentModel.Wpf
             Document.Blocks.Add(new BlockUIContainer(line));
         }
 
-        protected override void Write(LynxToolkit.Documents.Run run)
+        protected override void Write(NonBreakingSpace nbsp, object parent)
         {
-            Current.Add(new Run(run.Text));
+            ((InlineCollection)parent).Add(new Run(" "));
         }
 
-        protected override void Write(LynxToolkit.Documents.Strong strong)
+        protected override void Write(LynxToolkit.Documents.Run run, object parent)
+        {
+            ((InlineCollection)parent).Add(new Run(run.Text));
+        }
+
+        protected override void Write(LynxToolkit.Documents.Strong strong, object parent)
         {
             var bold = new Bold();
-            Push(bold.Inlines);
-            WriteInlines(strong.Content);
-            Pop();
-            Current.Add(bold);
+            WriteInlines(strong.Content, bold.Inlines);
+            ((InlineCollection)parent).Add(bold);
         }
 
-        protected override void Write(LynxToolkit.Documents.Emphasized em)
+        protected override void Write(LynxToolkit.Documents.Emphasized em, object parent)
         {
             var italic = new Italic();
-            Push(italic.Inlines);
-            WriteInlines(em.Content);
-            Pop();
-            Current.Add(italic);
+            WriteInlines(em.Content, italic.Inlines);
+            ((InlineCollection)parent).Add(italic);
         }
 
-        protected override void Write(LynxToolkit.Documents.LineBreak linebreak)
+        protected override void Write(LynxToolkit.Documents.LineBreak linebreak, object parent)
         {
             var br = new LineBreak();
-            Current.Add(br);
+            ((InlineCollection)parent).Add(br);
         }
 
-        protected override void Write(LynxToolkit.Documents.InlineCode inlineCode)
+        protected override void Write(LynxToolkit.Documents.InlineCode inlineCode, object parent)
         {
             var run = new Run(inlineCode.Text);
             run.Style = this.Format(GetStyle(inlineCode));
-            Current.Add(run);
+            ((InlineCollection)parent).Add(run);
         }
 
-        protected override void Write(LynxToolkit.Documents.Hyperlink hyperlink)
+        protected override void Write(LynxToolkit.Documents.Hyperlink hyperlink, object parent)
         {
             var a = new Hyperlink();
             a.Style = this.Format(GetStyle(hyperlink));
             if (!string.IsNullOrWhiteSpace(hyperlink.Title)) a.ToolTip = hyperlink.Title;
             a.Click += (s, e) => MessageBox.Show(hyperlink.Url);
-            Push(a.Inlines);
-            WriteInlines(hyperlink.Content);
-            Pop();
-            Current.Add(a);
+            WriteInlines(hyperlink.Content, a.Inlines);
+            ((InlineCollection)parent).Add(a);
         }
 
-        protected override void Write(LynxToolkit.Documents.Image image)
+        protected override void Write(LynxToolkit.Documents.Image image, object parent)
         {
             var src = new BitmapImage();
 
@@ -330,11 +333,11 @@ namespace DocumentModel.Wpf
             {
                 var a = new Hyperlink();
                 a.Inlines.Add(img);
-                Current.Add(a);
+                ((InlineCollection)parent).Add(a);
             }
             else
             {
-                Current.Add(img);
+                ((InlineCollection)parent).Add(img);
             }
         }
     }

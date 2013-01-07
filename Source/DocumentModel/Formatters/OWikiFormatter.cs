@@ -19,8 +19,8 @@ namespace LynxToolkit.Documents
             WriteLine("- - -");
             WriteLine();
         }
-        
-        protected override void Write(Hyperlink hyperlink)
+
+        protected override void Write(Hyperlink hyperlink, object parent)
         {
             Write("[");
             Write(hyperlink.Url);
@@ -46,7 +46,7 @@ namespace LynxToolkit.Documents
             Write("]");
         }
 
-        protected override void Write(Image image)
+        protected override void Write(Image image, object parent)
         {
             Write("{", image.Source);
             if (!string.IsNullOrWhiteSpace(image.AlternateText))

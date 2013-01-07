@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ConstructorModel.cs" company="Lynx">
+// <copyright file="FieldModel.cs" company="Lynx">
 //   The MIT License (MIT)
 //   
 //   Copyright (c) 2012 Oystein Bjorke
@@ -27,83 +27,62 @@
 
 namespace XmlDocT
 {
-    using System;
-    using System.Collections.Generic;
     using System.Reflection;
     using System.Text;
 
-    public class ConstructorModel : MemberModel
+    public class FieldModel : MemberModel
     {
-        public ConstructorModel(TypeModel parent, ConstructorInfo ci)
-            : base(parent, ci)
+        public FieldModel(TypeModel parent, FieldInfo pi)
+            : base(parent, pi)
         {
-            this.Parameters = new List<ParameterModel>();
         }
 
-        public ConstructorInfo ConstructorInfo
+        public FieldInfo FieldInfo
         {
             get
             {
-                return (ConstructorInfo)this.Info;
+                return (FieldInfo)this.Info;
             }
         }
-
-        public IList<ParameterModel> Parameters { get; private set; }
 
         public override string GetXmlMemberName()
         {
-            var memberName = "M:" + Utilities.GetXmlMemberTypeName(this.Info.DeclaringType) + ".#ctor";
-            var memberParameters = string.Format("({0})", Utilities.GetXmlParameterList(this.ConstructorInfo, null));
-            return memberName + memberParameters;
+            return string.Format("F:{0}.{1}", Utilities.GetXmlMemberTypeName(this.Info.DeclaringType), this.Info.Name);
         }
 
-        public override IEnumerable<ParameterModel> GetParameters()
+        public override string GetPageTitle()
         {
-            return this.Parameters;
-        }
-
-        public override IEnumerable<Type> GetRelatedTypes()
-        {
-            yield return this.Info.DeclaringType;
-            var ci = (ConstructorInfo)this.Info;
-            foreach (var p in ci.GetParameters())
-            {
-                yield return p.ParameterType;
-            }
+            return string.Format(
+                "{0}.{1} ({2})", Utilities.GetNiceTypeName(this.DeclaringType), this, this.DeclaringType.Namespace);
         }
 
         public override string GetSyntax()
         {
             var sb = new StringBuilder();
-            var ci = (ConstructorInfo)this.Info;
-            if (ci.IsPublic)
-            {
-                sb.Append("public ");
-            }
+            var pi = (FieldInfo)this.Info;
 
-            sb.Append(ci.DeclaringType.Name);
-            sb.Append("(");
-            sb.Append(Utilities.GetNiceMethodParameters(ci, true));
-            sb.Append(")");
+            Utilities.AppendAttributes(pi.GetCustomAttributes(false), sb);
+
+            sb.Append("public ");
+            sb.Append(Utilities.GetNiceTypeName(pi.FieldType));
+            sb.Append(" ");
+            sb.Append(pi.Name);
             return sb.ToString();
         }
 
         public override string GetTitle()
         {
-            return string.Format("{0}.{1} Constructor", Utilities.GetNiceTypeName(this.DeclaringType), this);
+            return string.Format("{0}.{1} Field", Utilities.GetNiceTypeName(this.DeclaringType), this);
         }
 
         public override string ToString()
         {
-            return string.Format(
-                "{0}({1})", 
-                Utilities.GetNiceMethodName((ConstructorInfo)this.Info), 
-                Utilities.GetNiceMethodParameters((ConstructorInfo)this.Info));
+            return this.Name;
         }
 
         protected override string GetFileNameCore()
         {
-            return string.Format("{0}.{1}", this.DeclaringType.FullName, this);
+            return string.Format("{0}.{1}", this.DeclaringType.FullName, this.Name);
         }
     }
 }
