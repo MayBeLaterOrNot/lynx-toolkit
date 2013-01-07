@@ -51,12 +51,12 @@ namespace XmlDocT
             this.Type = type;
             var flags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static;
 
-            var typeNode = Utilities.GetMemberNode(xmldoc, this);
-            this.Description = Utilities.GetXmlContent(typeNode, "summary");
-            this.Remarks = Utilities.GetXmlContent(typeNode, "remarks");
-            this.Example = Utilities.GetXmlContent(typeNode, "example");
+            var typeNode = XmlUtilities.GetMemberNode(xmldoc, this);
+            this.Description = XmlUtilities.GetXmlContent(typeNode, "summary");
+            this.Remarks = XmlUtilities.GetXmlContent(typeNode, "remarks");
+            this.Example = XmlUtilities.GetXmlContent(typeNode, "example");
 
-            this.InheritedTypes = Utilities.GetInheritedTypes(type).ToArray();
+            this.InheritedTypes = XmlUtilities.GetInheritedTypes(type).ToArray();
 
             if (type.IsEnum)
             {
@@ -65,10 +65,10 @@ namespace XmlDocT
                     var fi = type.GetField(value.ToString());
 
                     var fm = new FieldModel(this, fi);
-                    var memberNode = Utilities.GetMemberNode(xmldoc, fm);
-                    fm.Description = Utilities.GetXmlContent(memberNode, "summary");
-                    fm.Remarks = Utilities.GetXmlContent(memberNode, "remarks");
-                    fm.Example = Utilities.GetXmlContent(memberNode, "example");
+                    var memberNode = XmlUtilities.GetMemberNode(xmldoc, fm);
+                    fm.Description = XmlUtilities.GetXmlContent(memberNode, "summary");
+                    fm.Remarks = XmlUtilities.GetXmlContent(memberNode, "remarks");
+                    fm.Example = XmlUtilities.GetXmlContent(memberNode, "example");
 
                     this.EnumMembers.Add(fm);
                 }
@@ -86,16 +86,16 @@ namespace XmlDocT
                     }
 
                     var cm = new ConstructorModel(this, ci);
-                    var memberNode = Utilities.GetMemberNode(xmldoc, cm);
+                    var memberNode = XmlUtilities.GetMemberNode(xmldoc, cm);
                     cm.IsOverloaded = constructors.Length > 1;
-                    cm.Description = Utilities.GetXmlContent(memberNode, "summary");
-                    cm.Remarks = Utilities.GetXmlContent(memberNode, "remarks");
-                    cm.Example = Utilities.GetXmlContent(memberNode, "example");
+                    cm.Description = XmlUtilities.GetXmlContent(memberNode, "summary");
+                    cm.Remarks = XmlUtilities.GetXmlContent(memberNode, "remarks");
+                    cm.Example = XmlUtilities.GetXmlContent(memberNode, "example");
 
                     foreach (var pi in ci.GetParameters())
                     {
                         var pm = new ParameterModel(cm, pi);
-                        pm.Description = Utilities.GetParameterDescription(memberNode, pi.Name);
+                        pm.Description = XmlUtilities.GetParameterDescription(memberNode, pi.Name);
                         cm.Parameters.Add(pm);
                     }
 
@@ -114,11 +114,11 @@ namespace XmlDocT
                     }
 
                     var pm = new PropertyModel(this, pi);
-                    var memberNode = Utilities.GetMemberNode(xmldoc, pm);
+                    var memberNode = XmlUtilities.GetMemberNode(xmldoc, pm);
                     pm.IsOverloaded = properties.Count(p => p.Name == pi.Name) > 1;
-                    pm.Description = Utilities.GetXmlContent(memberNode, "summary");
-                    pm.Remarks = Utilities.GetXmlContent(memberNode, "remarks");
-                    pm.Example = Utilities.GetXmlContent(memberNode, "example");
+                    pm.Description = XmlUtilities.GetXmlContent(memberNode, "summary");
+                    pm.Remarks = XmlUtilities.GetXmlContent(memberNode, "remarks");
+                    pm.Example = XmlUtilities.GetXmlContent(memberNode, "example");
 
                     this.Properties.Add(pm);
                 }
@@ -143,23 +143,23 @@ namespace XmlDocT
                 }
 
                 var mm = new MethodModel(this, mi);
-                var memberNode = Utilities.GetMemberNode(xmldoc, mm);
+                var memberNode = XmlUtilities.GetMemberNode(xmldoc, mm);
                 mm.IsOverloaded = methods.Count(m => m.Name == mi.Name) > 1;
-                mm.Description = Utilities.GetXmlContent(memberNode, "summary");
-                mm.Remarks = Utilities.GetXmlContent(memberNode, "remarks");
-                mm.Example = Utilities.GetXmlContent(memberNode, "example");
+                mm.Description = XmlUtilities.GetXmlContent(memberNode, "summary");
+                mm.Remarks = XmlUtilities.GetXmlContent(memberNode, "remarks");
+                mm.Example = XmlUtilities.GetXmlContent(memberNode, "example");
 
                 foreach (var pi in mi.GetParameters())
                 {
                     var pm = new ParameterModel(mm, pi)
                                  {
                                      Description =
-                                         Utilities.GetParameterDescription(memberNode, pi.Name)
+                                         XmlUtilities.GetParameterDescription(memberNode, pi.Name)
                                  };
                     mm.Parameters.Add(pm);
                 }
 
-                mm.ReturnValueDescription = Utilities.GetXmlContent(memberNode, "returns");
+                mm.ReturnValueDescription = XmlUtilities.GetXmlContent(memberNode, "returns");
 
                 this.Methods.Add(mm);
             }
@@ -173,10 +173,10 @@ namespace XmlDocT
                 }
 
                 var em = new EventModel(this, ei);
-                var memberNode = Utilities.GetMemberNode(xmldoc, em);
-                em.Description = Utilities.GetXmlContent(memberNode, "summary");
-                em.Remarks = Utilities.GetXmlContent(memberNode, "remarks");
-                em.Example = Utilities.GetXmlContent(memberNode, "example");
+                var memberNode = XmlUtilities.GetMemberNode(xmldoc, em);
+                em.Description = XmlUtilities.GetXmlContent(memberNode, "summary");
+                em.Remarks = XmlUtilities.GetXmlContent(memberNode, "remarks");
+                em.Example = XmlUtilities.GetXmlContent(memberNode, "example");
 
                 this.Events.Add(em);
             }
@@ -208,7 +208,7 @@ namespace XmlDocT
 
         public override string GetXmlMemberName()
         {
-            return string.Format("T:{0}", Utilities.GetXmlMemberTypeName(this.Type));
+            return string.Format("T:{0}", XmlUtilities.GetXmlMemberTypeName(this.Type));
         }
 
         public override string GetPageTitle()
@@ -219,7 +219,7 @@ namespace XmlDocT
         public override string GetSyntax()
         {
             var sb = new StringBuilder();
-            Utilities.AppendAttributes(this.Type.GetCustomAttributes(false), sb);
+            XmlUtilities.AppendAttributes(this.Type.GetCustomAttributes(false), sb);
             if (this.Type.IsPublic)
             {
                 sb.Append("public ");
@@ -239,13 +239,13 @@ namespace XmlDocT
                 sb.Append("struct ");
             }
 
-            var niceName = Utilities.GetNiceTypeName(this.Type);
+            var niceName = XmlUtilities.GetNiceTypeName(this.Type);
             sb.Append(niceName);
 
             var baseAndInterfaces = new List<string>();
             if (this.Type.BaseType != null && this.Type.BaseType != typeof(object))
             {
-                var name = Utilities.GetNiceTypeName(this.Type.BaseType);
+                var name = XmlUtilities.GetNiceTypeName(this.Type.BaseType);
                 name = name.Replace(this.Type.Namespace, string.Empty);
                 baseAndInterfaces.Add(name);
             }
@@ -253,7 +253,7 @@ namespace XmlDocT
             var baseInterfaces = this.Type.BaseType != null ? this.Type.BaseType.GetInterfaces() : new Type[] { };
             foreach (var i in this.Type.GetInterfaces().Except(baseInterfaces))
             {
-                var name = Utilities.GetNiceTypeName(i);
+                var name = XmlUtilities.GetNiceTypeName(i);
                 name = name.Replace(this.Type.Namespace, string.Empty);
                 baseAndInterfaces.Add(name);
             }
@@ -288,7 +288,7 @@ namespace XmlDocT
 
         public override string ToString()
         {
-            return Utilities.GetNiceTypeName(this.Type);
+            return XmlUtilities.GetNiceTypeName(this.Type);
         }
 
         protected override string GetFileNameCore()

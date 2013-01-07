@@ -10,11 +10,11 @@ namespace XmlDocT.Tests
         [Test]
         public void GetNiceParameterName()
         {
-            Assert.AreEqual("System.Int32", Utilities.GetXmlMemberParameterName(typeof(int)));
-            Assert.AreEqual("System.Int32[]", Utilities.GetXmlMemberParameterName(typeof(int[])));
-            Assert.AreEqual("System.Int32[0:,0:]", Utilities.GetXmlMemberParameterName(typeof(int[,])));
-            Assert.AreEqual("System.Collections.Generic.List{System.Int32}@", Utilities.GetXmlMemberParameterName(typeof(List<int>)));
-            Assert.AreEqual("System.Collections.Generic.IList{System.Int32}@", Utilities.GetXmlMemberParameterName(typeof(IList<int>)));
+            Assert.AreEqual("System.Int32", XmlUtilities.GetXmlMemberParameterName(typeof(int)));
+            Assert.AreEqual("System.Int32[]", XmlUtilities.GetXmlMemberParameterName(typeof(int[])));
+            Assert.AreEqual("System.Int32[0:,0:]", XmlUtilities.GetXmlMemberParameterName(typeof(int[,])));
+            Assert.AreEqual("System.Collections.Generic.List{System.Int32}@", XmlUtilities.GetXmlMemberParameterName(typeof(List<int>)));
+            Assert.AreEqual("System.Collections.Generic.IList{System.Int32}@", XmlUtilities.GetXmlMemberParameterName(typeof(IList<int>)));
         }
     }
 }

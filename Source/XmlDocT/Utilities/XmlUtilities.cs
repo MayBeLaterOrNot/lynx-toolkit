@@ -36,7 +36,10 @@ namespace XmlDocT
 
     using LynxToolkit;
 
-    public static class Utilities
+    /// <summary>
+    /// Utilities for reading xml doc files.
+    /// </summary>
+    public static class XmlUtilities
     {
         private static readonly char[] whitespaceCharacters = "\r\n ".ToCharArray();
 
@@ -209,31 +212,6 @@ namespace XmlDocT
             return sb.ToString();
         }
 
-        // public static XmlNode GetMemberNode(XmlDocument xmldoc, string memberName, string parameters)
-        // {
-        // XmlNode node = null;
-        // if (!string.IsNullOrEmpty(parameters))
-        // {
-        // node = xmldoc.SelectSingleNode("/doc/members/member[@name='" + memberName + parameters + "']");
-        // }
-
-        // if (node == null)
-        // {
-        // node = xmldoc.SelectSingleNode("/doc/members/member[@name='" + memberName + "']");
-        // }
-
-        // if (node == null)
-        // {
-        // if (memberName.EndsWith("#ctor") && parameters == "()")
-        // {
-        // }
-        // else
-        // {
-        // Console.WriteLine("Missing " + memberName + parameters);
-        // }
-        // }
-        // return node;
-        // }
         public static string GetParameterDescription(XmlNode node, string parameterName)
         {
             if (node == null)

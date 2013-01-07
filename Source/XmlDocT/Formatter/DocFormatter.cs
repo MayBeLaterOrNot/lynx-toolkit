@@ -65,7 +65,7 @@ namespace XmlDocT
         // Utilities.CreateDirectoryIfMissing(outputDirectory);
         // Console.WriteLine("Output:             {0}", Path.GetFileName(docPath));
         // }
-        public static void CreatePages(NamespaceCollection namespaceCollection, string outputdir, string format, string outputExtension, string styleSheet, string template, bool singlePage)
+        public static void CreatePages(NamespaceCollection namespaceCollection, string outputdir, string format, string outputExtension, string styleSheet, string template, bool singlePage, bool createMemberPages)
         {
             var f = new DocFormatter
                         {
@@ -84,25 +84,29 @@ namespace XmlDocT
                 f.CreateNamespacePage(ns);
                 foreach (var t in ns.Types)
                 {
-                    f.CreateTypePage(t);
-                    foreach (var m in t.Properties)
-                    {
-                        f.CreateMemberPage(m);
-                    }
+                    f.CreateTypePage(t, createMemberPages);
 
-                    foreach (var m in t.Methods)
+                    if (createMemberPages)
                     {
-                        f.CreateMemberPage(m);
-                    }
+                        foreach (var m in t.Properties)
+                        {
+                            f.CreateMemberPage(m);
+                        }
 
-                    foreach (var m in t.Constructors)
-                    {
-                        f.CreateMemberPage(m);
-                    }
+                        foreach (var m in t.Methods)
+                        {
+                            f.CreateMemberPage(m);
+                        }
 
-                    foreach (var m in t.Events)
-                    {
-                        f.CreateMemberPage(m);
+                        foreach (var m in t.Constructors)
+                        {
+                            f.CreateMemberPage(m);
+                        }
+
+                        foreach (var m in t.Events)
+                        {
+                            f.CreateMemberPage(m);
+                        }
                     }
                 }
             }
@@ -349,7 +353,7 @@ namespace XmlDocT
             }
 
             var link = this.GetLink(type);
-            var name = Utilities.GetNiceTypeName(type);
+            var name = XmlUtilities.GetNiceTypeName(type);
             var a = new Hyperlink { Url = link, Title = name };
             a.Content.Add(new Run(name));
             return a;
@@ -464,17 +468,17 @@ namespace XmlDocT
             var a = new Hyperlink { Url = filename };
             if (strong)
             {
-                a.Content.Add(new Strong().Add(new Run(Utilities.GetNiceTypeName(t))));
+                a.Content.Add(new Strong().Add(new Run(XmlUtilities.GetNiceTypeName(t))));
             }
             else
             {
-                a.Content.Add(new Run(Utilities.GetNiceTypeName(t)));
+                a.Content.Add(new Run(XmlUtilities.GetNiceTypeName(t)));
             }
 
             return a;
         }
 
-        private void CreateTypePage(TypeModel c)
+        private void CreateTypePage(TypeModel c, bool createMemberPages)
         {
             this.CreatePage();
             this.AddHeader(c.GetTitle(), 1, c.GetFileName());
@@ -525,9 +529,9 @@ namespace XmlDocT
                 this.doc.Blocks.Add(new CodeBlock { Text = syntax });
             }
 
-            this.AddTable("Constructors", c.Constructors, c.Type);
-            this.AddTable("Properties", c.Properties, c.Type);
-            this.AddTable("Methods", c.Methods, c.Type);
+            this.AddTable("Constructors", c.Constructors, c.Type, createMemberPages);
+            this.AddTable("Properties", c.Properties, c.Type, createMemberPages);
+            this.AddTable("Methods", c.Methods, c.Type, createMemberPages);
             this.AddTable("Members", c.EnumMembers, c.Type, false);
             this.AddRemarks(c, c.Type);
             this.AddExamples(c, c.Type);

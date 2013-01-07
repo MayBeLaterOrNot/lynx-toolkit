@@ -47,13 +47,13 @@ namespace XmlDocT
 
         public override string GetXmlMemberName()
         {
-            return string.Format("F:{0}.{1}", Utilities.GetXmlMemberTypeName(this.Info.DeclaringType), this.Info.Name);
+            return string.Format("F:{0}.{1}", XmlUtilities.GetXmlMemberTypeName(this.Info.DeclaringType), this.Info.Name);
         }
 
         public override string GetPageTitle()
         {
             return string.Format(
-                "{0}.{1} ({2})", Utilities.GetNiceTypeName(this.DeclaringType), this, this.DeclaringType.Namespace);
+                "{0}.{1} ({2})", XmlUtilities.GetNiceTypeName(this.DeclaringType), this, this.DeclaringType.Namespace);
         }
 
         public override string GetSyntax()
@@ -61,10 +61,10 @@ namespace XmlDocT
             var sb = new StringBuilder();
             var pi = (FieldInfo)this.Info;
 
-            Utilities.AppendAttributes(pi.GetCustomAttributes(false), sb);
+            XmlUtilities.AppendAttributes(pi.GetCustomAttributes(false), sb);
 
             sb.Append("public ");
-            sb.Append(Utilities.GetNiceTypeName(pi.FieldType));
+            sb.Append(XmlUtilities.GetNiceTypeName(pi.FieldType));
             sb.Append(" ");
             sb.Append(pi.Name);
             return sb.ToString();
@@ -72,7 +72,7 @@ namespace XmlDocT
 
         public override string GetTitle()
         {
-            return string.Format("{0}.{1} Field", Utilities.GetNiceTypeName(this.DeclaringType), this);
+            return string.Format("{0}.{1} Field", XmlUtilities.GetNiceTypeName(this.DeclaringType), this);
         }
 
         public override string ToString()

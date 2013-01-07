@@ -47,13 +47,13 @@ namespace XmlDocT
 
         public override string GetXmlMemberName()
         {
-            return string.Format("P:{0}.{1}", Utilities.GetXmlMemberTypeName(this.Info.DeclaringType), this.Info.Name);
+            return string.Format("P:{0}.{1}", XmlUtilities.GetXmlMemberTypeName(this.Info.DeclaringType), this.Info.Name);
         }
 
         public override string GetPageTitle()
         {
             return string.Format(
-                "{0}.{1} ({2})", Utilities.GetNiceTypeName(this.DeclaringType), this, this.DeclaringType.Namespace);
+                "{0}.{1} ({2})", XmlUtilities.GetNiceTypeName(this.DeclaringType), this, this.DeclaringType.Namespace);
         }
 
         public override string GetSyntax()
@@ -61,12 +61,12 @@ namespace XmlDocT
             var sb = new StringBuilder();
             var pi = (PropertyInfo)this.Info;
 
-            Utilities.AppendAttributes(pi.GetCustomAttributes(false), sb);
+            XmlUtilities.AppendAttributes(pi.GetCustomAttributes(false), sb);
 
             // pi.GetGetMethod().IsPublic
             // pi.GetSetMethod().IsPublic
             sb.Append("public ");
-            sb.Append(Utilities.GetNiceTypeName(pi.PropertyType));
+            sb.Append(XmlUtilities.GetNiceTypeName(pi.PropertyType));
             sb.Append(" ");
             sb.Append(pi.Name);
             sb.Append(" { ");
@@ -86,7 +86,7 @@ namespace XmlDocT
 
         public override string GetTitle()
         {
-            return string.Format("{0}.{1} Property", Utilities.GetNiceTypeName(this.DeclaringType), this);
+            return string.Format("{0}.{1} Property", XmlUtilities.GetNiceTypeName(this.DeclaringType), this);
         }
 
         public override string ToString()

@@ -38,32 +38,131 @@ namespace WikiT
 
     public class Program
     {
-        private static Dictionary<string, string> config;
+        /// <summary>
+        /// Gets or sets the input folder and search pattern.
+        /// </summary>
+        /// <value>The input.</value>
+        public static string Input { get; set; }
 
-        private static string configDirectory;
+        /// <summary>
+        /// Gets or sets the default syntax of the input files.
+        /// </summary>
+        /// <value>The following values are accepted: owiki, md, creole, xml.</value>
+        public static string DefaultSyntax { get; set; }
+
+        /// <summary>
+        /// Gets or sets the output format.
+        /// </summary>
+        /// <value>The output format (html, docx, owiki, md, creole, xml).</value>
+        public static string Format { get; set; }
+
+        /// <summary>
+        /// Gets or sets the output folder.
+        /// </summary>
+        /// <value>The output folder.</value>
+        public static string Output { get; set; }
+
+        /// <summary>
+        /// Gets or sets the output extension.
+        /// </summary>
+        /// <value>The output extension.</value>
+        public static string Extension { get; set; }
+
+        /// <summary>
+        /// Gets or sets the template (word or html file).
+        /// </summary>
+        /// <value>The template.</value>
+        public static string Template { get; set; }
+
+        /// <summary>
+        /// Gets or sets the stylesheet (css file).
+        /// </summary>
+        public static string Stylesheet { get; set; }
+
+        /// <summary>
+        /// Gets or sets the format string for local links.
+        /// </summary>
+        public static string LocalLinks { get; set; }
+
+        /// <summary>
+        /// Gets or sets the format string for links containing a space identifier.
+        /// </summary>
+        public static string SpaceLinks { get; set; }
+
+        /// <summary>
+        /// Gets or sets the defines.
+        /// </summary>
+        /// <value>The defines.</value>
+        public static HashSet<string> Defines { get; set; }
 
         public static int Main(string[] args)
         {
             Console.WriteLine(Application.Header);
             if (args.Length < 3)
             {
-                Console.WriteLine("Arguments: <config-file> <directory> <search-pattern> <output-directory>");
-                Console.WriteLine("Example: UserManual.config ..\\docs *.wiki ..\\output");
+                Console.WriteLine("Arguments: [/input=folder/search-pattern] [/DefaultSyntax=owiki] [/Format=html] [/Extension=.html] [/Output=output-folder]");
+                Console.WriteLine(@"Example: /input=..\docs\*.wiki /output=..\output");
                 return -1;
             }
 
-            var configFile = args[0];
-            var inputDirectory = args[1];
-            var searchPattern = args[2];
-            var outputDirectory = args.Length > 3 ? args[3] : null;
-            config = LoadConfiguration(configFile);
-            configDirectory = Path.GetDirectoryName(configFile);
-            if (outputDirectory != null)
+            // set default values
+            Input = "*.wiki";
+            DefaultSyntax = null;
+            Format = "html";
+            Extension = null;
+            Output = "output";
+            Defines = new HashSet<string>();
+
+            foreach (var arg in args)
             {
-                config["OutputDirectory"] = outputDirectory;
+                var kv = arg.Split('=');
+                if (kv.Length > 0)
+                {
+                    switch (kv[0].ToLower())
+                    {
+                        case "/input":
+                            Input = kv[1];
+                            break;
+                        case "/output":
+                            Output = kv[1];
+                            continue;
+                        case "/defaultsyntax":
+                            DefaultSyntax = kv[1].ToLower();
+                            continue;
+                        case "/format":
+                            Format = kv[1].ToLower();
+                            continue;
+                        case "/extension":
+                            Extension = kv[1];
+                            continue;
+                        case "/template":
+                            Template = kv[1];
+                            continue;
+                        case "/stylesheet":
+                            Stylesheet = kv[1];
+                            continue;
+                        case "/locallinks":
+                            LocalLinks = kv[1];
+                            continue;
+                        case "/spacelinks":
+                            SpaceLinks = kv[1];
+                            continue;
+                        case "/define":
+                            Defines.Add(kv[1]);
+                            continue;
+                    }
+                }
             }
 
-            var files = FindFiles(inputDirectory, searchPattern).ToList();
+            if (Extension == null)
+            {
+                Extension = "." + Format;
+            }
+
+            var inputDirectory = Path.GetDirectoryName(Input);
+            var searchPattern = Path.GetFileName(Input);
+
+            var files = Utilities.FindFiles(inputDirectory, searchPattern).ToList();
             foreach (var f in files)
             {
                 if (Transform(f))
@@ -73,43 +172,6 @@ namespace WikiT
             }
 
             return 0;
-        }
-
-        private static string CreateExtension(string format)
-        {
-            return format.StartsWith(".") ? format : "." + format;
-        }
-
-        private static IEnumerable<string> FindFiles(string directory, string searchPattern)
-        {
-            foreach (var file in Directory.GetFiles(directory, searchPattern))
-            {
-                yield return file;
-            }
-
-            foreach (var file in Directory.GetDirectories(directory).SelectMany(d => FindFiles(d, searchPattern)))
-            {
-                yield return file;
-            }
-        }
-
-        /// <summary>
-        ///     Gets a file name from the configuration dictionary.
-        /// </summary>
-        /// <param name="key">The key.</param>
-        /// <returns></returns>
-        /// <remarks>
-        ///     The file name must be resolved relative to the path of the configuration file.
-        /// </remarks>
-        private static string GetFileName(string key)
-        {
-            string path;
-            if (config.TryGetValue(key, out path))
-            {
-                return Path.Combine(configDirectory, path);
-            }
-
-            return null;
         }
 
         private static bool IsFileModified(string filePath, string newContent)
@@ -123,84 +185,68 @@ namespace WikiT
             return !string.Equals(content, newContent);
         }
 
-        private static Dictionary<string, string> LoadConfiguration(string path)
-        {
-            var result = new Dictionary<string, string>();
-            foreach (var line in File.ReadAllLines(path))
-            {
-                if (line.StartsWith("#"))
-                {
-                    continue;
-                }
-
-                var fields = line.Split('=');
-                result.Add(fields[0].Trim(), fields[1].Trim());
-            }
-
-            return result;
-        }
-
-        private static void OpenForEdit(string outputPath, Dictionary<string, string> config)
-        {
-            Utilities.OpenForEdit(outputPath, config["Scc"]);
-        }
-
         private static bool Transform(string filePath)
         {
-            string defaultSyntax;
-            config.TryGetValue("DefaultSyntax", out defaultSyntax);
-
             var text = File.ReadAllText(filePath);
-            var doc = WikiParser.Parse(
-                text, Path.GetDirectoryName(filePath), Path.GetExtension(filePath), defaultSyntax);
-            var outputFormat = config["OutputFormat"];
-            var outputDirectory = config["OutputDirectory"];
-            var outputExtension = CreateExtension(outputFormat);
+            var doc = WikiParser.ParseFile(filePath, DefaultSyntax, Defines);
             var outputPath = filePath;
-            if (outputDirectory != null)
+            if (Output != null)
             {
-                outputPath = Path.Combine(outputDirectory, Path.GetFileName(filePath));
+                outputPath = Path.Combine(Output, Path.GetFileName(filePath));
             }
 
-            outputPath = Path.ChangeExtension(outputPath, outputExtension);
+            outputPath = Path.ChangeExtension(outputPath, Extension);
 
-            switch (outputFormat)
+            string outputText;
+
+            switch (Format)
             {
                 case "docm":
                 case "docx":
                     {
-                        OpenForEdit(outputPath, config);
-                        WordFormatter.Format(doc, outputPath, new WordFormatterOptions { Template = GetFileName("Template") });
+                        WordFormatter.Format(doc, outputPath, new WordFormatterOptions { Template = Template });
                         return true;
                     }
 
+                case "owiki":
+                    outputText = OWikiFormatter.Format(doc);
+                    break;
+
+                case "creole":
+                    outputText = CreoleFormatter.Format(doc);
+                    break;
+
+                case "md":
+                    outputText = MarkdownFormatter.Format(doc);
+                    break;
+                case "xml":
+                    outputText = XmlFormatter.Format(doc);
+                    break;
+
                 case "html":
                 case "htm":
-                    {
-                        string localLinks, spaceLinks;
-                        config.TryGetValue("LocalLinks", out localLinks);
-                        config.TryGetValue("SpaceLinks", out spaceLinks);
-                        var options = new HtmlFormatterOptions
-                                          {
-                                              Css = GetFileName("css"),
-                                              Template = GetFileName("Template"),
-                                              LocalLinkFormatString = localLinks,
-                                              SpaceLinkFormatString = spaceLinks
-                                          };
-                        var html = HtmlFormatter.Format(doc, options);
-                        if (IsFileModified(outputPath, html))
-                        {
-                            OpenForEdit(outputPath, config);
-                            File.WriteAllText(outputPath, html);
-                            return true;
-                        }
-
-                        return false;
-                    }
+                    var options = new HtmlFormatterOptions
+                                      {
+                                          Css = Stylesheet,
+                                          Template = Template,
+                                          LocalLinkFormatString = LocalLinks,
+                                          SpaceLinkFormatString = SpaceLinks
+                                      };
+                    outputText = HtmlFormatter.Format(doc, options);
+                    break;
 
                 default:
-                    throw new FormatException(string.Format("The output format '{0}' is not supported.", outputFormat));
+                    throw new FormatException(string.Format("The output format '{0}' is not supported.", Format));
             }
+
+            if (IsFileModified(outputPath, outputText))
+            {
+                File.WriteAllText(outputPath, outputText);
+                return true;
+            }
+
+            return false;
+
         }
     }
 }

@@ -30,7 +30,7 @@ namespace DocumentBrowser
 
         private void Update()
         {
-            var doc = WikiParser.Parse(Input, null, null, null);
+            var doc = WikiParser.Parse(Input, null, null, null, null);
 
             Wiki = OWikiFormatter.Format(doc);
             WikiCreole = CreoleFormatter.Format(doc);

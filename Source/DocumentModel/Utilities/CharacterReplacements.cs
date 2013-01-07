@@ -45,6 +45,11 @@
 
         public static string Decode(string input)
         {
+            if (input == null)
+            {
+                return null;
+            }
+
             foreach (var kvp in Replacements)
             {
                 input = input.Replace(kvp.Key, kvp.Value);
@@ -55,6 +60,11 @@
 
         public static string Encode(string input)
         {
+            if (input == null)
+            {
+                return null;
+            }
+
             foreach (var kvp in Replacements)
             {
                 input = input.Replace(kvp.Value, kvp.Key);

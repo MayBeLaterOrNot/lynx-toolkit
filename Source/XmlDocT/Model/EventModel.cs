@@ -49,7 +49,7 @@ namespace XmlDocT
 
         public override string GetXmlMemberName()
         {
-            return string.Format("E:{0}.{1}", Utilities.GetXmlMemberTypeName(this.Info.DeclaringType), this.Info.Name);
+            return string.Format("E:{0}.{1}", XmlUtilities.GetXmlMemberTypeName(this.Info.DeclaringType), this.Info.Name);
         }
 
         public override IEnumerable<Type> GetRelatedTypes()
@@ -65,8 +65,8 @@ namespace XmlDocT
             var ei = this.EventInfo;
 
             sb.Append("event ");
-            Utilities.AppendAttributes(ei.GetCustomAttributes(false), sb);
-            sb.Append(Utilities.GetNiceTypeName(ei.EventHandlerType));
+            XmlUtilities.AppendAttributes(ei.GetCustomAttributes(false), sb);
+            sb.Append(XmlUtilities.GetNiceTypeName(ei.EventHandlerType));
             sb.Append(" ");
             sb.Append(ei.Name);
             return sb.ToString();
@@ -74,7 +74,7 @@ namespace XmlDocT
 
         public override string GetTitle()
         {
-            return string.Format("{0}.{1} Event", Utilities.GetNiceTypeName(this.DeclaringType), this);
+            return string.Format("{0}.{1} Event", XmlUtilities.GetNiceTypeName(this.DeclaringType), this);
         }
 
         public override bool IsInherited()

@@ -64,7 +64,7 @@ namespace XmlDocT
         public override string GetXmlMemberName()
         {
             var memberName = string.Format(
-                "M:{0}.{1}", Utilities.GetXmlMemberTypeName(this.Info.DeclaringType), this.Info.Name);
+                "M:{0}.{1}", XmlUtilities.GetXmlMemberTypeName(this.Info.DeclaringType), this.Info.Name);
 
             IEnumerable<string> methodGenericArgs = null;
             if (this.MethodInfo.IsGenericMethod)
@@ -74,7 +74,7 @@ namespace XmlDocT
             }
 
             var memberParameters = string.Format(
-                "({0})", Utilities.GetXmlParameterList(this.MethodInfo, methodGenericArgs));
+                "({0})", XmlUtilities.GetXmlParameterList(this.MethodInfo, methodGenericArgs));
             return memberName + memberParameters;
         }
 
@@ -94,7 +94,7 @@ namespace XmlDocT
             var sb = new StringBuilder();
 
             var mb = this.MethodInfo;
-            Utilities.AppendAttributes(mb.GetCustomAttributes(false), sb);
+            XmlUtilities.AppendAttributes(mb.GetCustomAttributes(false), sb);
             if (mb.IsPublic)
             {
                 sb.Append("public ");
@@ -110,18 +110,18 @@ namespace XmlDocT
                 sb.Append("virtual ");
             }
 
-            sb.Append(Utilities.GetNiceTypeName(mb.ReturnType));
+            sb.Append(XmlUtilities.GetNiceTypeName(mb.ReturnType));
             sb.Append(" ");
             sb.Append(mb.Name);
             sb.Append("(");
-            sb.Append(Utilities.GetNiceMethodParameters(mb, true));
+            sb.Append(XmlUtilities.GetNiceMethodParameters(mb, true));
             sb.Append(")");
             return sb.ToString();
         }
 
         public override string GetTitle()
         {
-            return string.Format("{0}.{1} Method", Utilities.GetNiceTypeName(this.DeclaringType), this);
+            return string.Format("{0}.{1} Method", XmlUtilities.GetNiceTypeName(this.DeclaringType), this);
         }
 
         public override bool IsInherited()
@@ -131,7 +131,7 @@ namespace XmlDocT
 
         public override string ToString()
         {
-            return Utilities.GetNiceMethodName((MethodBase)this.Info);
+            return XmlUtilities.GetNiceMethodName((MethodBase)this.Info);
         }
 
         protected override string GetFileNameCore()

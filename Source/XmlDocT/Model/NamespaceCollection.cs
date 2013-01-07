@@ -94,7 +94,7 @@ namespace XmlDocT
                 var nsm = this.CreateOrGetNamespaceModel(type.Namespace, xmldoc);
                 var tm = new TypeModel(type, xmldoc);
                 nsm.Types.Add(tm);
-                Console.WriteLine("    " + Utilities.GetNiceTypeName(type));
+                Console.WriteLine("    " + XmlUtilities.GetNiceTypeName(type));
             }
 
             foreach (var type in assembly.GetTypes())
@@ -188,8 +188,8 @@ namespace XmlDocT
             }
 
             nsm = new NamespaceModel { Name = ns };
-            var node = Utilities.GetMemberNode(xmldoc, nsm);
-            nsm.Description = Utilities.GetXmlContent(node, "summary");
+            var node = XmlUtilities.GetMemberNode(xmldoc, nsm);
+            nsm.Description = XmlUtilities.GetXmlContent(node, "summary");
             this.Namespaces.Add(ns, nsm);
             return nsm;
         }

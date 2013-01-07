@@ -52,8 +52,8 @@ namespace XmlDocT
 
         public override string GetXmlMemberName()
         {
-            var memberName = "M:" + Utilities.GetXmlMemberTypeName(this.Info.DeclaringType) + ".#ctor";
-            var memberParameters = string.Format("({0})", Utilities.GetXmlParameterList(this.ConstructorInfo, null));
+            var memberName = "M:" + XmlUtilities.GetXmlMemberTypeName(this.Info.DeclaringType) + ".#ctor";
+            var memberParameters = string.Format("({0})", XmlUtilities.GetXmlParameterList(this.ConstructorInfo, null));
             return memberName + memberParameters;
         }
 
@@ -83,22 +83,22 @@ namespace XmlDocT
 
             sb.Append(ci.DeclaringType.Name);
             sb.Append("(");
-            sb.Append(Utilities.GetNiceMethodParameters(ci, true));
+            sb.Append(XmlUtilities.GetNiceMethodParameters(ci, true));
             sb.Append(")");
             return sb.ToString();
         }
 
         public override string GetTitle()
         {
-            return string.Format("{0}.{1} Constructor", Utilities.GetNiceTypeName(this.DeclaringType), this);
+            return string.Format("{0}.{1} Constructor", XmlUtilities.GetNiceTypeName(this.DeclaringType), this);
         }
 
         public override string ToString()
         {
             return string.Format(
                 "{0}({1})", 
-                Utilities.GetNiceMethodName((ConstructorInfo)this.Info), 
-                Utilities.GetNiceMethodParameters((ConstructorInfo)this.Info));
+                XmlUtilities.GetNiceMethodName((ConstructorInfo)this.Info), 
+                XmlUtilities.GetNiceMethodParameters((ConstructorInfo)this.Info));
         }
 
         protected override string GetFileNameCore()

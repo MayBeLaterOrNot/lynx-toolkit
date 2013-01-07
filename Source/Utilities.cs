@@ -30,12 +30,26 @@ namespace LynxToolkit
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
+    using System.Linq;
     using System.Reflection;
     using System.Text;
     using System.Text.RegularExpressions;
 
     public static class Utilities
     {
+        public static IEnumerable<string> FindFiles(string directory, string searchPattern)
+        {
+            foreach (var file in Directory.GetFiles(directory, searchPattern))
+            {
+                yield return file;
+            }
+
+            foreach (var file in Directory.GetDirectories(directory).SelectMany(d => FindFiles(d, searchPattern)))
+            {
+                yield return file;
+            }
+        }
+
         /// <summary>
         ///     Creates the directory if missing.
         /// </summary>
@@ -149,6 +163,24 @@ namespace LynxToolkit
                     notMatchAction(s);
                 }
             }
+        }
+
+        /// <summary>
+        /// Set the output string if the match group with the specified key is a success.
+        /// </summary>
+        /// <param name="m">The match.</param>
+        /// <param name="key">The key.</param>
+        /// <param name="output">The output.</param>
+        /// <returns><c>true</c> if the value was set, <c>false</c> otherwise</returns>
+        public static bool SetIfSuccess(this Match m, string key, ref string output)
+        {
+            if (m.Groups[key].Success)
+            {
+                output = m.Groups[key].Value;
+                return true;
+            }
+
+            return false;
         }
 
         /// <summary>

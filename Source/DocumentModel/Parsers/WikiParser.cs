@@ -4,19 +4,6 @@ namespace LynxToolkit.Documents
     using System.Collections.Generic;
     using System.IO;
     using System.Text.RegularExpressions;
-    public static class MatchExtensions
-    {
-        public static bool SetIfSuccess(this Match m, string key, ref string output)
-        {
-            if (m.Groups[key].Success)
-            {
-                output = m.Groups[key].Value;
-                return true;
-            }
-
-            return false;
-        }
-    }
 
     public class WikiParser
     {
@@ -25,6 +12,7 @@ namespace LynxToolkit.Documents
 
         private static readonly Regex DirectivesExpression;
         private static readonly Regex IncludeExpression;
+        private static readonly Regex DefineExpression;
 
         static WikiParser()
         {
@@ -51,13 +39,42 @@ namespace LynxToolkit.Documents
 (?<index>@index .*? \r?\n)|
 (?<toc>@toc .*? \r?\n)
 )", RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+            DefineExpression = new Regex(
+                @"^\s*@if\s*(?<criteria>.+?)\s*$(?<block>.*?)^@endif", RegexOptions.Compiled | RegexOptions.Singleline);
         }
 
-        public static Document Parse(string text, string path, string ext, string defaultSyntax)
+        /// <summary>
+        /// Parses the specified text.
+        /// </summary>
+        /// <param name="text">The text.</param>
+        /// <param name="includePath">The include resolve path (used to resolve include files).</param>
+        /// <param name="includeDefaultExtension">The default extension (used to resolve include files).</param>
+        /// <param name="defaultSyntax">The default syntax.</param>
+        /// <param name="defines">The defines.</param>
+        /// <returns>A Document.</returns>
+        /// <exception cref="System.IO.FileNotFoundException">Include file not found</exception>
+        public static Document Parse(string text, string includePath, string includeDefaultExtension, string defaultSyntax, HashSet<string> defines = null)
         {
+            if (defines == null)
+            {
+                defines = new HashSet<string>();
+            }
+
             string title = null, description = null, keywords = null, syntax = defaultSyntax, creator = null, subject = null, category = null, date = null, version = null, revision = null;
-            var includepaths = new List<string>();
-            includepaths.Add(".");
+            var includepaths = new List<string> { "." };
+
+            // solve @if ... @endif expressions
+            text = DefineExpression.Replace(
+                text,
+                m =>
+                {
+                    var criteria = m.Groups["criteria"].Value;
+                    if (defines.Contains(criteria))
+                    {
+                        return m.Groups["block"].Value;
+                    }
+                    return string.Empty;
+                });
 
             text = DirectivesExpression.Replace(text,
                 m =>
@@ -99,19 +116,20 @@ namespace LynxToolkit.Documents
                 string include = null;
                 if (match.SetIfSuccess("include", ref include))
                 {
-                    var includeFilePath = ResolveInclude(include, path, includepaths, ext);
+                    // todo: support wildcards?
+                    var includeFilePath = ResolveInclude(include, includePath, includepaths, includeDefaultExtension);
                     if (includeFilePath == null)
                     {
                         throw new FileNotFoundException("Include file not found", include);
                     }
 
                     var includeText = File.ReadAllText(includeFilePath);
-                    doc.Append(Parse(includeText, Path.GetDirectoryName(includeFilePath), ext, defaultSyntax));
+                    doc.Append(Parse(includeText, Path.GetDirectoryName(includeFilePath), includeDefaultExtension, defaultSyntax, defines));
                     continue;
                 }
                 if (match.Groups["index"].Success)
                 {
-                    doc.Blocks.Add(new Index());                    
+                    doc.Blocks.Add(new Index());
                 }
                 if (match.Groups["toc"].Success)
                 {
@@ -146,11 +164,11 @@ namespace LynxToolkit.Documents
             foreach (var p in includepaths)
             {
                 var f = Path.Combine(Path.Combine(path, p), include);
-                if (ext != null)
+                if (ext != null && string.IsNullOrEmpty(Path.GetExtension(f)))
                 {
                     f = Path.ChangeExtension(f, ext);
                 }
-                var fullPath = Path.GetFullPath(f);
+
                 if (File.Exists(f))
                 {
                     return f;
@@ -182,13 +200,14 @@ namespace LynxToolkit.Documents
                     doc = OWikiParser.Parse(text);
                     break;
             }
+
             return doc;
         }
 
-        public static Document ParseFile(string filePath, string defaultSyntax = null)
+        public static Document ParseFile(string filePath, string defaultSyntax = null, HashSet<string> defines = null)
         {
             var text = File.ReadAllText(filePath);
-            return Parse(text, Path.GetDirectoryName(filePath), Path.GetExtension(filePath), defaultSyntax);
+            return Parse(text, Path.GetDirectoryName(filePath), Path.GetExtension(filePath), defaultSyntax, defines);
         }
     }
 }

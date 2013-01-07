@@ -58,6 +58,7 @@ namespace XmlDocT
             string stylesheet = null;
             string template = null;
             var singlePage = false;
+            var createMemberPages = false;
 
             var model = new NamespaceCollection();
 
@@ -70,6 +71,9 @@ namespace XmlDocT
                     {
                         case "/singlepage":
                             singlePage = true;
+                            break;
+                        case "/creatememberpages":
+                            createMemberPages = true;
                             break;
                         case "/output":
                             outputDirectory = kv[1];
@@ -151,7 +155,7 @@ namespace XmlDocT
             Console.WriteLine("  Writing documentation output files...");
 
             // Write the documentation pages
-            DocFormatter.CreatePages(model, outputDirectory, format, outputExtension, stylesheet, template, singlePage);
+            DocFormatter.CreatePages(model, outputDirectory, format, outputExtension, stylesheet, template, singlePage, createMemberPages);
 
             Console.WriteLine();
             Console.WriteLine(
