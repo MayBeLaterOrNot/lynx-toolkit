@@ -126,13 +126,7 @@
             var wf = new WordFormatter(doc, options.Template);
             wf.Format();
             wf.Save(filePath);
-            wf.Close();
             return wf.Package;
-        }
-
-        public void Close()
-        {
-            // this.Package.Close();
         }
 
         /// <summary>
@@ -151,6 +145,12 @@
             var p = CreateParagraph(headerID);
             this.WriteInlines(header.Content, p);
             this.body.AppendChild(p);
+        }
+
+        protected override void Write(TableOfContents toc)
+        {
+            var sdt = new SdtContentBlock();
+            this.body.AppendChild(sdt);
         }
 
         protected override void Write(Paragraph paragraph)
@@ -268,27 +268,32 @@
             {
                 var p = this.GenerateListItemParagraph(item, ListID, level, list is UnorderedList);
                 this.body.Append(p);
-                this.WriteListItems(item.NestedList, level + 1);
+                if (item.NestedList != null)
+                {
+                    this.WriteListItems(item.NestedList, level + 1);
+                }
             }
         }
 
-        DocumentFormat.OpenXml.Wordprocessing.Paragraph GenerateListItemParagraph(LynxToolkit.Documents.ListItem item, string styleID, int level, bool unordered)
+        DocumentFormat.OpenXml.Wordprocessing.Paragraph GenerateListItemParagraph(Documents.ListItem item, string styleID, int level, bool unordered)
         {
 
             var p = new DocumentFormat.OpenXml.Wordprocessing.Paragraph();
 
             var paragraphProperties1 = new ParagraphProperties();
-            var paragraphStyleId1 = new ParagraphStyleId() { Val = styleID };
+            var paragraphStyleId1 = new ParagraphStyleId { Val = styleID };
 
             var numberingProperties1 = new NumberingProperties();
             var numberingLevelReference1 = new NumberingLevelReference { Val = level };
             var numberingId1 = new NumberingId { Val = unordered ? 1 : 2 };
+            var paragraphMarkRunProperties1 = new ParagraphMarkRunProperties();
 
             numberingProperties1.Append(numberingLevelReference1);
             numberingProperties1.Append(numberingId1);
 
             paragraphProperties1.Append(paragraphStyleId1);
             paragraphProperties1.Append(numberingProperties1);
+            paragraphProperties1.Append(paragraphMarkRunProperties1);
             WriteInlines(item.Content, p);
 
             p.Append(paragraphProperties1);
@@ -310,7 +315,9 @@
         protected override void Write(CodeBlock codeBlock)
         {
             var p = CreateParagraph(CodeID);
-            var run = CreateTextRun(codeBlock.Text, CodeID);
+            var runStyle = new RunStyle { Val = CodeID };
+            var runProperties = new RunProperties(runStyle);
+            var run = new DocumentFormat.OpenXml.Wordprocessing.Run(runProperties, new Text(codeBlock.Text));
             p.AppendChild(run);
             this.body.AppendChild(p);
         }
@@ -321,19 +328,12 @@
 
         protected override void Write(NonBreakingSpace nbsp, object parent)
         {
-            this.AppendElement(new DocumentFormat.OpenXml.Wordprocessing.Run(new DocumentFormat.OpenXml.Wordprocessing.Text(" ")), parent);
+            this.AppendElement(new DocumentFormat.OpenXml.Wordprocessing.Run(new Text(" ") { Space = SpaceProcessingModeValues.Preserve }), parent);
         }
 
         protected override void Write(Run r, object parent)
         {
-            this.AppendElement(CreateTextRun(r.Text, BodyTextID), parent);
-        }
-
-        private static DocumentFormat.OpenXml.Wordprocessing.Run CreateTextRun(string text, string styleID)
-        {
-            var runStyle = new RunStyle { Val = styleID };
-            var runProperties = new RunProperties(runStyle);
-            return new DocumentFormat.OpenXml.Wordprocessing.Run(runProperties, new Text(text));
+            this.AppendElement(new DocumentFormat.OpenXml.Wordprocessing.Run(new Text(r.Text) { Space = SpaceProcessingModeValues.Preserve }), parent);
         }
 
         protected override void Write(Strong strong, object parent)
@@ -382,7 +382,10 @@
 
         protected override void Write(InlineCode inlineCode, object parent)
         {
-            this.AppendElement(CreateTextRun(inlineCode.Text, InlineCodeID), parent);
+            var runStyle = new RunStyle { Val = InlineCodeID };
+            var runProperties = new RunProperties(runStyle);
+            var run = new DocumentFormat.OpenXml.Wordprocessing.Run(runProperties, new Text(inlineCode.Text));
+            this.AppendElement(run, parent);
         }
 
         protected override void Write(Hyperlink hyperlink, object parent)
@@ -394,10 +397,10 @@
             this.AppendElement(h, parent);
         }
 
-        private void AppendElement(DocumentFormat.OpenXml.OpenXmlElement h, object parent)
+        private void AppendElement(OpenXmlElement element, object parent)
         {
             var compositeElement = (OpenXmlCompositeElement)parent;
-            compositeElement.Append(h);
+            compositeElement.AppendChild(element);
         }
 
         protected override void Write(Image image, object parent)

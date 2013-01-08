@@ -221,6 +221,12 @@ namespace LynxToolkit.Documents
 
     public class TableOfContents : Block
     {
+        public int Levels { get; set; }
+
+        public TableOfContents()
+        {
+            this.Levels = 3;
+        }
     }
 
     public class Index : Block

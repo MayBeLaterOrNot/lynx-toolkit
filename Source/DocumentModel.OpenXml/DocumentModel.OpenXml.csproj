@@ -32,6 +32,7 @@
   <ItemGroup>
     <Reference Include="DocumentFormat.OpenXml">
       <HintPath>..\..\Components\DocumentFormat.OpenXml.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

@@ -39,7 +39,7 @@ namespace LynxToolkit.Documents
     {
         protected Document doc;
 
-        public DocumentFormatter(Document doc)
+        protected DocumentFormatter(Document doc)
         {
             this.doc = doc;
         }
@@ -111,6 +111,8 @@ namespace LynxToolkit.Documents
 
         protected abstract void Write(Header header);
 
+        protected abstract void Write(TableOfContents toc);
+
         protected abstract void Write(Paragraph paragraph);
 
         protected abstract void Write(UnorderedList list);
@@ -172,6 +174,11 @@ namespace LynxToolkit.Documents
         protected virtual void WriteBlock(Block block)
         {
             if (this.WriteBlock<Header>(block, this.Write))
+            {
+                return;
+            }
+
+            if (this.WriteBlock<TableOfContents>(block, this.Write))
             {
                 return;
             }

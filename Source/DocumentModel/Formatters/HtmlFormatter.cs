@@ -208,6 +208,52 @@ namespace LynxToolkit.Documents
             this.w.WriteEndElement();
         }
 
+        protected override void Write(TableOfContents toc)
+        {
+            bool preToc = true;
+            int level = 0;
+            int index = 0;
+            foreach (var block in doc.Blocks)
+            {
+                if (block == toc) preToc = false;
+                var header = block as Header;
+                if (header == null || header.Level > toc.Levels || preToc)
+                {
+                    continue;
+                }
+
+                while (level < header.Level)
+                {
+                    this.w.WriteStartElement("ul");
+                    level++;
+                }
+
+                if (level > header.Level)
+                {
+                    this.w.WriteEndElement();
+                    level--;
+                }
+
+                if (header.ID == null)
+                {
+                    header.ID = string.Format("{0}", index++);
+                }
+
+                this.w.WriteStartElement("li");
+                this.w.WriteStartElement("a");
+                this.w.WriteAttributeString("href", "#" + header.ID);
+                this.WriteInlines(header.Content);
+                this.w.WriteEndElement();
+                this.w.WriteEndElement(); // li
+            }
+
+            while (level > 0)
+            {
+                this.w.WriteEndElement();
+                level--;
+            }
+        }
+
         private void WriteAttributes(Element e)
         {
             if (e.ID != null)
@@ -225,7 +271,7 @@ namespace LynxToolkit.Documents
                 this.w.WriteAttributeString("title", e.Title);
             }
         }
-        
+
         protected override void Write(Paragraph paragraph)
         {
             this.w.WriteStartElement("p");
@@ -416,7 +462,7 @@ namespace LynxToolkit.Documents
                 this.w.WriteAttributeString("href", image.Link);
             }
 
-            this.w.WriteStartElement("img"); 
+            this.w.WriteStartElement("img");
             this.WriteAttributes(image);
             this.w.WriteAttributeString("src", image.Source);
             this.w.WriteAttributeString("alt", image.AlternateText);

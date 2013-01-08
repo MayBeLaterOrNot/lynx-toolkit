@@ -65,7 +65,7 @@ namespace XmlDocT
         // Utilities.CreateDirectoryIfMissing(outputDirectory);
         // Console.WriteLine("Output:             {0}", Path.GetFileName(docPath));
         // }
-        public static void CreatePages(NamespaceCollection namespaceCollection, string output, string format, string outputExtension, string styleSheet, string template, bool singlePage, bool createMemberPages)
+        public static void CreatePages(NamespaceCollection namespaceCollection, string output, string format, string outputExtension, string styleSheet, string template, bool singlePage, bool createMemberPages, int topLevel)
         {
             var f = new DocFormatter
                         {
@@ -78,34 +78,34 @@ namespace XmlDocT
                             Template = template
                         };
 
-            f.CreateNamespacesPage(namespaceCollection);
+            f.CreateNamespacesPage(namespaceCollection, topLevel);
             foreach (var ns in namespaceCollection.Namespaces.Values.OrderBy(ns => ns.Name))
             {
-                f.CreateNamespacePage(ns);
+                f.CreateNamespacePage(ns, topLevel);
                 foreach (var t in ns.Types)
                 {
-                    f.CreateTypePage(t, createMemberPages);
+                    f.CreateTypePage(t, createMemberPages, topLevel);
 
                     if (createMemberPages)
                     {
                         foreach (var m in t.Properties)
                         {
-                            f.CreateMemberPage(m);
+                            f.CreateMemberPage(m, topLevel);
                         }
 
                         foreach (var m in t.Methods)
                         {
-                            f.CreateMemberPage(m);
+                            f.CreateMemberPage(m, topLevel);
                         }
 
                         foreach (var m in t.Constructors)
                         {
-                            f.CreateMemberPage(m);
+                            f.CreateMemberPage(m, topLevel);
                         }
 
                         foreach (var m in t.Events)
                         {
-                            f.CreateMemberPage(m);
+                            f.CreateMemberPage(m, topLevel);
                         }
                     }
                 }
@@ -117,11 +117,11 @@ namespace XmlDocT
             }
         }
 
-        private void AddExamples(Model c, Type scope)
+        private void AddExamples(Model c, Type scope, int headerLevel)
         {
             if (!string.IsNullOrWhiteSpace(c.Example))
             {
-                this.AddHeader("Examples", 2);
+                this.AddHeader("Examples", headerLevel);
                 this.AddText(c.Example, scope);
 
                 // var code = new CodeBlock();
@@ -155,16 +155,16 @@ namespace XmlDocT
             this.doc.Blocks.Add(p);
         }
 
-        private void AddRemarks(Model c, Type scope)
+        private void AddRemarks(Model c, Type scope, int headerLevel)
         {
             if (!string.IsNullOrWhiteSpace(c.Remarks))
             {
-                this.AddHeader("Remarks", 2);
+                this.AddHeader("Remarks", headerLevel);
                 this.AddText(c.Remarks, scope);
             }
         }
 
-        private void AddSeeAlso(IEnumerable<Type> types)
+        private void AddSeeAlso(IEnumerable<Type> types, int headerLevel)
         {
             var typeModels =
                 types.Distinct()
@@ -177,7 +177,7 @@ namespace XmlDocT
                 return;
             }
 
-            this.AddHeader("See Also", 2);
+            this.AddHeader("See Also", headerLevel);
 
             var p = new Paragraph();
             foreach (var type in typeModels)
@@ -213,7 +213,7 @@ namespace XmlDocT
             this.doc.Blocks.Add(p);
         }
 
-        private void AddTable(string header, IEnumerable<Model> content, Type scope, bool createLinks = true)
+        private void AddTable(string header, IEnumerable<Model> content, Type scope, bool createLinks = true, int headerLevel = 2)
         {
             var table = new Table();
             var trh = new TableRow();
@@ -247,7 +247,7 @@ namespace XmlDocT
             {
                 if (header != null)
                 {
-                    this.AddHeader(header, 2);
+                    this.AddHeader(header, headerLevel);
                 }
 
                 this.AddTable(table);
@@ -379,10 +379,10 @@ namespace XmlDocT
             return a;
         }
 
-        private void CreateMemberPage(MemberModel c)
+        private void CreateMemberPage(MemberModel c, int topLevel)
         {
             this.CreatePage();
-            this.AddHeader(c.GetTitle(), 1, c.GetFileName());
+            this.AddHeader(c.GetTitle(), topLevel, c.GetFileName());
             this.AddText(c.Description, c.DeclaringType);
 
             this.AddNamespaceInfo(c.Info.DeclaringType);
@@ -390,15 +390,15 @@ namespace XmlDocT
             var syntax = c.GetSyntax();
             if (syntax != null)
             {
-                this.AddHeader("Syntax", 2);
+                this.AddHeader("Syntax", topLevel + 1);
                 this.doc.Blocks.Add(new CodeBlock { Text = syntax });
             }
 
-            this.AddTable("Parameters", c.GetParameters(), c.DeclaringType, 3);
+            this.AddTable("Parameters", c.GetParameters(), c.DeclaringType, topLevel + 2);
             var mm = c as MethodModel;
             if (mm != null && mm.ReturnType != typeof(void))
             {
-                this.AddHeader("Return Value", 3);
+                this.AddHeader("Return Value", topLevel + 2);
                 var p = new Paragraph();
                 p.Content.Add(new Run("Type: "));
                 p.Content.Add(this.CreateLink(mm.ReturnType));
@@ -408,10 +408,10 @@ namespace XmlDocT
             }
 
             // this.AddImplements(c);
-            this.AddRemarks(c, c.DeclaringType);
-            this.AddExamples(c, c.DeclaringType);
+            this.AddRemarks(c, c.DeclaringType, topLevel + 1);
+            this.AddExamples(c, c.DeclaringType, topLevel + 1);
 
-            this.AddSeeAlso(c.GetRelatedTypes());
+            this.AddSeeAlso(c.GetRelatedTypes(), topLevel + 1);
 
             this.WritePage(c.GetFileName(), c.GetPageTitle(), c.Description);
         }
@@ -429,31 +429,37 @@ namespace XmlDocT
             return a;
         }
 
-        private void CreateNamespacePage(NamespaceModel ns)
+        private void CreateNamespacePage(NamespaceModel ns, int topLevel)
         {
             this.CreatePage();
-            this.AddHeader(ns.GetTitle(), 1, ns.GetFileName());
+            this.AddHeader(ns.GetTitle(), topLevel, ns.GetFileName());
             this.AddText(ns.Description, null);
 
-            this.AddTable("Classes", ns.Types.Where(t => t.Type.IsClass), null);
-            this.AddTable("Structures", ns.Types.Where(t => t.Type.IsValueType && !t.Type.IsEnum), null);
-            this.AddTable("Interfaces", ns.Types.Where(t => t.Type.IsInterface), null);
+            this.AddTable("Classes", ns.Types.Where(t => t.Type.IsClass), null, true, topLevel + 1);
+            this.AddTable("Structures", ns.Types.Where(t => t.Type.IsValueType && !t.Type.IsEnum), null, true, topLevel + 1);
+            this.AddTable("Interfaces", ns.Types.Where(t => t.Type.IsInterface), null, true, topLevel + 1);
 
             // this.AddTable("Delegates", ns.Types.Where(t => t.Type.IsDelegate));
-            this.AddTable("Enumerations", ns.Types.Where(t => t.Type.IsEnum), null);
+            this.AddTable("Enumerations", ns.Types.Where(t => t.Type.IsEnum), null, true, topLevel + 1);
 
             this.AddSeeAlso(this.NamespaceCollection.Namespaces.Values.Where(n => n != ns).OrderBy(n => n.Name));
 
             this.WritePage(ns.GetFileName(), ns.GetTitle(), ns.Description);
         }
 
-        private void CreateNamespacesPage(NamespaceCollection namespaceCollection)
+        private void CreateNamespacesPage(NamespaceCollection namespaceCollection, int topLevel)
         {
             this.CreatePage();
-            var commonNamespace = GetCommonStartString(namespaceCollection.Namespaces.Keys).TrimEnd('.');
-            this.AddHeader(namespaceCollection.Title ?? (commonNamespace + " namespaces"), 1, "namespaces");
+            
+            var commonNamespace = GetCommonStartString(namespaceCollection.Namespaces.Keys);
+            if (commonNamespace != null)
+            {
+                commonNamespace = commonNamespace.TrimEnd('.');
+            }
+
+            this.AddHeader(namespaceCollection.Title ?? (commonNamespace + " namespaces"), topLevel, "namespaces");
             this.AddText(namespaceCollection.Description, null);
-            this.AddTable(null, namespaceCollection.Namespaces.Values, null);
+            this.AddTable(null, namespaceCollection.Namespaces.Values, null, true, topLevel + 1);
             this.WritePage(commonNamespace, null, null);
         }
 
@@ -496,7 +502,7 @@ namespace XmlDocT
             {
                 return new Run(typeName);
             }
-            
+
             var a = new Hyperlink { Url = url };
 
             if (strong)
@@ -511,17 +517,17 @@ namespace XmlDocT
             return a;
         }
 
-        private void CreateTypePage(TypeModel typeModel, bool createMemberPages)
+        private void CreateTypePage(TypeModel typeModel, bool createMemberPages, int topLevel)
         {
             this.CreatePage();
-            this.AddHeader(typeModel.GetTitle(), 1, typeModel.GetFileName());
+            this.AddHeader(typeModel.GetTitle(), topLevel, typeModel.GetFileName());
             this.AddText(typeModel.Description, typeModel.Type);
 
             bool showInheritanceHierarchy = !typeModel.Type.IsEnum;
 
             if (showInheritanceHierarchy)
             {
-                this.AddHeader("Inheritance hierarchy", 2);
+                this.AddHeader("Inheritance hierarchy", topLevel + 1);
                 var p = new Paragraph();
                 int level = 0;
                 foreach (var t in typeModel.InheritedTypes)
@@ -563,18 +569,18 @@ namespace XmlDocT
             var syntax = typeModel.GetSyntax();
             if (syntax != null)
             {
-                this.AddHeader("Syntax", 2);
+                this.AddHeader("Syntax", topLevel + 1);
                 this.doc.Blocks.Add(new CodeBlock { Text = syntax });
             }
 
             this.AddText(string.Format("The {0} type exposes the following members.", typeModel), null);
 
-            this.AddTable("Constructors", typeModel.Constructors, typeModel.Type, createMemberPages);
-            this.AddTable("Properties", typeModel.Properties, typeModel.Type, createMemberPages);
-            this.AddTable("Methods", typeModel.Methods, typeModel.Type, createMemberPages);
-            this.AddTable("Members", typeModel.EnumMembers, typeModel.Type, false);
-            this.AddRemarks(typeModel, typeModel.Type);
-            this.AddExamples(typeModel, typeModel.Type);
+            this.AddTable("Constructors", typeModel.Constructors, typeModel.Type, createMemberPages, topLevel + 1);
+            this.AddTable("Properties", typeModel.Properties, typeModel.Type, createMemberPages, topLevel + 1);
+            this.AddTable("Methods", typeModel.Methods, typeModel.Type, createMemberPages, topLevel + 1);
+            this.AddTable("Members", typeModel.EnumMembers, typeModel.Type, false, topLevel + 1);
+            this.AddRemarks(typeModel, typeModel.Type, topLevel + 1);
+            this.AddExamples(typeModel, typeModel.Type, topLevel + 1);
             this.WritePage(typeModel.GetFileName(), typeModel.GetPageTitle(), typeModel.Description);
         }
 
@@ -637,7 +643,7 @@ namespace XmlDocT
                         break;
                     }
 
-                case "docx":
+                case "word":
                     {
                         var path = GetOutputFile(fileName, ".docx");
                         var options = new WordFormatterOptions { Template = this.Template };

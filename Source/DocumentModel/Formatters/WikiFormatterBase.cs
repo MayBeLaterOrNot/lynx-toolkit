@@ -127,6 +127,11 @@ namespace LynxToolkit.Documents
 
         public int LineLength { get; set; }
 
+        protected override void Write(TableOfContents toc)
+        {
+            this.WriteLine("@toc");
+        }
+
         protected override void Write(Paragraph paragraph)
         {
             var tmp = sb;

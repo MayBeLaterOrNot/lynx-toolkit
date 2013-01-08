@@ -100,7 +100,7 @@ namespace WikiT
             Console.WriteLine(Application.Header);
             if (args.Length < 3)
             {
-                Console.WriteLine("Arguments: [/input=folder/search-pattern] [/DefaultSyntax=owiki] [/Format=html] [/Extension=.html] [/Output=output-folder]");
+                Console.WriteLine("Arguments: [/input=folder/search-pattern] [/defaultSyntax=owiki] [/format=html] [/extension=.html] [/output=output-folder]");
                 Console.WriteLine(@"Example: /input=..\docs\*.wiki /output=..\output");
                 return -1;
             }
@@ -111,6 +111,8 @@ namespace WikiT
             Format = "html";
             Extension = null;
             Output = "output";
+            LocalLinks = string.Empty;
+            SpaceLinks = string.Empty;
             Defines = new HashSet<string>();
 
             foreach (var arg in args)
@@ -156,8 +158,27 @@ namespace WikiT
 
             if (Extension == null)
             {
-                Extension = "." + Format;
+                switch (Format)
+                {
+                    case "html":
+                        Extension = ".html";
+                        break;
+                    case "owiki":
+                        Extension = ".wiki";
+                        break;
+                    case "markdown":
+                        Extension = ".md";
+                        break;
+                    case "word":
+                        Extension = ".docx";
+                        break;
+                    default:
+                        Extension = "." + Format;
+                        break;
+                }
             }
+            
+            Utilities.CreateDirectoryIfMissing(Output);
 
             var inputDirectory = Path.GetDirectoryName(Input);
             var searchPattern = Path.GetFileName(Input);
@@ -165,10 +186,13 @@ namespace WikiT
             var files = Utilities.FindFiles(inputDirectory, searchPattern).ToList();
             foreach (var f in files)
             {
-                if (Transform(f))
+                Console.Write(f);
+                if (!Transform(f))
                 {
-                    Console.WriteLine(f);
+                    Console.Write(" (no change)");
                 }
+
+                Console.WriteLine();
             }
 
             return 0;
@@ -187,7 +211,6 @@ namespace WikiT
 
         private static bool Transform(string filePath)
         {
-            var text = File.ReadAllText(filePath);
             var doc = WikiParser.ParseFile(filePath, DefaultSyntax, Defines);
             var outputPath = filePath;
             if (Output != null)
@@ -201,8 +224,7 @@ namespace WikiT
 
             switch (Format)
             {
-                case "docm":
-                case "docx":
+                case "word":
                     {
                         WordFormatter.Format(doc, outputPath, new WordFormatterOptions { Template = Template });
                         return true;
@@ -216,7 +238,7 @@ namespace WikiT
                     outputText = CreoleFormatter.Format(doc);
                     break;
 
-                case "md":
+                case "markdown":
                     outputText = MarkdownFormatter.Format(doc);
                     break;
                 case "xml":
@@ -224,7 +246,6 @@ namespace WikiT
                     break;
 
                 case "html":
-                case "htm":
                     var options = new HtmlFormatterOptions
                                       {
                                           Css = Stylesheet,

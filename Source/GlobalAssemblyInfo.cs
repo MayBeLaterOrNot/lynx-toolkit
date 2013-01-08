@@ -34,5 +34,5 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: ComVisible(false)]
-[assembly: AssemblyVersion("2012.2.1.*")]
-[assembly: AssemblyFileVersion("2012.2.1.0")]
+[assembly: AssemblyVersion("2013.1.1.*")]
+[assembly: AssemblyFileVersion("2013.1.1.0")]

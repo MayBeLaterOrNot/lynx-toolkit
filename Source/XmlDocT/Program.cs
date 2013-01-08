@@ -27,6 +27,7 @@
 namespace XmlDocT
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.Globalization;
     using System.IO;
@@ -59,6 +60,8 @@ namespace XmlDocT
             string template = null;
             var singlePage = false;
             var createMemberPages = false;
+            int topLevel = 1;
+            var input = new List<string>();
 
             var model = new NamespaceCollection();
 
@@ -75,11 +78,17 @@ namespace XmlDocT
                         case "/creatememberpages":
                             createMemberPages = true;
                             break;
+                        case "/input":
+                            input.Add(kv[1]);
+                            continue;
                         case "/output":
                             output = kv[1];
                             continue;
                         case "/stylesheet":
                             stylesheet = kv[1];
+                            continue;
+                        case "/toplevel":
+                            topLevel = int.Parse(kv[1]);
                             continue;
                         case "/template":
                             template = kv[1];
@@ -87,7 +96,7 @@ namespace XmlDocT
                         case "/format":
                             format = kv[1].ToLower();
                             continue;
-                        case "/outputextension":
+                        case "/extension":
                             outputExtension = kv[1].ToLower();
                             continue;
                         case "/ignore":
@@ -96,12 +105,17 @@ namespace XmlDocT
                     }
                 }
 
-                // Read input data
-                if (arg.Contains('*'))
+                input.Add(arg);
+            }
+
+            // Process input data
+            foreach (var path in input)
+            {
+                if (path.Contains('*'))
                 {
-                    var dir = Path.GetDirectoryName(arg);
-                    var pattern = Path.GetFileName(arg);
-                    Console.WriteLine("Processing " + arg);
+                    var dir = Path.GetDirectoryName(path);
+                    var pattern = Path.GetFileName(path);
+                    Console.WriteLine("Processing " + path);
                     foreach (var fileName in Directory.GetFiles(dir, pattern))
                     {
                         model.Add(fileName);
@@ -110,17 +124,17 @@ namespace XmlDocT
                     continue;
                 }
 
-                if (File.Exists(arg))
+                if (File.Exists(path))
                 {
-                    Console.WriteLine("Processing " + arg);
-                    model.Add(arg);
+                    Console.WriteLine("Processing " + path);
+                    model.Add(path);
                     continue;
                 }
 
-                if (Directory.Exists(arg))
+                if (Directory.Exists(path))
                 {
-                    Console.WriteLine("Processing " + arg + @"\\*.dll");
-                    foreach (var fileName in Directory.GetFiles(arg, "*.dll"))
+                    Console.WriteLine("Processing " + path + @"\\*.dll");
+                    foreach (var fileName in Directory.GetFiles(path, "*.dll"))
                     {
                         model.Add(fileName);
                     }
@@ -141,10 +155,10 @@ namespace XmlDocT
             {
                 Console.WriteLine("  Output directory: {0}", Path.GetFullPath(outputDirectory));
             }
-            
+
             if (singlePage)
             {
-                Console.WriteLine("  Output file: {0}", Path.GetFullPath(output));                
+                Console.WriteLine("  Output file: {0}", Path.GetFullPath(output));
             }
 
             if (stylesheet != null)
@@ -163,7 +177,7 @@ namespace XmlDocT
             Console.WriteLine("  Writing documentation output files...");
 
             // Write the documentation pages
-            DocFormatter.CreatePages(model, output, format, outputExtension, stylesheet, template, singlePage, createMemberPages);
+            DocFormatter.CreatePages(model, output, format, outputExtension, stylesheet, template, singlePage, createMemberPages, topLevel);
 
             Console.WriteLine();
             Console.WriteLine(

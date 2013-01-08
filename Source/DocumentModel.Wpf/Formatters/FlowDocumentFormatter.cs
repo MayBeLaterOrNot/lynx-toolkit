@@ -123,6 +123,10 @@ namespace DocumentModel.Wpf
             Document.Blocks.Add(p);
         }
 
+        protected override void Write(TableOfContents toc)
+        {
+        }
+        
         private Stack<InlineCollection> outputStack = new Stack<InlineCollection>();
 
         //InlineCollection Current { get { return outputStack.Peek(); } }

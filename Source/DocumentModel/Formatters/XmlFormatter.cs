@@ -27,5 +27,11 @@ namespace LynxToolkit.Documents
         {
             return serializer.Deserialize(s) as Document;
         }
+
+        public static Document Parse(string xml)
+        {
+            var ms = new MemoryStream(Encoding.UTF8.GetBytes(xml));
+            return serializer.Deserialize(ms) as Document;
+        }
     }
 }

@@ -37,10 +37,10 @@ namespace LynxToolkit.Documents
 (?:
 (@include \s (?<include>.+?) \r?\n)|
 (?<index>@index .*? \r?\n)|
-(?<toc>@toc .*? \r?\n)
+(?<toc>@toc \s* (?<levels>\d+)? .*? \r?\n)
 )", RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
             DefineExpression = new Regex(
-                @"^\s*@if\s*(?<criteria>.+?)\s*$(?<block>.*?)^@endif", RegexOptions.Compiled | RegexOptions.Singleline);
+                @"^\s*@if\s+(?<criteria>.+?)\s*$(?<block>.*?)^@endif", RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.Multiline);
         }
 
         /// <summary>
@@ -133,7 +133,13 @@ namespace LynxToolkit.Documents
                 }
                 if (match.Groups["toc"].Success)
                 {
-                    doc.Blocks.Add(new TableOfContents());
+                    var toc = new TableOfContents();
+                    if (match.Groups["levels"].Success)
+                    {
+                        toc.Levels = int.Parse(match.Groups["levels"].Value);
+                    }
+
+                    doc.Blocks.Add(toc);
                 }
             }
 
@@ -180,6 +186,11 @@ namespace LynxToolkit.Documents
 
         private static Document ParseCore(string text, string syntax)
         {
+            if (text.StartsWith("<?xml"))
+            {
+                return XmlFormatter.Parse(text);
+            }
+
             Document doc;
             switch (syntax)
             {
