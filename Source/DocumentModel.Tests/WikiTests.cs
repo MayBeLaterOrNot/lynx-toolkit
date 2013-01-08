@@ -64,7 +64,7 @@ namespace LynxToolkit.Documents.Tests
             CompareLines(expected, output, "MarkdownFormatter");
 
             // And convert back to OWiki
-            var doc2 = MarkdownParser.Parse(output);
+            var doc2 = MarkdownParser.Parse(output, null);
             var output1 = OWikiFormatter.Format(doc);
             var output2 = OWikiFormatter.Format(doc2);
             CompareLines(output1, output2, "MarkdownParser");
@@ -83,7 +83,7 @@ namespace LynxToolkit.Documents.Tests
 
             // And convert back to OWiki
             var output1 = OWikiFormatter.Format(doc);
-            var doc2 = CreoleParser.Parse(output);
+            var doc2 = CreoleParser.Parse(output, "Input");
             var output2 = OWikiFormatter.Format(doc2);
             CompareLines(output1, output2, "CreoleParser");
         }

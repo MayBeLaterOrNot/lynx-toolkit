@@ -568,5 +568,7 @@ namespace LynxToolkit.Documents
         public string Link { get; set; }
 
         public string Source { get; set; }
+
+        public string BaseDirectory { get; set; }
     }
 }

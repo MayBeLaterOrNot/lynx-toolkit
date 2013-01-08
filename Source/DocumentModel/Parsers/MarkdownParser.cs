@@ -31,9 +31,9 @@ namespace LynxToolkit.Documents
 )");
         }
 
-        public static Document Parse(string text)
+        public static Document Parse(string text, string documentFolder)
         {
-            var p = new MarkdownParser();
+            var p = new MarkdownParser { BaseDirectory = documentFolder };
             p.ParseCore(text);
             return p.Document;
         }

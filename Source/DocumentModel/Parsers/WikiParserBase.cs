@@ -6,6 +6,8 @@ namespace LynxToolkit.Documents
 {
     public abstract class WikiParserBase : DocumentParser
     {
+        public string BaseDirectory { get; set; }
+
         protected Regex TableRowExpression;
         protected Regex ListItemExpression;
         protected Regex DirectivesExpression;
@@ -150,6 +152,7 @@ namespace LynxToolkit.Documents
             ParseInlines(text, quote.Content);
             doc.Blocks.Add(quote);
         }
+
         private void AddTable(string text)
         {
             var table = new Table();
@@ -174,6 +177,7 @@ namespace LynxToolkit.Documents
                 }
                 table.Rows.Add(tr);
             }
+
             doc.Blocks.Add(table);
         }
 
@@ -206,6 +210,7 @@ namespace LynxToolkit.Documents
                     var s = text.Substring(index, match.Index - index);
                     this.ParseRun(s, inlines);
                 }
+
                 index = match.Index + match.Length;
 
                 var strongGroup = match.Groups["strong"];
@@ -276,7 +281,7 @@ namespace LynxToolkit.Documents
                     var src = match.Groups["imgsrc"].Value;
                     var alt = match.Groups["imgalt"].Value;
                     var imglink = match.Groups["imglink"].Value;
-                    var img = new Image { Source = src, AlternateText = alt, Link = imglink };
+                    var img = new Image { Source = src, BaseDirectory = this.BaseDirectory, AlternateText = alt, Link = imglink };
                     inlines.Add(img);
                 }
 

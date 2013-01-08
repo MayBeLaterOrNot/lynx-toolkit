@@ -47,13 +47,13 @@ namespace LynxToolkit.Documents
         /// Parses the specified text.
         /// </summary>
         /// <param name="text">The text.</param>
-        /// <param name="includePath">The include resolve path (used to resolve include files).</param>
+        /// <param name="documentFolder">The include resolve path (used to resolve include files).</param>
         /// <param name="includeDefaultExtension">The default extension (used to resolve include files).</param>
         /// <param name="defaultSyntax">The default syntax.</param>
         /// <param name="defines">The defines.</param>
         /// <returns>A Document.</returns>
         /// <exception cref="System.IO.FileNotFoundException">Include file not found</exception>
-        public static Document Parse(string text, string includePath, string includeDefaultExtension, string defaultSyntax, HashSet<string> defines = null)
+        public static Document Parse(string text, string documentFolder, string includeDefaultExtension, string defaultSyntax, HashSet<string> defines = null)
         {
             if (defines == null)
             {
@@ -108,7 +108,7 @@ namespace LynxToolkit.Documents
                     var s = text.Substring(index, match.Index - index);
                     if (!string.IsNullOrWhiteSpace(s))
                     {
-                        doc.Append(ParseCore(s, syntax));
+                        doc.Append(ParseCore(s, syntax, documentFolder));
                     }
                 }
                 index = match.Index + match.Length;
@@ -117,7 +117,7 @@ namespace LynxToolkit.Documents
                 if (match.SetIfSuccess("include", ref include))
                 {
                     // todo: support wildcards?
-                    var includeFilePath = ResolveInclude(include, includePath, includepaths, includeDefaultExtension);
+                    var includeFilePath = ResolveInclude(include, documentFolder, includepaths, includeDefaultExtension);
                     if (includeFilePath == null)
                     {
                         throw new FileNotFoundException("Include file not found", include);
@@ -148,7 +148,7 @@ namespace LynxToolkit.Documents
                 var s = text.Substring(index);
                 if (!string.IsNullOrWhiteSpace(s))
                 {
-                    doc.Append(ParseCore(s, syntax));
+                    doc.Append(ParseCore(s, syntax, documentFolder));
                 }
             }
 
@@ -165,11 +165,11 @@ namespace LynxToolkit.Documents
             return doc;
         }
 
-        private static string ResolveInclude(string include, string path, IEnumerable<string> includepaths, string ext)
+        private static string ResolveInclude(string include, string documentPath, IEnumerable<string> includepaths, string ext)
         {
             foreach (var p in includepaths)
             {
-                var f = Path.Combine(Path.Combine(path, p), include);
+                var f = Path.Combine(Path.Combine(documentPath, p), include);
                 if (ext != null && string.IsNullOrEmpty(Path.GetExtension(f)))
                 {
                     f = Path.ChangeExtension(f, ext);
@@ -184,7 +184,7 @@ namespace LynxToolkit.Documents
             return null;
         }
 
-        private static Document ParseCore(string text, string syntax)
+        private static Document ParseCore(string text, string syntax, string documentFolder)
         {
             if (text.StartsWith("<?xml"))
             {
@@ -195,11 +195,11 @@ namespace LynxToolkit.Documents
             switch (syntax)
             {
                 case "creole":
-                    doc = CreoleParser.Parse(text);
+                    doc = CreoleParser.Parse(text, documentFolder);
                     break;
                 case "markdown":
                 case "md":
-                    doc = MarkdownParser.Parse(text);
+                    doc = MarkdownParser.Parse(text, documentFolder);
                     break;
                 case "confluence":
                     throw new Exception("Confluence wiki parsing not supported.");
@@ -208,7 +208,7 @@ namespace LynxToolkit.Documents
                     throw new Exception("Codeplex wiki parsing not supported.");
                 // doc = CodeplexParser.Parse(text);
                 default:
-                    doc = OWikiParser.Parse(text);
+                    doc = OWikiParser.Parse(text, documentFolder);
                     break;
             }
 

@@ -406,7 +406,8 @@
         protected override void Write(Image image, object parent)
         {
             var p = new DocumentFormat.OpenXml.Wordprocessing.Paragraph();
-            p.AppendChild(this.CreateImageRun(image.Source, image.AlternateText));
+            var source = System.IO.Path.Combine(image.BaseDirectory, image.Source);
+            p.AppendChild(this.CreateImageRun(source, image.AlternateText));
             body.AppendChild(p);
         }
 
@@ -429,18 +430,24 @@
         /// </param>
         private DocumentFormat.OpenXml.Wordprocessing.Run CreateImageRun(string source, string description)
         {
+            if (!File.Exists(source))
+            {
+                throw new FileNotFoundException("The image was not found.", source);
+            }
+
             // http://msdn.microsoft.com/en-us/library/bb497430.aspx
             string ext = System.IO.Path.GetExtension(source).ToLower();
-            ImagePartType ipt = ImagePartType.Jpeg;
+
+            var ipt = ImagePartType.Jpeg;
             if (ext == ".png")
             {
                 ipt = ImagePartType.Png;
             }
 
             var imagePart = this.mainPart.AddImagePart(ipt);
-            using (var stream = new FileStream(source, FileMode.Open))
+            using (var imageStream = File.OpenRead(source))
             {
-                imagePart.FeedData(stream);
+                imagePart.FeedData(imageStream);
             }
 
             using (var bmp = new System.Drawing.Bitmap(source))
@@ -571,7 +578,7 @@
             var outline1 = new Outline();
             var noFill2 = new NoFill();
 
-            outline1.Append(noFill2);
+            //outline1.Append(noFill2);
 
             shapeProperties1.Append(transform2D1);
             shapeProperties1.Append(presetGeometry1);

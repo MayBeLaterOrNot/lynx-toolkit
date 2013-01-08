@@ -35,9 +35,9 @@ namespace LynxToolkit.Documents
 )", false);
         }
 
-        public static Document Parse(string text)
+        public static Document Parse(string text, string documentFolder)
         {
-            var p = new OWikiParser();
+            var p = new OWikiParser { BaseDirectory = documentFolder };
             p.ParseCore(text);
             return p.Document;
         }

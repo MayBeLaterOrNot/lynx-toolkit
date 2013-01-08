@@ -30,9 +30,9 @@ namespace LynxToolkit.Documents
 )", false);
         }
 
-        public static Document Parse(string text)
+        public static Document Parse(string text, string documentFolder)
         {
-            var p = new CreoleParser();
+            var p = new CreoleParser { BaseDirectory = documentFolder };
             p.ParseCore(text);
             return p.Document;
         }
