@@ -460,7 +460,7 @@ namespace XmlDocT
             this.AddHeader(namespaceCollection.Title ?? (commonNamespace + " namespaces"), topLevel, "namespaces");
             this.AddText(namespaceCollection.Description, null);
             this.AddTable(null, namespaceCollection.Namespaces.Values, null, true, topLevel + 1);
-            this.WritePage(commonNamespace, null, null);
+            this.WritePage("Namespaces", null, null);
         }
 
         private string GetCommonStartString(IEnumerable<string> keys)

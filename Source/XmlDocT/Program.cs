@@ -114,6 +114,11 @@ namespace XmlDocT
                 if (path.Contains('*'))
                 {
                     var dir = Path.GetDirectoryName(path);
+                    if (string.IsNullOrWhiteSpace(dir))
+                    {
+                        dir = ".";
+                    }
+
                     var pattern = Path.GetFileName(path);
                     Console.WriteLine("Processing " + path);
                     foreach (var fileName in Directory.GetFiles(dir, pattern))
@@ -161,12 +166,12 @@ namespace XmlDocT
                 Console.WriteLine("  Output file: {0}", Path.GetFullPath(output));
             }
 
-            if (stylesheet != null)
-            {
-                Console.WriteLine("  Copying stylesheet: {0}", Path.GetFullPath(stylesheet));
-                var destStylesheet = Path.Combine(output, Path.GetFileName(stylesheet));
-                File.Copy(stylesheet, destStylesheet, true);
-            }
+            //if (stylesheet != null)
+            //{
+            //    Console.WriteLine("  Copying stylesheet: {0}", Path.GetFullPath(stylesheet));
+            //    var destStylesheet = Path.Combine(output, Path.GetFileName(stylesheet));
+            //    File.Copy(stylesheet, destStylesheet, true);
+            //}
 
             Console.WriteLine("  Output format: {0}", format);
             if (singlePage)
