@@ -1,5 +1,5 @@
 ﻿using System.Reflection;
 
-[assembly: AssemblyTitle("DocumentModel.Wpf")]
+[assembly: AssemblyTitle("LynxToolkit.Documents.Wpf")]
 [assembly: AssemblyDescription("")]
-[assembly: AssemblyProduct("DocumentModel.Wpf")]
+[assembly: AssemblyProduct("LynxToolkit.Documents.Wpf")]

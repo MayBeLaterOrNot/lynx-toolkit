@@ -1,4 +1,4 @@
-namespace DocumentModel.Wpf
+namespace LynxToolkit.Documents.Wpf
 {
     using System;
     using System.Collections.Generic;
