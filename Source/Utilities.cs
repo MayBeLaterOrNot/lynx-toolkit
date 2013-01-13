@@ -292,7 +292,7 @@ namespace LynxToolkit
             get
             {
                 var sb = new StringBuilder();
-                var fvi = FileVersionInfo.GetVersionInfo(typeof(Application).Assembly.Location);
+                var fvi = FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly().Location);
                 sb.AppendLine(fvi.ProductName);
                 sb.AppendFormat(
                     "Version {0}.{1} (build {2})", fvi.ProductMajorPart, fvi.ProductMinorPart, fvi.ProductBuildPart);
