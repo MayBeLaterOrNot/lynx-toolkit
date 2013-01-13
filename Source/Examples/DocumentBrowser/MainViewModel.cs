@@ -215,7 +215,7 @@ namespace DocumentBrowser
 
         private void Update()
         {
-            var doc = WikiParser.Parse(this.Input, null, null, null, null);
+            var doc = WikiParser.Parse(this.Input, null, null, null);
 
             this.Wiki = OWikiFormatter.Format(doc);
             this.WikiCreole = CreoleFormatter.Format(doc);

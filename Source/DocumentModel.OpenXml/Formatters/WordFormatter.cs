@@ -202,7 +202,6 @@
                 //    tr.Append(trp);
                 //}
 
-                int j = 0;
                 foreach (var c in row.Cells)
                 {
                     bool isHeader = c is TableHeaderCell;

@@ -1,3 +1,30 @@
+// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="WikiParser.cs" company="Lynx">
+//   The MIT License (MIT)
+//   
+//   Copyright (c) 2012 Oystein Bjorke
+//   
+//   Permission is hereby granted, free of charge, to any person obtaining a
+//   copy of this software and associated documentation files (the
+//   "Software"), to deal in the Software without restriction, including
+//   without limitation the rights to use, copy, modify, merge, publish,
+//   distribute, sublicense, and/or sell copies of the Software, and to
+//   permit persons to whom the Software is furnished to do so, subject to
+//   the following conditions:
+//   
+//   The above copyright notice and this permission notice shall be included
+//   in all copies or substantial portions of the Software.
+//   
+//   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+//   OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+//   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+//   IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+//   CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+//   TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+//   SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// </copyright>
+// --------------------------------------------------------------------------------------------------------------------
+
 namespace LynxToolkit.Documents
 {
     using System;
@@ -7,17 +34,15 @@ namespace LynxToolkit.Documents
 
     public class WikiParser
     {
-        public Document Document { get; set; }
-        public string Syntax { get; set; }
+        private static readonly Regex DefineExpression;
 
         private static readonly Regex DirectivesExpression;
+
         private static readonly Regex IncludeExpression;
-        private static readonly Regex DefineExpression;
 
         static WikiParser()
         {
-            DirectivesExpression = new Regex(
-@"(?<=[^\\]|^)     # Not escaped
+            DirectivesExpression = new Regex(@"(?<=[^\\]|^)     # Not escaped
 @(?:
 (?:syntax \s (?<syntax>.+?) \r?\n)|
 (?:title \s (?<title>.+?) \r?\n)|
@@ -32,16 +57,20 @@ namespace LynxToolkit.Documents
 (?:includepath \s (?<includepath>.+?) \r?\n)
 )", RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
-            IncludeExpression = new Regex(
-@"(?<=[^\\]|^)     # Not escaped
+            IncludeExpression = new Regex(@"(?<=[^\\]|^)     # Not escaped
 (?:
 (@include \s (?<include>.+?) \r?\n)|
 (?<index>@index .*? \r?\n)|
 (?<toc>@toc \s* (?<levels>\d+)? .*? \r?\n)
 )", RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
             DefineExpression = new Regex(
-                @"^\s*@if\s+(?<criteria>.+?)\s*$(?<block>.*?)^@endif", RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.Multiline);
+                @"^\s*@if\s+(?<criteria>.+?)\s*$(?<block>.*?)^@endif",
+                RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.Multiline);
         }
+
+        public Document Document { get; set; }
+
+        public string Syntax { get; set; }
 
         /// <summary>
         /// Parses the specified text.
@@ -50,18 +79,44 @@ namespace LynxToolkit.Documents
         /// <param name="documentFolder">The include resolve path (used to resolve include files).</param>
         /// <param name="includeDefaultExtension">The default extension (used to resolve include files).</param>
         /// <param name="defaultSyntax">The default syntax.</param>
+        /// <param name="replacements">The variables.</param>
         /// <param name="defines">The defines.</param>
-        /// <returns>A Document.</returns>
+        /// <returns>
+        /// A Document.
+        /// </returns>
         /// <exception cref="System.IO.FileNotFoundException">Include file not found</exception>
-        public static Document Parse(string text, string documentFolder, string includeDefaultExtension, string defaultSyntax, HashSet<string> defines = null)
+        public static Document Parse(
+            string text,
+            string documentFolder,
+            string includeDefaultExtension,
+            string defaultSyntax,
+            Dictionary<string, string> replacements = null,
+            HashSet<string> defines = null)
         {
             if (defines == null)
             {
                 defines = new HashSet<string>();
             }
 
-            string title = null, description = null, keywords = null, syntax = defaultSyntax, creator = null, subject = null, category = null, date = null, version = null, revision = null;
+            string title = null,
+                   description = null,
+                   keywords = null,
+                   syntax = defaultSyntax,
+                   creator = null,
+                   subject = null,
+                   category = null,
+                   date = null,
+                   version = null,
+                   revision = null;
             var includepaths = new List<string> { "." };
+
+            if (replacements != null)
+            {
+                foreach (var kvp in replacements)
+                {
+                    text = text.Replace("$" + kvp.Key, kvp.Value);
+                }
+            }
 
             // solve @if ... @endif expressions
             text = DefineExpression.Replace(
@@ -73,10 +128,12 @@ namespace LynxToolkit.Documents
                     {
                         return m.Groups["block"].Value;
                     }
+
                     return string.Empty;
                 });
 
-            text = DirectivesExpression.Replace(text,
+            text = DirectivesExpression.Replace(
+                text,
                 m =>
                 {
                     m.SetIfSuccess("syntax", ref syntax);
@@ -111,6 +168,7 @@ namespace LynxToolkit.Documents
                         doc.Append(ParseCore(s, syntax, documentFolder));
                     }
                 }
+
                 index = match.Index + match.Length;
 
                 string include = null;
@@ -120,17 +178,26 @@ namespace LynxToolkit.Documents
                     var includeFilePath = ResolveInclude(include, documentFolder, includepaths, includeDefaultExtension);
                     if (includeFilePath == null)
                     {
-                        throw new FileNotFoundException("Include file not found", include);
+                        throw new FileNotFoundException("Include file not found (" + include + ")", include);
                     }
 
                     var includeText = File.ReadAllText(includeFilePath);
-                    doc.Append(Parse(includeText, Path.GetDirectoryName(includeFilePath), includeDefaultExtension, defaultSyntax, defines));
+                    doc.Append(
+                        Parse(
+                            includeText,
+                            Path.GetDirectoryName(includeFilePath),
+                            includeDefaultExtension,
+                            defaultSyntax,
+                            replacements,
+                            defines));
                     continue;
                 }
+
                 if (match.Groups["index"].Success)
                 {
                     doc.Blocks.Add(new Index());
                 }
+
                 if (match.Groups["toc"].Success)
                 {
                     var toc = new TableOfContents();
@@ -165,23 +232,10 @@ namespace LynxToolkit.Documents
             return doc;
         }
 
-        private static string ResolveInclude(string include, string documentPath, IEnumerable<string> includepaths, string ext)
+        public static Document ParseFile(string filePath, string defaultSyntax = null, Dictionary<string, string> replacements = null, HashSet<string> defines = null)
         {
-            foreach (var p in includepaths)
-            {
-                var f = Path.Combine(Path.Combine(documentPath, p), include);
-                if (ext != null && string.IsNullOrEmpty(Path.GetExtension(f)))
-                {
-                    f = Path.ChangeExtension(f, ext);
-                }
-
-                if (File.Exists(f))
-                {
-                    return f;
-                }
-            }
-
-            return null;
+            var text = File.ReadAllText(filePath);
+            return Parse(text, Path.GetDirectoryName(filePath), Path.GetExtension(filePath), defaultSyntax, replacements, defines);
         }
 
         private static Document ParseCore(string text, string syntax, string documentFolder)
@@ -203,9 +257,11 @@ namespace LynxToolkit.Documents
                     break;
                 case "confluence":
                     throw new Exception("Confluence wiki parsing not supported.");
+
                 // doc = ConfluenceParser.Parse(text);
                 case "codeplex":
                     throw new Exception("Codeplex wiki parsing not supported.");
+
                 // doc = CodeplexParser.Parse(text);
                 default:
                     doc = OWikiParser.Parse(text, documentFolder);
@@ -215,10 +271,24 @@ namespace LynxToolkit.Documents
             return doc;
         }
 
-        public static Document ParseFile(string filePath, string defaultSyntax = null, HashSet<string> defines = null)
+        private static string ResolveInclude(
+            string include, string documentPath, IEnumerable<string> includepaths, string ext)
         {
-            var text = File.ReadAllText(filePath);
-            return Parse(text, Path.GetDirectoryName(filePath), Path.GetExtension(filePath), defaultSyntax, defines);
+            foreach (var p in includepaths)
+            {
+                var f = Path.Combine(Path.Combine(documentPath, p), include);
+                if (ext != null && string.IsNullOrEmpty(Path.GetExtension(f)))
+                {
+                    f = Path.ChangeExtension(f, ext);
+                }
+
+                if (File.Exists(f))
+                {
+                    return f;
+                }
+            }
+
+            return null;
         }
     }
 }

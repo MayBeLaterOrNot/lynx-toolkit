@@ -95,6 +95,8 @@ namespace WikiT
         /// <value>The defines.</value>
         public static HashSet<string> Defines { get; set; }
 
+        public static Dictionary<string, string> Replacements { get; set; }
+
         public static int Main(string[] args)
         {
             Console.WriteLine(Application.Header);
@@ -114,6 +116,7 @@ namespace WikiT
             LocalLinks = string.Empty;
             SpaceLinks = string.Empty;
             Defines = new HashSet<string>();
+            Replacements = new Dictionary<string, string>();
 
             foreach (var arg in args)
             {
@@ -152,6 +155,9 @@ namespace WikiT
                         case "/define":
                             Defines.Add(kv[1]);
                             continue;
+                        default:
+                            Replacements.Add(kv[0].Trim('/'), kv[1]);
+                            continue;
                     }
                 }
             }
@@ -177,7 +183,7 @@ namespace WikiT
                         break;
                 }
             }
-            
+
             Utilities.CreateDirectoryIfMissing(Output);
 
             var inputDirectory = Path.GetDirectoryName(Input);
@@ -211,11 +217,12 @@ namespace WikiT
 
         private static bool Transform(string filePath)
         {
-            var doc = WikiParser.ParseFile(filePath, DefaultSyntax, Defines);
+            var doc = WikiParser.ParseFile(filePath, DefaultSyntax, Replacements, Defines);
             var outputPath = filePath;
-            if (Output != null)
+            if (Output != null && filePath != null)
             {
-                outputPath = Path.Combine(Output, Path.GetFileName(filePath));
+                var fileName = Path.GetFileName(filePath) ?? string.Empty;
+                outputPath = Path.Combine(Output, fileName);
             }
 
             outputPath = Path.ChangeExtension(outputPath, Extension);
