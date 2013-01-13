@@ -53,17 +53,8 @@ namespace XmlDocT
             var w = Stopwatch.StartNew();
             Console.WriteLine(Application.Header);
 
-            var output = ".";
-            var format = "html";
-            string outputExtension = null;
-            string stylesheet = null;
-            string template = null;
-            var singlePage = false;
-            var createMemberPages = false;
-            int topLevel = 1;
+            var doc = new DocFormatter();
             var input = new List<string>();
-
-            var model = new NamespaceCollection();
 
             foreach (var arg in args)
             {
@@ -73,34 +64,43 @@ namespace XmlDocT
                     switch (kv[0].ToLower())
                     {
                         case "/singlepage":
-                            singlePage = true;
+                            doc.SinglePage = true;
                             break;
                         case "/creatememberpages":
-                            createMemberPages = true;
+                            doc.CreateMemberPages = true;
+                            break;
+                        case "/indexpage":
+                            doc.IndexPage = kv[1];
+                            break;
+                        case "/indextitle":
+                            doc.IndexTitle= kv[1];
+                            break;
+                        case "/helpcontents":
+                            doc.HtmlHelpContents = kv[1];
                             break;
                         case "/input":
                             input.Add(kv[1]);
                             continue;
                         case "/output":
-                            output = kv[1];
+                            doc.Output = kv[1];
                             continue;
                         case "/stylesheet":
-                            stylesheet = kv[1];
+                            doc.StyleSheet = kv[1];
                             continue;
                         case "/toplevel":
-                            topLevel = int.Parse(kv[1]);
+                            doc.TopLevel = int.Parse(kv[1]);
                             continue;
                         case "/template":
-                            template = kv[1];
+                            doc.Template = kv[1];
                             continue;
                         case "/format":
-                            format = kv[1].ToLower();
+                            doc.Format = kv[1].ToLower();
                             continue;
                         case "/extension":
-                            outputExtension = kv[1].ToLower();
+                            doc.OutputExtension = kv[1].ToLower();
                             continue;
                         case "/ignore":
-                            model.IgnoreAttributes.Add(kv[1]);
+                            doc.Model.IgnoreAttributes.Add(kv[1]);
                             continue;
                     }
                 }
@@ -123,7 +123,7 @@ namespace XmlDocT
                     Console.WriteLine("Processing " + path);
                     foreach (var fileName in Directory.GetFiles(dir, pattern))
                     {
-                        model.Add(fileName);
+                        doc.Model.Add(fileName);
                     }
 
                     continue;
@@ -132,7 +132,7 @@ namespace XmlDocT
                 if (File.Exists(path))
                 {
                     Console.WriteLine("Processing " + path);
-                    model.Add(path);
+                    doc.Model.Add(path);
                     continue;
                 }
 
@@ -141,7 +141,7 @@ namespace XmlDocT
                     Console.WriteLine("Processing " + path + @"\\*.dll");
                     foreach (var fileName in Directory.GetFiles(path, "*.dll"))
                     {
-                        model.Add(fileName);
+                        doc.Model.Add(fileName);
                     }
                 }
             }
@@ -149,7 +149,11 @@ namespace XmlDocT
             Console.WriteLine();
             Console.WriteLine("Output");
 
-            var outputDirectory = singlePage ? Path.GetDirectoryName(output) : output;
+            var outputDirectory = doc.SinglePage ? Path.GetDirectoryName(doc.Output) : doc.Output;
+            if (outputDirectory == null)
+            {
+                outputDirectory = ".";
+            }
 
             if (!Directory.Exists(outputDirectory))
             {
@@ -161,20 +165,13 @@ namespace XmlDocT
                 Console.WriteLine("  Output directory: {0}", Path.GetFullPath(outputDirectory));
             }
 
-            if (singlePage)
+            if (doc.SinglePage)
             {
-                Console.WriteLine("  Output file: {0}", Path.GetFullPath(output));
+                Console.WriteLine("  Output file: {0}", Path.GetFullPath(doc.Output));
             }
 
-            //if (stylesheet != null)
-            //{
-            //    Console.WriteLine("  Copying stylesheet: {0}", Path.GetFullPath(stylesheet));
-            //    var destStylesheet = Path.Combine(output, Path.GetFileName(stylesheet));
-            //    File.Copy(stylesheet, destStylesheet, true);
-            //}
-
-            Console.WriteLine("  Output format: {0}", format);
-            if (singlePage)
+            Console.WriteLine("  Output format: {0}", doc.Format);
+            if (doc.SinglePage)
             {
                 Console.WriteLine("  Output to a single page.");
             }
@@ -182,7 +179,7 @@ namespace XmlDocT
             Console.WriteLine("  Writing documentation output files...");
 
             // Write the documentation pages
-            DocFormatter.CreatePages(model, output, format, outputExtension, stylesheet, template, singlePage, createMemberPages, topLevel);
+            doc.WritePages();
 
             Console.WriteLine();
             Console.WriteLine(

@@ -115,6 +115,14 @@ namespace XmlDocT
         public static string GetNiceMethodName(MethodBase mi)
         {
             var name = mi.Name;
+            
+            // Check if it is an operator name
+            if (name.StartsWith("op_"))
+            {
+                // Remove operator prefix
+                name = name.Substring(3);
+            }
+
             if (mi.IsConstructor && mi.DeclaringType != null)
             {
                 name = mi.DeclaringType.Name;

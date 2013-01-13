@@ -10,8 +10,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>XmlDocT</RootNamespace>
     <AssemblyName>XmlDocT</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup>
@@ -25,6 +26,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <OutputPath>..\..\Output\</OutputPath>
@@ -34,6 +36,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="DocumentFormat.OpenXml, Version=2.5.5631.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -49,6 +52,9 @@
     <Compile Include="..\GlobalAssemblyInfo.cs">
       <Link>Properties\GlobalAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="..\HhcGen\SiteMap.cs">
+      <Link>HtmlHelp\SiteMap.cs</Link>
+    </Compile>
     <Compile Include="Formatter\DocFormatter.cs" />
     <Compile Include="Model\ConstructorModel.cs" />
     <Compile Include="Model\FieldModel.cs" />
@@ -56,8 +62,9 @@
     <Compile Include="Model\Model.cs" />
     <Compile Include="Model\EventModel.cs" />
     <Compile Include="Model\MethodModel.cs" />
-    <Compile Include="Model\NamespaceCollection.cs" />
+    <Compile Include="Model\LibraryModel.cs" />
     <Compile Include="Model\NamespaceModel.cs" />
+    <Compile Include="Model\OperatorModel.cs" />
     <Compile Include="Model\ParameterModel.cs" />
     <Compile Include="Model\PropertyModel.cs" />
     <Compile Include="Model\TypeModel.cs" />
@@ -79,6 +86,9 @@
       <Project>{3c23aabf-5ccb-4000-8d1c-1fe055ccbc5e}</Project>
       <Name>DocumentModel</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

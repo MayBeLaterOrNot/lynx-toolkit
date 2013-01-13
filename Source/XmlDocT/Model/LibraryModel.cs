@@ -24,7 +24,6 @@
 //   SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace XmlDocT
 {
     using System;
@@ -36,21 +35,76 @@ namespace XmlDocT
     using System.Runtime.CompilerServices;
     using System.Xml;
 
-    public class NamespaceCollection : IEnumerable<NamespaceModel>
+    public class LibraryModel : Model, IEnumerable<NamespaceModel>
     {
-        public NamespaceCollection()
+        private string title;
+
+        private string name;
+
+        public LibraryModel()
         {
+            this.FileName = "Index";
             this.Namespaces = new Dictionary<string, NamespaceModel>();
             this.IgnoreAttributes = new List<string>();
         }
 
-        public string Description { get; set; }
+        public override string GetXmlMemberName()
+        {
+            return string.Format("T:{0}.LibraryDoc", this.Name);
+        }
+
+        protected override string GetFileNameCore()
+        {
+            return this.FileName;
+        }
+        
+        public string Name
+        {
+            get
+            {
+                if (this.name == null)
+                {
+                    var commonNamespace = this.GetCommonStartString(this.Namespaces.Keys);
+                    if (commonNamespace != null)
+                    {
+                        commonNamespace = commonNamespace.TrimEnd('.');
+                    }
+
+                    return commonNamespace;
+                }
+
+                return this.name;
+            }
+
+            set
+            {
+                this.name = value;
+            }
+        }
 
         public List<string> IgnoreAttributes { get; private set; }
 
         public Dictionary<string, NamespaceModel> Namespaces { get; private set; }
+        
+        public string FileName {get;set;}
 
-        public string Title { get; set; }
+        public string Title
+        {
+            get
+            {
+                if (this.title == null)
+                {
+                    return string.Format("{0} namespaces", this.Name);
+                }
+
+                return this.title;
+            }
+
+            set
+            {
+                this.title = value;
+            }
+        }
 
         public void Add(string assemblyFile)
         {
@@ -105,6 +159,12 @@ namespace XmlDocT
                 Console.WriteLine("    " + XmlUtilities.GetNiceTypeName(type));
             }
 
+            var node = XmlUtilities.GetMemberNode(xmldoc, this);
+            if (node != null)
+            {
+                this.Description = XmlUtilities.GetXmlContent(node, "summary");
+            }
+
             foreach (var type in assembly.GetTypes())
             {
                 if (!this.IsTypeDocumentable(type))
@@ -142,6 +202,11 @@ namespace XmlDocT
                 {
                     return true;
                 }
+            }
+
+            if (this.FindType(cref, scope, out model))
+            {
+                return true;
             }
 
             model = null;
@@ -245,13 +310,35 @@ namespace XmlDocT
             return false;
         }
 
+        private string GetCommonStartString(IEnumerable<string> keys)
+        {
+            string result = null;
+            foreach (var key in keys)
+            {
+                if (result == null)
+                {
+                    result = key;
+                    continue;
+                }
+
+                int i;
+                for (i = 0; i < result.Length && i < key.Length && result[i] == key[i]; i++)
+                {
+                }
+
+                result = key.Substring(0, i);
+            }
+
+            return result;
+        }
+
         private bool IsTypeDocumentable(Type type)
         {
             if (!type.IsClass && !type.IsInterface && !type.IsEnum && !type.IsValueType)
             {
                 return false;
             }
-            
+
             if (!type.IsPublic)
             {
                 return false;

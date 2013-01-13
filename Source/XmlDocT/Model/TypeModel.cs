@@ -44,7 +44,9 @@ namespace XmlDocT
 
             this.Constructors = new List<ConstructorModel>();
             this.Properties = new List<PropertyModel>();
+            this.Fields = new List<FieldModel>();
             this.Methods = new List<MethodModel>();
+            this.Operators = new List<OperatorModel>();
             this.Events = new List<EventModel>();
             this.EnumMembers = new List<FieldModel>();
 
@@ -124,6 +126,27 @@ namespace XmlDocT
                 }
             }
 
+            var fields = type.GetFields(flags);
+            if (fields.Length > 0)
+            {
+                foreach (var fi in fields)
+                {
+                    if (fi.DeclaringType.Assembly != type.Assembly)
+                    {
+                        continue;
+                    }
+
+                    var fm = new FieldModel(this, fi);
+                    var memberNode = XmlUtilities.GetMemberNode(xmldoc, fm);
+                    fm.IsOverloaded = properties.Count(p => p.Name == fi.Name) > 1;
+                    fm.Description = XmlUtilities.GetXmlContent(memberNode, "summary");
+                    fm.Remarks = XmlUtilities.GetXmlContent(memberNode, "remarks");
+                    fm.Example = XmlUtilities.GetXmlContent(memberNode, "example");
+
+                    this.Fields.Add(fm);
+                }
+            }
+
             var methods = type.GetMethods(flags);
             foreach (var mi in methods)
             {
@@ -138,6 +161,11 @@ namespace XmlDocT
                 }
 
                 if (mi.Name.StartsWith("add_") || mi.Name.StartsWith("remove_"))
+                {
+                    continue;
+                }
+
+                if (mi.Name.StartsWith("op_"))
                 {
                     continue;
                 }
@@ -162,6 +190,34 @@ namespace XmlDocT
                 mm.ReturnValueDescription = XmlUtilities.GetXmlContent(memberNode, "returns");
 
                 this.Methods.Add(mm);
+            }
+
+            foreach (var mi in methods.Where(m => m.Name.StartsWith("op_")))
+            {
+                if (mi.DeclaringType.Assembly != type.Assembly)
+                {
+                    continue;
+                }
+
+                var mm = new OperatorModel(this, mi);
+                var memberNode = XmlUtilities.GetMemberNode(xmldoc, mm);
+                mm.IsOverloaded = methods.Count(m => m.Name == mi.Name) > 1;
+                mm.Description = XmlUtilities.GetXmlContent(memberNode, "summary");
+                mm.Remarks = XmlUtilities.GetXmlContent(memberNode, "remarks");
+                mm.Example = XmlUtilities.GetXmlContent(memberNode, "example");
+
+                foreach (var pi in mi.GetParameters())
+                {
+                    var pm = new ParameterModel(mm, pi)
+                    {
+                        Description =
+                            XmlUtilities.GetParameterDescription(memberNode, pi.Name)
+                    };
+                    mm.Parameters.Add(pm);
+                }
+
+                mm.ReturnValueDescription = XmlUtilities.GetXmlContent(memberNode, "returns");
+                this.Operators.Add(mm);
             }
 
             var events = type.GetEvents(flags);
@@ -201,6 +257,10 @@ namespace XmlDocT
         public Type[] InheritedTypes { get; set; }
 
         public IList<MethodModel> Methods { get; private set; }
+
+        public IList<OperatorModel> Operators { get; private set; }
+
+        public IList<FieldModel> Fields { get; private set; }
 
         public IList<PropertyModel> Properties { get; private set; }
 
@@ -247,15 +307,19 @@ namespace XmlDocT
             var niceName = XmlUtilities.GetNiceTypeName(this.Type);
             sb.Append(niceName);
 
+            // Get interfaces implemented in the base types
             var baseAndInterfaces = new List<string>();
-            if (this.Type.BaseType != null && this.Type.BaseType != typeof(object))
+            if (this.Type.BaseType != null && this.Type.BaseType != typeof(object) && this.Type.BaseType != typeof(ValueType))
             {
                 var name = XmlUtilities.GetNiceTypeName(this.Type.BaseType);
                 name = name.Replace(this.Type.Namespace, string.Empty);
                 baseAndInterfaces.Add(name);
             }
 
+            // Get the interfaces implemented in the base type
             var baseInterfaces = this.Type.BaseType != null ? this.Type.BaseType.GetInterfaces() : new Type[] { };
+
+            // Add interfaces implemented in this type, except interfaces implemented in the base types
             foreach (var i in this.Type.GetInterfaces().Except(baseInterfaces))
             {
                 var name = XmlUtilities.GetNiceTypeName(i);

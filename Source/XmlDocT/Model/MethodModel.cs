@@ -51,6 +51,11 @@ namespace XmlDocT
 
         public IList<ParameterModel> Parameters { get; private set; }
 
+        public override IEnumerable<ParameterModel> GetParameters()
+        {
+            return this.Parameters;
+        }
+
         public Type ReturnType
         {
             get
@@ -112,6 +117,7 @@ namespace XmlDocT
 
             sb.Append(XmlUtilities.GetNiceTypeName(mb.ReturnType));
             sb.Append(" ");
+
             sb.Append(mb.Name);
             sb.Append("(");
             sb.Append(XmlUtilities.GetNiceMethodParameters(mb, true));
@@ -131,12 +137,18 @@ namespace XmlDocT
 
         public override string ToString()
         {
-            return XmlUtilities.GetNiceMethodName((MethodBase)this.Info);
+            if (!this.IsOverloaded) return XmlUtilities.GetNiceMethodName(this.MethodInfo);
+            return string.Format(
+                "{0}({1})",
+                XmlUtilities.GetNiceMethodName(this.MethodInfo),
+                XmlUtilities.GetNiceMethodParameters(this.MethodInfo));
         }
 
         protected override string GetFileNameCore()
         {
-            return string.Format("{0}.{1}", this.DeclaringType.FullName, this.Name);
+            //if (this.IsOverloaded)
+            //    return string.Format("{0}.{1}({2})", this.DeclaringType.FullName, this.Name);
+            return string.Format("{0}.{1}", this.DeclaringType.FullName, this);
         }
     }
 }

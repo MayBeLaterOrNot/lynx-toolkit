@@ -112,7 +112,7 @@
         /// <summary>
         /// Method8s the specified numbers.
         /// </summary>
-        /// <typeparam name="T">The type.</typeparam>
+        /// <typeparam name="T1">The type.</typeparam>
         /// <param name="numbers">The numbers.</param>
         /// <returns>The numbers.</returns>
         public List<T1> Method8<T1>(List<T1> numbers) { return null; }
@@ -127,15 +127,21 @@
         public List<T2> Method8<T1,T2>(List<T1> numbers) { return null; }
     }
 
+    /// <summary>
+    /// Generic test class.
+    /// </summary>
+    /// <typeparam name="T">The type.</typeparam>
     public class TestClass<T>
     {
         /// <summary>
         /// Method8s the specified numbers.
         /// </summary>
-        /// <typeparam name="T">The type.</typeparam>
+        /// <typeparam name="T1">The type of the numbers.</typeparam>
         /// <param name="numbers">The numbers.</param>
-        /// <returns>The numbers.</returns>
-        public List<T> Method8<T>(List<T> numbers) { return null; }
+        /// <returns>
+        /// The numbers.
+        /// </returns>
+        public List<T1> Method8<T1>(List<T1> numbers) { return null; }
 
     }
 }

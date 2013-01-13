@@ -65,8 +65,7 @@ namespace XmlDocT
         public override IEnumerable<Type> GetRelatedTypes()
         {
             yield return this.Info.DeclaringType;
-            var ci = (ConstructorInfo)this.Info;
-            foreach (var p in ci.GetParameters())
+            foreach (var p in this.ConstructorInfo.GetParameters())
             {
                 yield return p.ParameterType;
             }
@@ -75,7 +74,7 @@ namespace XmlDocT
         public override string GetSyntax()
         {
             var sb = new StringBuilder();
-            var ci = (ConstructorInfo)this.Info;
+            var ci = this.ConstructorInfo;
             if (ci.IsPublic)
             {
                 sb.Append("public ");
@@ -96,9 +95,9 @@ namespace XmlDocT
         public override string ToString()
         {
             return string.Format(
-                "{0}({1})", 
-                XmlUtilities.GetNiceMethodName((ConstructorInfo)this.Info), 
-                XmlUtilities.GetNiceMethodParameters((ConstructorInfo)this.Info));
+                "{0}({1})",
+                XmlUtilities.GetNiceMethodName(this.ConstructorInfo),
+                XmlUtilities.GetNiceMethodParameters(this.ConstructorInfo));
         }
 
         protected override string GetFileNameCore()
