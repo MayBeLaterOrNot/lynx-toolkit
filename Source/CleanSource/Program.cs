@@ -53,6 +53,11 @@ namespace CleanSource
         private static readonly Regex RegionExpression = new Regex(@"^(\s*#(?:end)?region.*?)$", RegexOptions.Compiled | RegexOptions.Multiline | RegexOptions.Singleline);
 
         /// <summary>
+        /// Expression to search for dependency properties.
+        /// </summary>
+        private static readonly Regex DependencyPropertyExpression = new Regex(@"(?<=/// <summary>\s*/// )(?<summary>.*?)(?=\s*/// </summary>\s*public static readonly DependencyProperty (?<PropertyName>.*?)Property)", RegexOptions.Compiled | RegexOptions.Multiline);
+
+        /// <summary>
         /// The number of files cleaned.
         /// </summary>
         private static int filesCleaned;
@@ -159,9 +164,61 @@ namespace CleanSource
             }
 
             fileCount++;
-            var input = File.ReadAllLines(file);
+
+            var input = File.ReadAllText(file);
+            var output = CleanCode(input);
+
+            if (!string.Equals(input, output))
+            {
+                Console.WriteLine(file);
+                if (openForEditExecutable != null)
+                {
+                    Utilities.OpenForEdit(file, openForEditExecutable, openForEditArguments);
+                }
+
+                try
+                {
+                    File.WriteAllText(file, output, Encoding.UTF8);
+                    filesCleaned++;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+            }
+        }
+        private static string CleanCode(string text)
+        {
+            // dependency property
+            text = Regex.Replace(text, @"(?<=/// <summary>\s*/// )(?<summary>.*?)(?=\s*/// </summary>\s*public static readonly DependencyProperty (?<name>.*?)Property)", 
+                "Identifies the <see cref=\"${name}\"/> dependency property.");
+
+            // dependency property
+            text = Regex.Replace(text, @"(?<=/// <summary>\s*/// )(?<summary>.*?)(?=\s*/// </summary>\s*public static readonly RoutedEvent (?<name>.*?)Event)",
+                "Identifies the <see cref=\"${name}\"/> routed event.");
+
+            // regions
+            if (cleanRegions)
+            {
+                text = Regex.Replace(text, @"([^\S\r\n]*#(?:end)?region[^\r\n]*)", string.Empty);
+            }
+
+            // empty remarks
+            text = Regex.Replace(text, @"/// <remarks>\s*(/// )?</remarks>", string.Empty);
+
+            // Whitespace at end of line
+            text = Regex.Replace(text, @"[^\S\r\n]+(?=[\r\n$])", string.Empty);
+
+            // Replace double new lines
+            text = Regex.Replace(text, @"(\r?\n\r?){3,}", "\r\n\r\n");
+
+            return text;
+        }
+
+        private static string CleanCodeOld(string text)
+        {
+            var input = text.Split('\n');
             var output = new StringBuilder();
-            bool modified = false;
 
             int end;
 
@@ -186,7 +243,6 @@ namespace CleanSource
                     break;
                 }
 
-                modified = true;
             }
 
             string previousLine = null;
@@ -198,7 +254,6 @@ namespace CleanSource
 
                 if (cleanRegions && RegionExpression.Match(thisline).Success)
                 {
-                    modified = true;
 
                     // skip the following blank line
                     if (string.IsNullOrWhiteSpace(nextline))
@@ -210,9 +265,9 @@ namespace CleanSource
                 }
 
                 // Remove duplicate lines containing "/// Initializes a new instance of the"
-                if (cleanSummary && previousLine != null && previousLine.Contains(ConstructorSummarySubString) && thisline.Contains(ConstructorSummarySubString))
+                if (cleanSummary && previousLine != null && previousLine.Contains(ConstructorSummarySubString)
+                    && thisline.Contains(ConstructorSummarySubString))
                 {
-                    modified = true;
                     continue;
                 }
 
@@ -224,7 +279,8 @@ namespace CleanSource
                 }
 
                 // remove empty remarks comments
-                if (nextline != null && Regex.IsMatch(thisline, @"^\s*///\s<remarks>\s*$") && Regex.IsMatch(nextline, @"^\s*///\s</remarks>\s*$"))
+                if (nextline != null && Regex.IsMatch(thisline, @"^\s*///\s<remarks>\s*$")
+                    && Regex.IsMatch(nextline, @"^\s*///\s</remarks>\s*$"))
                 {
                     i++;
                     continue;
@@ -239,14 +295,12 @@ namespace CleanSource
                 var trimmed1 = Regex.Replace(thisline, @"///\s+(?=[^<])", indentSummary ? "///     " : "/// ");
                 if (!string.Equals(trimmed1, thisline))
                 {
-                    modified = true;
                 }
 
                 // trim the end
                 var trimmed = trimmed1.TrimEnd();
                 if (!string.Equals(trimmed, thisline))
                 {
-                    modified = true;
                 }
 
                 if (output.Length > 0)
@@ -258,24 +312,7 @@ namespace CleanSource
                 previousLine = trimmed;
             }
 
-            if (modified)
-            {
-                Console.WriteLine(file);
-                if (openForEditExecutable != null)
-                {
-                    Utilities.OpenForEdit(file, openForEditExecutable, openForEditArguments);
-                }
-
-                try
-                {
-                    File.WriteAllText(file, output.ToString(), Encoding.UTF8);
-                    filesCleaned++;
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e.Message);
-                }
-            }
+            return output.ToString();
         }
     }
 }
