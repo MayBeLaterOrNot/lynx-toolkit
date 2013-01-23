@@ -44,30 +44,42 @@
     <Compile Include="..\Utilities.cs">
       <Link>Utilities.cs</Link>
     </Compile>
-    <Compile Include="Formatters\CodeplexFormatter.cs" />
-    <Compile Include="Formatters\ConfluenceFormatter.cs" />
-    <Compile Include="Formatters\MarkdownFormatter.cs" />
-    <Compile Include="Formatters\CreoleFormatter.cs" />
-    <Compile Include="Formatters\DocumentFormatter.cs" />
-    <Compile Include="Formatters\XmlFormatter.cs" />
-    <Compile Include="Utilities\SymbolResolver.cs" />
-    <Compile Include="Formatters\WikiFormatterBase.cs" />
-    <Compile Include="Utilities\CharacterReplacements.cs" />
-    <Compile Include="Parsers\CreoleParser.cs" />
-    <Compile Include="Parsers\DocumentParser.cs" />
-    <Compile Include="Formatters\HtmlFormatter.cs" />
-    <Compile Include="Parsers\HtmlParser.cs" />
-    <Compile Include="Formatters\OWikiFormatter.cs" />
-    <Compile Include="Parsers\MarkdownParser.cs" />
-    <Compile Include="Parsers\OWikiParser.cs" />
-    <Compile Include="DocumentModel.cs" />
-    <Compile Include="Parsers\WikiParser.cs" />
-    <Compile Include="Parsers\WikiParserBase.cs" />
+    <Compile Include="Text\Formatters\CodeplexFormatter.cs" />
+    <Compile Include="Text\Formatters\ConfluenceFormatter.cs" />
+    <Compile Include="Text\Formatters\MarkdownFormatter.cs" />
+    <Compile Include="Text\Formatters\CreoleFormatter.cs" />
+    <Compile Include="Text\Formatters\DocumentFormatter.cs" />
+    <Compile Include="Text\Formatters\XmlFormatter.cs" />
+    <Compile Include="Spreadsheet\BorderStyle.cs" />
+    <Compile Include="Spreadsheet\HorizontalAlignment.cs" />
+    <Compile Include="Spreadsheet\TableBuilder.cs" />
+    <Compile Include="Spreadsheet\VerticalAlignment.cs" />
+    <Compile Include="Spreadsheet\XBook.cs" />
+    <Compile Include="Spreadsheet\XCell.cs" />
+    <Compile Include="Spreadsheet\XCellRange.cs" />
+    <Compile Include="Spreadsheet\XCellReference.cs" />
+    <Compile Include="Spreadsheet\XColumn.cs" />
+    <Compile Include="Spreadsheet\XSheet.cs" />
+    <Compile Include="Spreadsheet\XStyle.cs" />
+    <Compile Include="Text\Utilities\SymbolResolver.cs" />
+    <Compile Include="Text\Formatters\WikiFormatterBase.cs" />
+    <Compile Include="Text\Utilities\CharacterReplacements.cs" />
+    <Compile Include="Text\Parsers\CreoleParser.cs" />
+    <Compile Include="Text\Parsers\DocumentParser.cs" />
+    <Compile Include="Text\Formatters\HtmlFormatter.cs" />
+    <Compile Include="Text\Parsers\HtmlParser.cs" />
+    <Compile Include="Text\Formatters\OWikiFormatter.cs" />
+    <Compile Include="Text\Parsers\MarkdownParser.cs" />
+    <Compile Include="Text\Parsers\OWikiParser.cs" />
+    <Compile Include="Text\DocumentModel.cs" />
+    <Compile Include="Text\Parsers\WikiParser.cs" />
+    <Compile Include="Text\Parsers\WikiParserBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="DocumentModel.cd" />
+    <None Include="Text\DocumentModel.cd" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <UsingTask TaskName="PepitaGet.RestorePackagesTask" AssemblyFile="$(SolutionDir)..\Tools\Pepita\PepitaGet.dll" />
   <Target Name="BeforeBuild">

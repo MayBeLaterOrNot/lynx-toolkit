@@ -289,7 +289,7 @@ namespace LynxToolkit.Documents.Wpf
 
         protected override void Write(LynxToolkit.Documents.InlineCode inlineCode, object parent)
         {
-            var run = new Run(inlineCode.Text);
+            var run = new Run(inlineCode.Code);
             run.Style = this.Format(GetStyle(inlineCode));
             ((InlineCollection)parent).Add(run);
         }

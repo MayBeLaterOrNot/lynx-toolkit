@@ -210,7 +210,7 @@ namespace LynxToolkit.Documents
                     break;
                 case "code":
                     var code = new InlineCode();
-                    code.Text = e.Value;
+                    code.Code = e.Value;
                     // ParseInlines(e, code.Content);
                     ic.Add(code);
                     break;

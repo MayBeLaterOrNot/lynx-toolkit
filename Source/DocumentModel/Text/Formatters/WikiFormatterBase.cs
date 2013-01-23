@@ -236,7 +236,7 @@ namespace LynxToolkit.Documents
 
         protected override void Write(InlineCode inlineCode, object parent)
         {
-            Write("{{", inlineCode.Text, "}}");
+            Write("{{", inlineCode.Code, "}}");
         }
 
     }

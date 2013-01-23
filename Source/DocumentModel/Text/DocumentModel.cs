@@ -188,7 +188,7 @@ namespace LynxToolkit.Documents
     public class Paragraph : ContentBlock
     {
         public Paragraph()
-        {            
+        {
         }
 
         public Paragraph(params Inline[] inlines)
@@ -513,14 +513,35 @@ namespace LynxToolkit.Documents
 
             return this;
         }
+
+        public void Add(string text)
+        {
+            this.Add(new Run(text));
+        }
     }
 
     public class Emphasized : InlineContent
     {
+        public Emphasized()
+        {
+        }
+
+        public Emphasized(string text)
+        {
+            this.Content.Add(new Run(text));
+        }
     }
 
     public class Strong : InlineContent
     {
+        public Strong()
+        {
+        }
+
+        public Strong(string text)
+        {
+            this.Content.Add(new Run(text));
+        }
     }
 
     public class Symbol : Inline
@@ -530,15 +551,25 @@ namespace LynxToolkit.Documents
 
     public class InlineCode : Inline
     {
+        public InlineCode()
+        {
+        }
+
+        public InlineCode(string code, Language language = Language.Cs)
+        {
+            this.Code = code;
+            this.Language = language;
+        }
+
         public Language Language { get; set; }
 
-        public string Text { get; set; }
+        public string Code { get; set; }
     }
 
     public class Hyperlink : InlineContent
     {
         public Hyperlink()
-        {            
+        {
         }
 
         public Hyperlink(string url, params Inline[] inlines)

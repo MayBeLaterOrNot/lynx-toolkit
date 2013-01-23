@@ -383,7 +383,7 @@
         {
             var runStyle = new RunStyle { Val = InlineCodeID };
             var runProperties = new RunProperties(runStyle);
-            var run = new DocumentFormat.OpenXml.Wordprocessing.Run(runProperties, new Text(inlineCode.Text));
+            var run = new DocumentFormat.OpenXml.Wordprocessing.Run(runProperties, new Text(inlineCode.Code));
             this.AppendElement(run, parent);
         }
 

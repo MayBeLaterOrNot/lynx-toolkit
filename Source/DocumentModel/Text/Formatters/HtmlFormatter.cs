@@ -415,7 +415,7 @@ namespace LynxToolkit.Documents
         {
             this.w.WriteStartElement("code");
             this.WriteAttributes(inlineCode);
-            this.w.WriteRaw(inlineCode.Text);
+            this.w.WriteRaw(inlineCode.Code);
             this.w.WriteEndElement();
         }
 

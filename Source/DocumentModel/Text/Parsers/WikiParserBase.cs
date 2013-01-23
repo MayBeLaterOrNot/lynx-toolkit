@@ -249,7 +249,7 @@ namespace LynxToolkit.Documents
                 if (codeGroup.Success)
                 {
                     var code = codeGroup.Value;
-                    var a = new InlineCode { Text = code };
+                    var a = new InlineCode { Code = code };
                     inlines.Add(a);
                 }
 
