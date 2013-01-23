@@ -40,8 +40,16 @@ namespace XmlDocT
 
     public class DocFormatter
     {
+        private static readonly Regex DescriptionBlocksExpression = new Regex(@"(?:
+(?:\<code\>(?<code>.*?)\</code\>)|
+(?:\<para\>(?<code>.*?)\</para\>)
+)", RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+
         private static readonly Regex DescriptionExpression = new Regex(@"(?:
-(?:\<see \s+ cref\s*=\s*""(?<cref>.*?)"" \s* /\>)|
+(?:\<see \s+ cref\s*=\s*""(?<see>.*?)"" \s* /\>)|
+(?:\<seealso \s+ cref\s*=\s*""(?<seealso>.*?)"" \s* /\>)|
+(?:\<paramref \s+ name\s*=\s*""(?<paramref>.*?)"" \s* /\>)|
+(?:\<typeparamref \s+ name\s*=\s*""(?<typeparamref>.*?)"" \s* /\>)|
 (?:\<c\>(?<c>.*?)\</c\>)
 )", RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
@@ -365,38 +373,55 @@ namespace XmlDocT
                 return;
             }
 
-            DescriptionExpression.Match(
-                description,
-                s => content.Add(new Run(s)),
-                match =>
+            // todo: code and para
+
+            DescriptionExpression.Match(description, s => content.Add(new Run(s)), match => this.AppendDescription(content, scope, match));
+        }
+
+        private void AppendDescription(InlineCollection content, Type scope, Match match)
+        {
+            var seeSuccess = match.Groups["see"].Success;
+            var seeAlsoSuccess = match.Groups["seealso"].Success;
+            if (seeSuccess || seeAlsoSuccess)
+            {
+                var cref = match.Groups[seeSuccess ? "see" : "seealso"].Value;
+                string url, title, text;
+                if (this.ResolveCrossReference(cref, scope, out url, out title, out text))
                 {
-                    if (match.Groups["cref"].Success)
+                    var link = new Hyperlink { Url = url, Title = title };
+                    link.Content.Add(new Run(text));
+                    content.Add(link);
+                }
+                else
+                {
+                    if (cref.Length > 2 && cref[1] == ':')
                     {
-                        var cref = match.Groups["cref"].Value;
-                        string url, title, text;
-                        if (ResolveCrossReference(cref, scope, out url, out title, out text))
-                        {
-                            var link = new Hyperlink { Url = url, Title = title };
-                            link.Content.Add(new Run(text));
-                            content.Add(link);
-                        }
-                        else
-                        {
-                            if (cref.Length > 2 && cref[1] == ':')
-                            {
-                                cref = cref.Substring(2);
-                            }
-
-                            content.Add(new Run(cref));
-                        }
+                        cref = cref.Substring(2);
                     }
 
-                    if (match.Groups["c"].Success)
-                    {
-                        var c = match.Groups["c"].Value;
-                        content.Add(new InlineCode { Text = c, Language = Language.Cs });
-                    }
-                });
+                    content.Add(new Run(cref));
+                }
+
+                return;
+            }
+
+            if (match.Groups["paramref"].Success)
+            {
+                var name = match.Groups["paramref"].Value;
+                content.Add(new InlineCode(name));
+            }
+
+            if (match.Groups["typeparamref"].Success)
+            {
+                var name = match.Groups["typeparamref"].Value;
+                content.Add(new InlineCode(name));
+            }
+
+            if (match.Groups["c"].Success)
+            {
+                var c = match.Groups["c"].Value;
+                content.Add(new InlineCode { Code = c, Language = Language.Cs });
+            }
         }
 
         private bool ResolveCrossReference(string cref, Type scope, out string url, out string title, out string text)
