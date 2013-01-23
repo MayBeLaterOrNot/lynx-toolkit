@@ -270,13 +270,14 @@ $",
                             "Invalid dependency relation. The target property " + this.Name + "." + d.Target
                             + " is not defined.");
                     }
+                }
 
-                    if (!this.Properties.ContainsKey(d.Source))
-                    {
-                        throw new InvalidOperationException(
-                            "Invalid dependency relation. The source property " + this.Name + "." + d.Source
-                            + " is not defined.");
-                    }
+                // Source properties must be defined
+                if (!this.Properties.ContainsKey(d.Source))
+                {
+                    throw new InvalidOperationException(
+                        "Invalid dependency relation. The source property " + this.Name + "." + d.Source
+                        + " is not defined.");
                 }
 
                 var source = this.Properties[d.Source];
