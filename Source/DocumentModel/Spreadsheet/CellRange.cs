@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="XCellRange.cs" company="Lynx">
+// <copyright file="CellRange.cs" company="Lynx">
 //   The MIT License (MIT)
 //   
 //   Copyright (c) 2012 Oystein Bjorke
@@ -27,25 +27,24 @@
 //   Represents a spreadsheet cell range.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace LynxToolkit.Documents.Spreadsheet
 {
     /// <summary>
     /// Represents a spreadsheet cell range.
     /// </summary>
-    public struct XCellRange
+    public struct CellRange
     {
         /// <summary>
         /// Gets or sets the end cell.
         /// </summary>
         /// <value>The end.</value>
-        public XCellReference End { get; set; }
+        public CellReference End { get; set; }
 
         /// <summary>
         /// Gets or sets the start cell.
         /// </summary>
         /// <value>The start.</value>
-        public XCellReference Start { get; set; }
+        public CellReference Start { get; set; }
 
         /// <summary>
         /// Parses the specified range.
@@ -54,12 +53,19 @@ namespace LynxToolkit.Documents.Spreadsheet
         /// The range.
         /// </param>
         /// <returns>
-        /// XCellRange.
+        /// A <see cref="CellRange"/>.
         /// </returns>
-        public static XCellRange Parse(string range)
+        public static CellRange Parse(string range)
         {
-            var f = range.Split(':');
-            return new XCellRange { Start = XCellReference.Parse(f[0]), End = XCellReference.Parse(f[1]) };
+            if (range.Contains(":"))
+            {
+
+                var f = range.Split(':');
+                return new CellRange { Start = CellReference.Parse(f[0]), End = CellReference.Parse(f[1]) };
+            }
+
+            var cell = CellReference.Parse(range);
+            return new CellRange { Start = cell, End = cell };
         }
 
         /// <summary>

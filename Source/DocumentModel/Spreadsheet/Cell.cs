@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="XCell.cs" company="Lynx">
+// <copyright file="Cell.cs" company="Lynx">
 //   The MIT License (MIT)
 //   
 //   Copyright (c) 2012 Oystein Bjorke
@@ -27,16 +27,15 @@
 //   Represents a spreadsheet cell.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace LynxToolkit.Documents.Spreadsheet
 {
     /// <summary>
     /// Represents a spreadsheet cell.
     /// </summary>
-    public class XCell
+    public class Cell
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="XCell"/> class.
+        /// Initializes a new instance of the <see cref="Cell"/> class.
         /// </summary>
         /// <param name="row">
         /// The row.
@@ -44,7 +43,7 @@ namespace LynxToolkit.Documents.Spreadsheet
         /// <param name="column">
         /// The column.
         /// </param>
-        public XCell(int row, int column)
+        public Cell(int row, int column)
         {
             this.Row = row;
             this.Column = column;
@@ -78,12 +77,12 @@ namespace LynxToolkit.Documents.Spreadsheet
         /// Gets or sets the style.
         /// </summary>
         /// <value>The style.</value>
-        public XStyle Style { get; set; }
+        public Style Style { get; set; }
 
         /// <summary>
-        /// Formats the content.
+        /// Formats the content of the cell.
         /// </summary>
-        /// <returns>System.String.</returns>
+        /// <returns>A <see cref="System.String" /> that represents the content of the cell.</returns>
         public string FormatContent()
         {
             if (this.Style != null && this.Style.NumberFormat != null)
@@ -97,10 +96,10 @@ namespace LynxToolkit.Documents.Spreadsheet
         /// <summary>
         /// Gets the cell reference string.
         /// </summary>
-        /// <returns>System.String.</returns>
+        /// <returns>A <see cref="System.String" /> that represents the cell reference.</returns>
         public string GetCellReferenceString()
         {
-            return XCellReference.Format(this.Row, this.Column);
+            return CellReference.Format(this.Row, this.Column);
         }
 
         /// <summary>

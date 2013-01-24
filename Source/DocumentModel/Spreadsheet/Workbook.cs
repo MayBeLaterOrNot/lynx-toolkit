@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="XBook.cs" company="Lynx">
+// <copyright file="Workbook.cs" company="Lynx">
 //   The MIT License (MIT)
 //   
 //   Copyright (c) 2012 Oystein Bjorke
@@ -27,23 +27,23 @@
 //   Represents a spreadsheet workbook.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace LynxToolkit.Documents.Spreadsheet
 {
+    using System.Collections;
     using System.Collections.Generic;
 
     /// <summary>
     /// Represents a spreadsheet workbook.
     /// </summary>
-    public class XBook
+    public class Workbook : IEnumerable<Worksheet>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="XBook"/> class.
+        /// Initializes a new instance of the <see cref="Workbook"/> class.
         /// </summary>
-        public XBook()
+        public Workbook()
         {
-            this.Sheets = new List<XSheet>();
-            this.Styles = new List<XStyle>();
+            this.Sheets = new List<Worksheet>();
+            this.Styles = new List<Style>();
             this.AddStyle();
         }
 
@@ -63,13 +63,13 @@ namespace LynxToolkit.Documents.Spreadsheet
         /// Gets the sheets.
         /// </summary>
         /// <value>The sheets.</value>
-        public List<XSheet> Sheets { get; private set; }
+        public List<Worksheet> Sheets { get; private set; }
 
         /// <summary>
         /// Gets the styles.
         /// </summary>
         /// <value>The styles.</value>
-        public List<XStyle> Styles { get; private set; }
+        public List<Style> Styles { get; private set; }
 
         /// <summary>
         /// Gets or sets the title.
@@ -84,11 +84,11 @@ namespace LynxToolkit.Documents.Spreadsheet
         /// The name of the sheet.
         /// </param>
         /// <returns>
-        /// A XSheet.
+        /// A <see cref="Worksheet"/>.
         /// </returns>
-        public XSheet AddSheet(string name)
+        public Worksheet AddSheet(string name = null)
         {
-            var sheet = new XSheet(name);
+            var sheet = new Worksheet(name ?? string.Format("Sheet{0}", this.Sheets.Count + 1));
             this.Sheets.Add(sheet);
             return sheet;
         }
@@ -123,7 +123,7 @@ namespace LynxToolkit.Documents.Spreadsheet
         /// <returns>
         /// A XStyle.
         /// </returns>
-        public XStyle AddStyle(
+        public Style AddStyle(
             HorizontalAlignment horizontalAlignment = HorizontalAlignment.Auto, 
             VerticalAlignment verticalAlignment = VerticalAlignment.Auto, 
             bool bold = false, 
@@ -133,7 +133,7 @@ namespace LynxToolkit.Documents.Spreadsheet
             uint? foreground = null, 
             uint? background = null)
         {
-            var style = new XStyle
+            var style = new Style
                             {
                                 HorizontalAlignment = horizontalAlignment, 
                                 VerticalAlignment = verticalAlignment, 
@@ -146,6 +146,24 @@ namespace LynxToolkit.Documents.Spreadsheet
                             };
             this.Styles.Add(style);
             return style;
+        }
+
+        /// <summary>
+        /// Gets the enumerator.
+        /// </summary>
+        /// <returns>An enumerator of <see cref="Worksheet"/>. </returns>
+        public IEnumerator<Worksheet> GetEnumerator()
+        {
+            return this.Sheets.GetEnumerator();
+        }
+
+        /// <summary>
+        /// Gets the enumerator.
+        /// </summary>
+        /// <returns>A <see cref="System.Collections.IEnumerator"/>.</returns>
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return this.GetEnumerator();
         }
     }
 }

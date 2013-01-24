@@ -40,8 +40,6 @@ namespace LynxToolkit.Documents.OpenXml
     using DocumentFormat.OpenXml.Packaging;
     using DocumentFormat.OpenXml.Spreadsheet;
 
-    using LynxToolkit.Documents.Spreadsheet;
-
     /// <summary>
     /// Provides export of spreadsheet models to Excel OpenXML files.
     /// </summary>
@@ -61,7 +59,7 @@ namespace LynxToolkit.Documents.OpenXml
         /// <param name="filePath">
         /// The file path.
         /// </param>
-        public static void Export(XBook book, string filePath)
+        public static void Export(Spreadsheet.Workbook book, string filePath)
         {
             using (var stream = File.Create(filePath))
             {
@@ -78,7 +76,7 @@ namespace LynxToolkit.Documents.OpenXml
         /// <param name="stream">
         /// The stream.
         /// </param>
-        public static void Export(XBook book, Stream stream)
+        public static void Export(Spreadsheet.Workbook book, Stream stream)
         {
             using (var document = SpreadsheetDocument.Create(stream, SpreadsheetDocumentType.Workbook))
             {
@@ -95,19 +93,19 @@ namespace LynxToolkit.Documents.OpenXml
         /// <returns>
         /// A BorderStyleValues.
         /// </returns>
-        private static BorderStyleValues ConvertBorderStyle(BorderStyle borderStyle)
+        private static BorderStyleValues ConvertBorderStyle(Spreadsheet.BorderStyle borderStyle)
         {
             switch (borderStyle)
             {
-                case BorderStyle.Thin:
+                case Spreadsheet.BorderStyle.Thin:
                     return BorderStyleValues.Thin;
-                case BorderStyle.Thick:
+                case Spreadsheet.BorderStyle.Thick:
                     return BorderStyleValues.Thick;
-                case BorderStyle.Double:
+                case Spreadsheet.BorderStyle.Double:
                     return BorderStyleValues.Double;
-                case BorderStyle.Hair:
+                case Spreadsheet.BorderStyle.Hair:
                     return BorderStyleValues.Hair;
-                case BorderStyle.Dashed:
+                case Spreadsheet.BorderStyle.Dashed:
                     return BorderStyleValues.Dashed;
                 default:
                     return BorderStyleValues.None;
@@ -123,7 +121,7 @@ namespace LynxToolkit.Documents.OpenXml
         /// <returns>
         /// A <see cref="Stylesheet"/>.
         /// </returns>
-        private static Stylesheet CreateStylesheet(IEnumerable<XStyle> styles)
+        private static Stylesheet CreateStylesheet(IEnumerable<Spreadsheet.Style> styles)
         {
             var numberingFormats = new List<NumberingFormat>();
             var fontElements = new List<Font>();
@@ -214,8 +212,7 @@ namespace LynxToolkit.Documents.OpenXml
                 fontElements.Add(font1);
                 cellFormat.ApplyFont = true;
 
-                if (style.LeftBorderStyle != BorderStyle.None || style.RightBorderStyle != BorderStyle.None
-                    || style.TopBorderStyle != BorderStyle.None || style.BottomBorderStyle != BorderStyle.None)
+                if (style.HasBorder())
                 {
                     var leftBorder1 = new LeftBorder();
                     var rightBorder1 = new RightBorder();
@@ -244,15 +241,15 @@ namespace LynxToolkit.Documents.OpenXml
                 var alignment = new Alignment();
                 switch (style.HorizontalAlignment)
                 {
-                    case HorizontalAlignment.Left:
+                    case Spreadsheet.HorizontalAlignment.Left:
                         alignment.Horizontal = HorizontalAlignmentValues.Left;
                         cellFormat.ApplyAlignment = true;
                         break;
-                    case HorizontalAlignment.Center:
+                    case Spreadsheet.HorizontalAlignment.Center:
                         alignment.Horizontal = HorizontalAlignmentValues.Center;
                         cellFormat.ApplyAlignment = true;
                         break;
-                    case HorizontalAlignment.Right:
+                    case Spreadsheet.HorizontalAlignment.Right:
                         alignment.Horizontal = HorizontalAlignmentValues.Right;
                         cellFormat.ApplyAlignment = true;
                         break;
@@ -260,15 +257,15 @@ namespace LynxToolkit.Documents.OpenXml
 
                 switch (style.VerticalAlignment)
                 {
-                    case VerticalAlignment.Top:
+                    case Spreadsheet.VerticalAlignment.Top:
                         alignment.Vertical = VerticalAlignmentValues.Top;
                         cellFormat.ApplyAlignment = true;
                         break;
-                    case VerticalAlignment.Middle:
+                    case Spreadsheet.VerticalAlignment.Middle:
                         alignment.Vertical = VerticalAlignmentValues.Center;
                         cellFormat.ApplyAlignment = true;
                         break;
-                    case VerticalAlignment.Bottom:
+                    case Spreadsheet.VerticalAlignment.Bottom:
                         alignment.Vertical = VerticalAlignmentValues.Bottom;
                         cellFormat.ApplyAlignment = true;
                         break;
@@ -343,7 +340,7 @@ namespace LynxToolkit.Documents.OpenXml
         /// <param name="document">
         /// The document.
         /// </param>
-        private static void Export(XBook book, SpreadsheetDocument document)
+        private static void Export(Spreadsheet.Workbook book, SpreadsheetDocument document)
         {
             var workbookPart = document.AddWorkbookPart();
             var workbook = new Workbook();
@@ -351,7 +348,7 @@ namespace LynxToolkit.Documents.OpenXml
 
             var sheets = workbook.AppendChild(new Sheets());
 
-            var styles = new Dictionary<XStyle, uint>();
+            var styles = new Dictionary<Spreadsheet.Style, uint>();
             uint styleIndex = 0;
             foreach (var style in book.Styles)
             {
@@ -416,7 +413,7 @@ namespace LynxToolkit.Documents.OpenXml
                         var actualWidth = c.Width;
                         if (double.IsNaN(actualWidth))
                         {
-                            actualWidth = spreadSheet.FindColumnWidth(j - 1);
+                            actualWidth = spreadSheet.FindMaximumColumnWidth(j - 1);
                         }
 
                         var column = new Column

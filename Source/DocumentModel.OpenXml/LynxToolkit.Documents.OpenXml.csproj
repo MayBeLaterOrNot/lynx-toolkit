@@ -1,15 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{B547BFBE-720E-4E63-9885-1BF6AB7BEA6F}</ProjectGuid>
+    <ProjectGuid>{A4E4A901-66D5-45BA-B8DE-14E4AE6D66E9}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>StrictWikiTests</RootNamespace>
-    <AssemblyName>StrictWikiTests</AssemblyName>
+    <RootNamespace>LynxToolkit.Documents.OpenXml</RootNamespace>
+    <AssemblyName>LynxToolkit.Documents.OpenXml</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
@@ -22,55 +21,45 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\..\Output\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="nunit.framework">
-      <HintPath>..\packages\NUnit.2.6.1\lib\nunit.framework.dll</HintPath>
+    <Reference Include="DocumentFormat.OpenXml">
+      <HintPath>..\..\Components\DocumentFormat.OpenXml.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="WikiTests.cs" />
+    <Compile Include="..\GlobalAssemblyInfo.cs">
+      <Link>Properties\GlobalAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="Text\WordFormatter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Spreadsheet\ExcelWriter.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DocumentModel\DocumentModel.csproj">
+    <ProjectReference Include="..\DocumentModel\LynxToolkit.Documents.csproj">
       <Project>{3C23AABF-5CCB-4000-8D1C-1FE055CCBC5E}</Project>
-      <Name>DocumentModel</Name>
+      <Name>LynxToolkit.Documents</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="ExpectedOutput\Example.html">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="ExpectedOutput\Example.md">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="ExpectedOutput\Example.creole">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <None Include="ExpectedOutput\Example.wiki">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <Content Include="Input\Example.wiki">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <None Include="packages.config" />
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <UsingTask TaskName="PepitaGet.RestorePackagesTask" AssemblyFile="$(SolutionDir)..\Tools\Pepita\PepitaGet.dll" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
-    <PepitaGet.RestorePackagesTask />
   </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
 </Project>

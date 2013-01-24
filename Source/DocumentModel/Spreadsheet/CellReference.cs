@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="XCellReference.cs" company="Lynx">
+// <copyright file="CellReference.cs" company="Lynx">
 //   The MIT License (MIT)
 //   
 //   Copyright (c) 2012 Oystein Bjorke
@@ -27,18 +27,15 @@
 //   Represents a spreadsheet cell reference.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace LynxToolkit.Documents.Spreadsheet
 {
-    using System.Globalization;
-
     /// <summary>
     /// Represents a spreadsheet cell reference.
     /// </summary>
-    public struct XCellReference
+    public struct CellReference
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="XCellReference"/> struct.
+        /// Initializes a new instance of the <see cref="CellReference"/> struct.
         /// </summary>
         /// <param name="row">
         /// The row.
@@ -46,7 +43,7 @@ namespace LynxToolkit.Documents.Spreadsheet
         /// <param name="column">
         /// The column.
         /// </param>
-        public XCellReference(int row, int column)
+        public CellReference(int row, int column)
             : this()
         {
             this.Row = row;
@@ -83,11 +80,7 @@ namespace LynxToolkit.Documents.Spreadsheet
             var c1 = column % 26;
             var b0 = (char)((byte)'A' + c0 - 1);
             var b1 = (char)((byte)'A' + c1);
-            return string.Format(
-                "{0}{1}{2}", 
-                column >= 26 ? b0.ToString(CultureInfo.InvariantCulture) : string.Empty, 
-                b1, 
-                (row + 1).ToString());
+            return column >= 26 ? string.Format("{0}{1}{2}", b0, b1, row + 1) : string.Format("{0}{1}", b1, row + 1);
         }
 
         /// <summary>
@@ -97,23 +90,23 @@ namespace LynxToolkit.Documents.Spreadsheet
         /// The cell reference.
         /// </param>
         /// <returns>
-        /// An XCellReference.
+        /// A <see cref="CellReference"/>.
         /// </returns>
-        public static XCellReference Parse(string cellReference)
+        public static CellReference Parse(string cellReference)
         {
             if (char.IsDigit(cellReference[1]))
             {
-                int column = (int)(cellReference[0] - 'A');
+                int column = cellReference[0] - 'A';
                 int row = int.Parse(cellReference.Substring(1)) - 1;
-                return new XCellReference(row, column);
+                return new CellReference(row, column);
             }
             else
             {
-                int c0 = (int)(cellReference[0] - 'A');
-                int c1 = (int)(cellReference[1] - 'A');
-                int column = (c0 + 1) * 26 + c1;
+                int c0 = cellReference[0] - 'A';
+                int c1 = cellReference[1] - 'A';
+                int column = ((c0 + 1) * 26) + c1;
                 int row = int.Parse(cellReference.Substring(2)) - 1;
-                return new XCellReference(row, column);
+                return new CellReference(row, column);
             }
         }
 

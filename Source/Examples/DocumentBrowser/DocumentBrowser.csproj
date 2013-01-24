@@ -212,17 +212,17 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\DocumentModel.OpenXml\DocumentModel.OpenXml.csproj">
+    <ProjectReference Include="..\..\DocumentModel.OpenXml\LynxToolkit.Documents.OpenXml.csproj">
       <Project>{a4e4a901-66d5-45ba-b8de-14e4ae6d66e9}</Project>
-      <Name>DocumentModel.OpenXml</Name>
+      <Name>LynxToolkit.Documents.OpenXml</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\DocumentModel.Wpf\DocumentModel.Wpf.csproj">
+    <ProjectReference Include="..\..\DocumentModel.Wpf\LynxToolkit.Documents.Wpf.csproj">
       <Project>{08e223e5-a9ee-472e-9ced-4ab424d04d57}</Project>
-      <Name>DocumentModel.Wpf</Name>
+      <Name>LynxToolkit.Documents.Wpf</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\DocumentModel\DocumentModel.csproj">
+    <ProjectReference Include="..\..\DocumentModel\LynxToolkit.Documents.csproj">
       <Project>{3C23AABF-5CCB-4000-8D1C-1FE055CCBC5E}</Project>
-      <Name>DocumentModel</Name>
+      <Name>LynxToolkit.Documents</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

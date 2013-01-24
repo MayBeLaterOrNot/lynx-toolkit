@@ -51,13 +51,13 @@
     </CodeAnalysisDictionary>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DocumentModel.OpenXml\DocumentModel.OpenXml.csproj">
+    <ProjectReference Include="..\DocumentModel.OpenXml\LynxToolkit.Documents.OpenXml.csproj">
       <Project>{A4E4A901-66D5-45BA-B8DE-14E4AE6D66E9}</Project>
-      <Name>DocumentModel.OpenXml</Name>
+      <Name>LynxToolkit.Documents.OpenXml</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DocumentModel\DocumentModel.csproj">
+    <ProjectReference Include="..\DocumentModel\LynxToolkit.Documents.csproj">
       <Project>{3C23AABF-5CCB-4000-8D1C-1FE055CCBC5E}</Project>
-      <Name>DocumentModel</Name>
+      <Name>LynxToolkit.Documents</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

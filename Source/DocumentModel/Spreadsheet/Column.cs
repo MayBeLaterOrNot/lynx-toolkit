@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="XColumn.cs" company="Lynx">
+// <copyright file="Column.cs" company="Lynx">
 //   The MIT License (MIT)
 //   
 //   Copyright (c) 2012 Oystein Bjorke
@@ -27,13 +27,12 @@
 //   Represents a spreadsheet column.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace LynxToolkit.Documents.Spreadsheet
 {
     /// <summary>
     /// Represents a spreadsheet column.
     /// </summary>
-    public class XColumn
+    public class Column
     {
         /// <summary>
         /// Gets or sets the width of the column.
