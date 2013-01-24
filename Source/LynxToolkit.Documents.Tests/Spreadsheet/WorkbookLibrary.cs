@@ -116,9 +116,9 @@ namespace LynxToolkit.Documents.Tests
             get
             {
                 var wb = new Workbook();
-                var left = wb.AddStyle(horizontalAlignment: Spreadsheet.HorizontalAlignment.Left);
-                var center = wb.AddStyle(horizontalAlignment: Spreadsheet.HorizontalAlignment.Center);
-                var right = wb.AddStyle(horizontalAlignment: Spreadsheet.HorizontalAlignment.Right);
+                var left = wb.AddStyle(Spreadsheet.HorizontalAlignment.Left);
+                var center = wb.AddStyle(Spreadsheet.HorizontalAlignment.Center);
+                var right = wb.AddStyle(Spreadsheet.HorizontalAlignment.Right);
                 var sheet1 = wb.AddSheet();
                 sheet1["A1"] = "Default";
                 sheet1["A2"] = "Left";
@@ -192,6 +192,52 @@ namespace LynxToolkit.Documents.Tests
                 sheet1["A3"] = Math.PI;
                 sheet1["A4"] = true;
                 sheet1["A5"] = new DateTime(2013, 1, 24);
+                return wb;
+            }
+        }
+
+        public static Workbook Borders
+        {
+            get
+            {
+                var wb = new Workbook();
+                var headerStyle = wb.AddStyle(fontName: "Cambria", fontSize: 18);
+                var allThick = wb.AddStyle().SetBorderStyle(BorderStyle.Thick);
+                var allThin = wb.AddStyle().SetBorderStyle(BorderStyle.Thin);
+                var allDouble = wb.AddStyle().SetBorderStyle(BorderStyle.Double);
+                var allDashed = wb.AddStyle().SetBorderStyle(BorderStyle.Dashed);
+                var allHair = wb.AddStyle().SetBorderStyle(BorderStyle.Hair);
+                var allBlue = wb.AddStyle().SetBorderStyle(BorderStyle.Thin).SetBorderColor(0x0000FF);
+                var leftBorder = wb.AddStyle().SetBorderStyle(BorderStyle.Thin, BorderStyle.None, BorderStyle.None, BorderStyle.None);
+                var rightBorder = wb.AddStyle().SetBorderStyle(BorderStyle.None, BorderStyle.None, BorderStyle.Thin, BorderStyle.None);
+                var topBorder = wb.AddStyle().SetBorderStyle(BorderStyle.None, BorderStyle.Thin, BorderStyle.None, BorderStyle.None);
+                var bottomBorder = wb.AddStyle().SetBorderStyle(BorderStyle.None, BorderStyle.None, BorderStyle.None, BorderStyle.Thin);
+
+                var sheet1 = wb.AddSheet("DataTypes");
+                sheet1["B1"] = "Borders";
+                sheet1["B3"] = "Thick";
+                sheet1["B5"] = "Thin";
+                sheet1["B7"] = "Double";
+                sheet1["B9"] = "Dashed";
+                sheet1["B11"] = "Hair";
+                sheet1["B13"] = "Blue";
+                sheet1["B15"] = "Left";
+                sheet1["B17"] = "Right";
+                sheet1["B19"] = "Top";
+                sheet1["B21"] = "Bottom";
+
+                sheet1.ApplyStyle("B1", headerStyle);
+                sheet1.ApplyStyle("B3", allThick);
+                sheet1.ApplyStyle("B5", allThin);
+                sheet1.ApplyStyle("B7", allDouble);
+                sheet1.ApplyStyle("B9", allDashed);
+                sheet1.ApplyStyle("B11", allHair);
+                sheet1.ApplyStyle("B13", allBlue);
+                sheet1.ApplyStyle("B15", leftBorder);
+                sheet1.ApplyStyle("B17", rightBorder);
+                sheet1.ApplyStyle("B19", topBorder);
+                sheet1.ApplyStyle("B21", bottomBorder);
+
                 return wb;
             }
         }

@@ -153,28 +153,30 @@ namespace LynxToolkit.Documents.Spreadsheet
         /// Sets the color of the border.
         /// </summary>
         /// <param name="color">
-        /// The color.
+        /// The border color.
         /// </param>
-        public void SetBorderColor(uint color)
+        /// <returns>The current instance (for fluid style assignments).</returns>
+        public Style SetBorderColor(uint color)
         {
             this.LeftBorderColor = color;
             this.RightBorderColor = color;
             this.TopBorderColor = color;
             this.BottomBorderColor = color;
+            return this;
         }
 
         /// <summary>
         /// Sets the border style.
         /// </summary>
-        /// <param name="allBorders">
-        /// All borders.
-        /// </param>
-        public void SetBorderStyle(BorderStyle allBorders)
+        /// <param name="allBorders">All borders.</param>
+        /// <returns>The current instance (for fluid style assignments).</returns>
+        public Style SetBorderStyle(BorderStyle allBorders)
         {
             this.LeftBorderStyle = allBorders;
             this.RightBorderStyle = allBorders;
             this.TopBorderStyle = allBorders;
             this.BottomBorderStyle = allBorders;
+            return this;
         }
 
         /// <summary>
@@ -192,13 +194,15 @@ namespace LynxToolkit.Documents.Spreadsheet
         /// <param name="bottomStyle">
         /// The bottom style.
         /// </param>
-        public void SetBorderStyle(
+        /// <returns>The current instance (for fluid style assignments).</returns>
+        public Style SetBorderStyle(
             BorderStyle leftStyle, BorderStyle topStyle, BorderStyle rightStyle, BorderStyle bottomStyle)
         {
             this.LeftBorderStyle = leftStyle;
             this.RightBorderStyle = rightStyle;
             this.TopBorderStyle = topStyle;
             this.BottomBorderStyle = bottomStyle;
+            return this;
         }
     }
 }
