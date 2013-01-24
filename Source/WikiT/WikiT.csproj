@@ -51,11 +51,11 @@
     </CodeAnalysisDictionary>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DocumentModel.OpenXml\LynxToolkit.Documents.OpenXml.csproj">
+    <ProjectReference Include="..\LynxToolkit.Documents.OpenXml\LynxToolkit.Documents.OpenXml.csproj">
       <Project>{A4E4A901-66D5-45BA-B8DE-14E4AE6D66E9}</Project>
       <Name>LynxToolkit.Documents.OpenXml</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DocumentModel\LynxToolkit.Documents.csproj">
+    <ProjectReference Include="..\LynxToolkit.Documents\LynxToolkit.Documents.csproj">
       <Project>{3C23AABF-5CCB-4000-8D1C-1FE055CCBC5E}</Project>
       <Name>LynxToolkit.Documents</Name>
     </ProjectReference>

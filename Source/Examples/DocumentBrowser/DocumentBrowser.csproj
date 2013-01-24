@@ -199,10 +199,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <Content Include="..\..\DocumentModel.Tests\Input\Example.wiki">
+    <None Include="..\..\LynxToolkit.Documents.Tests\Input\Example.wiki">
       <Link>Example.wiki</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    </None>
     <None Include="app.config" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
@@ -212,15 +211,15 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\DocumentModel.OpenXml\LynxToolkit.Documents.OpenXml.csproj">
+    <ProjectReference Include="..\..\LynxToolkit.Documents.OpenXml\LynxToolkit.Documents.OpenXml.csproj">
       <Project>{a4e4a901-66d5-45ba-b8de-14e4ae6d66e9}</Project>
       <Name>LynxToolkit.Documents.OpenXml</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\DocumentModel.Wpf\LynxToolkit.Documents.Wpf.csproj">
+    <ProjectReference Include="..\..\LynxToolkit.Documents.Wpf\LynxToolkit.Documents.Wpf.csproj">
       <Project>{08e223e5-a9ee-472e-9ced-4ab424d04d57}</Project>
       <Name>LynxToolkit.Documents.Wpf</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\DocumentModel\LynxToolkit.Documents.csproj">
+    <ProjectReference Include="..\..\LynxToolkit.Documents\LynxToolkit.Documents.csproj">
       <Project>{3C23AABF-5CCB-4000-8D1C-1FE055CCBC5E}</Project>
       <Name>LynxToolkit.Documents</Name>
     </ProjectReference>

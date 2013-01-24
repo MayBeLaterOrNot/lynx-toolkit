@@ -53,7 +53,7 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DocumentModel\LynxToolkit.Documents.csproj">
+    <ProjectReference Include="..\LynxToolkit.Documents\LynxToolkit.Documents.csproj">
       <Project>{3c23aabf-5ccb-4000-8d1c-1fe055ccbc5e}</Project>
       <Name>LynxToolkit.Documents</Name>
     </ProjectReference>

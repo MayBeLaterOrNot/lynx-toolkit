@@ -54,15 +54,15 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DocumentModel.OpenXml\LynxToolkit.Documents.OpenXml.csproj">
+    <ProjectReference Include="..\LynxToolkit.Documents.OpenXml\LynxToolkit.Documents.OpenXml.csproj">
       <Project>{A4E4A901-66D5-45BA-B8DE-14E4AE6D66E9}</Project>
       <Name>LynxToolkit.Documents.OpenXml</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DocumentModel.Tests\LynxToolkit.Documents.Tests.csproj">
+    <ProjectReference Include="..\LynxToolkit.Documents.Tests\LynxToolkit.Documents.Tests.csproj">
       <Project>{b547bfbe-720e-4e63-9885-1bf6ab7bea6f}</Project>
       <Name>LynxToolkit.Documents.Tests</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DocumentModel\LynxToolkit.Documents.csproj">
+    <ProjectReference Include="..\LynxToolkit.Documents\LynxToolkit.Documents.csproj">
       <Project>{3c23aabf-5ccb-4000-8d1c-1fe055ccbc5e}</Project>
       <Name>LynxToolkit.Documents</Name>
     </ProjectReference>

@@ -144,11 +144,11 @@ namespace LynxToolkit.Documents.OpenXml
             {
                 var cellFormat = new CellFormat
                                      {
-                                         BorderId = 0U, 
-                                         FillId = 0U, 
-                                         FontId = fontId, 
-                                         FormatId = formatId, 
-                                         NumberFormatId = 0U, 
+                                         BorderId = 0U,
+                                         FillId = 0U,
+                                         FontId = fontId,
+                                         FormatId = formatId,
+                                         NumberFormatId = 0U,
                                          ApplyNumberFormat = false
                                      };
 
@@ -207,7 +207,10 @@ namespace LynxToolkit.Documents.OpenXml
                 font1.AppendChild(color1);
                 font1.AppendChild(fontName1);
                 font1.AppendChild(fontFamilyNumbering1);
-                font1.AppendChild(fontScheme1);
+                if (formatId == 0)
+                {
+                    font1.AppendChild(fontScheme1);
+                }
 
                 fontElements.Add(font1);
                 cellFormat.ApplyFont = true;
@@ -290,23 +293,23 @@ namespace LynxToolkit.Documents.OpenXml
             var differentialFormats = new DifferentialFormats { Count = 0U };
             var tableStyles = new TableStyles
                                   {
-                                      Count = 0U, 
-                                      DefaultTableStyle = "TableStyleMedium2", 
+                                      Count = 0U,
+                                      DefaultTableStyle = "TableStyleMedium2",
                                       DefaultPivotStyle = "PivotStyleLight16"
                                   };
 
             var cellStyleFormats1 = new CellStyleFormats { Count = 1U };
             var cellFormat1 = new CellFormat
                                   {
-                                      NumberFormatId = 0U, 
-                                      FontId = 0U, 
-                                      FillId = 0U, 
+                                      NumberFormatId = 0U,
+                                      FontId = 0U,
+                                      FillId = 0U,
                                       BorderId = 0U
                                   };
             cellStyleFormats1.AppendChild(cellFormat1);
 
             var cellStyle1 = new CellStyle { Name = "Normal", FormatId = 0U, BuiltinId = 0U };
-            var cellStyles = new CellStyles();
+            var cellStyles = new CellStyles() { Count = 1 };
             cellStyles.AppendChild(cellStyle1);
 
             var stylesheet1 = new Stylesheet(
@@ -370,8 +373,8 @@ namespace LynxToolkit.Documents.OpenXml
                 // Append a new worksheet and associate it with the workbook.
                 var sheet = new Sheet
                                 {
-                                    Id = workbookPart.GetIdOfPart(worksheetPart), 
-                                    SheetId = i++, 
+                                    Id = workbookPart.GetIdOfPart(worksheetPart),
+                                    SheetId = i++,
                                     Name = spreadSheet.Name
                                 };
                 sheets.AppendChild(sheet);
@@ -418,10 +421,10 @@ namespace LynxToolkit.Documents.OpenXml
 
                         var column = new Column
                                          {
-                                             Width = new DoubleValue(actualWidth), 
-                                             Min = j, 
-                                             Max = j, 
-                                             BestFit = true, 
+                                             Width = new DoubleValue(actualWidth),
+                                             Min = j,
+                                             Max = j,
+                                             BestFit = true,
                                              CustomWidth = true
                                          };
                         j++;
