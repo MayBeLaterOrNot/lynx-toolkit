@@ -1,2 +1,0 @@
-..\Output\UpdateFileHeaders.exe "/company=Lynx Toolkit" /copyright-file=..\License.txt ..\Source > UpdateFileHeaders.log
-..\Output\CleanSource.exe /cleansummary /cleanregions ..\Source > CleanSource.log
