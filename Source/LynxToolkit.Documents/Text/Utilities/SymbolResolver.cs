@@ -1,5 +1,5 @@
-// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SymbolResolver.cs" company="Lynx">
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="SymbolResolver.cs" company="Lynx Toolkit">
 //   The MIT License (MIT)
 //   
 //   Copyright (c) 2012 Oystein Bjorke
@@ -24,7 +24,6 @@
 //   SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace LynxToolkit.Documents
 {
     using System.Collections.Generic;
@@ -38,31 +37,31 @@ namespace LynxToolkit.Documents
         {
             symbolDictionary = new Dictionary<string, string>
                                    {
-                                       { ":-)", "smile.png" }, 
-                                       { ":-(", "sad.png" }, 
-                                       { ":P", "tongue.png" }, 
-                                       { ":D", "biggrin.png" }, 
-                                       { ";-)", "wink.png" }, 
-                                       { ":)", "smile.png" }, 
-                                       { ":(", "sad.png" }, 
-                                       { ";)", "wink.png" }, 
-                                       { "(*)", "star_yellow.png" }, 
-                                       { "(*r)", "star_red.png" }, 
-                                       { "(*g)", "star_green.png" }, 
-                                       { "(*b)", "star_blue.png" }, 
-                                       { "(*y)", "star_yellow.png" }, 
-                                       { "(i)", "information.png" }, 
-                                       { "(/)", "check.png" }, 
-                                       { "(x)", "error.png" }, 
-                                       { "(!)", "warning.png" }, 
-                                       { "(+)", "add.png" }, 
-                                       { "(-)", "forbidden.png" }, 
-                                       { "(?)", "help.png" }, 
-                                       { "(on)", "lightbulb_on.png" }, 
-                                       { "(off)", "lightbulb.png" }, 
-                                       { "(_)", "under_construction.png" }, 
-                                       { "(y)", "thumbs_up.png" }, 
-                                       { "(n)", "thumbs_down.png" }, 
+                                       { ":-)", "smile.png" },
+                                       { ":-(", "sad.png" },
+                                       { ":P", "tongue.png" },
+                                       { ":D", "biggrin.png" },
+                                       { ";-)", "wink.png" },
+                                       { ":)", "smile.png" },
+                                       { ":(", "sad.png" },
+                                       { ";)", "wink.png" },
+                                       { "(*)", "star_yellow.png" },
+                                       { "(*r)", "star_red.png" },
+                                       { "(*g)", "star_green.png" },
+                                       { "(*b)", "star_blue.png" },
+                                       { "(*y)", "star_yellow.png" },
+                                       { "(i)", "information.png" },
+                                       { "(/)", "check.png" },
+                                       { "(x)", "error.png" },
+                                       { "(!)", "warning.png" },
+                                       { "(+)", "add.png" },
+                                       { "(-)", "forbidden.png" },
+                                       { "(?)", "help.png" },
+                                       { "(on)", "lightbulb_on.png" },
+                                       { "(off)", "lightbulb.png" },
+                                       { "(_)", "under_construction.png" },
+                                       { "(y)", "thumbs_up.png" },
+                                       { "(n)", "thumbs_down.png" },
                                        { "(h)", "home.png" }
                                    };
         }

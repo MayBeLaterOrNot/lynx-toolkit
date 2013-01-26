@@ -1,5 +1,5 @@
-// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="WikiParser.cs" company="Lynx">
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="WikiParser.cs" company="Lynx Toolkit">
 //   The MIT License (MIT)
 //   
 //   Copyright (c) 2012 Oystein Bjorke
@@ -23,8 +23,10 @@
 //   TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 //   SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // </copyright>
+// <summary>
+//   Parses the specified text.
+// </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace LynxToolkit.Documents
 {
     using System;

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="BorderStyle.cs" company="Lynx">
+// <copyright file="BorderStyle.cs" company="Lynx Toolkit">
 //   The MIT License (MIT)
 //   
 //   Copyright (c) 2012 Oystein Bjorke
@@ -27,7 +27,6 @@
 //   Defines the border style.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace LynxToolkit.Documents.Spreadsheet
 {
     /// <summary>
@@ -38,27 +37,27 @@ namespace LynxToolkit.Documents.Spreadsheet
         /// <summary>
         /// No border.
         /// </summary>
-        None, 
+        None,
 
         /// <summary>
         /// A thin border.
         /// </summary>
-        Thin, 
+        Thin,
 
         /// <summary>
         /// A thick border.
         /// </summary>
-        Thick, 
+        Thick,
 
         /// <summary>
         /// A double border.
         /// </summary>
-        Double, 
+        Double,
 
         /// <summary>
         /// A hair-line border.
         /// </summary>
-        Hair, 
+        Hair,
 
         /// <summary>
         /// A dashed border.

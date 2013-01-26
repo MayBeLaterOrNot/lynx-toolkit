@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="NamespaceCollection.cs" company="Lynx">
+// <copyright file="LibraryModel.cs" company="Lynx Toolkit">
 //   The MIT License (MIT)
 //   
 //   Copyright (c) 2012 Oystein Bjorke
@@ -57,7 +57,7 @@ namespace XmlDocT
         {
             return this.FileName;
         }
-        
+
         public string Name
         {
             get
@@ -85,7 +85,7 @@ namespace XmlDocT
         public List<string> IgnoreAttributes { get; private set; }
 
         public Dictionary<string, NamespaceModel> Namespaces { get; private set; }
-        
+
         public string FileName {get;set;}
 
         public string Title

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Worksheet.cs" company="Lynx">
+// <copyright file="Worksheet.cs" company="Lynx Toolkit">
 //   The MIT License (MIT)
 //   
 //   Copyright (c) 2012 Oystein Bjorke
@@ -27,7 +27,6 @@
 //   Represents a spreadsheet in a workbook.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace LynxToolkit.Documents.Spreadsheet
 {
     using System.Collections;

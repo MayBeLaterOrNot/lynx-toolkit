@@ -1,9 +1,9 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Program.cs" company="Lynx">
+// <copyright file="Program.cs" company="Lynx Toolkit">
 //   The MIT License (MIT)
-//
+//   
 //   Copyright (c) 2012 Oystein Bjorke
-//
+//   
 //   Permission is hereby granted, free of charge, to any person obtaining a
 //   copy of this software and associated documentation files (the
 //   "Software"), to deal in the Software without restriction, including
@@ -11,10 +11,10 @@
 //   distribute, sublicense, and/or sell copies of the Software, and to
 //   permit persons to whom the Software is furnished to do so, subject to
 //   the following conditions:
-//
+//   
 //   The above copyright notice and this permission notice shall be included
 //   in all copies or substantial portions of the Software.
-//
+//   
 //   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
 //   OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 //   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
@@ -51,11 +51,6 @@ namespace CleanSource
         /// Expression to search for region/end region lines.
         /// </summary>
         private static readonly Regex RegionExpression = new Regex(@"^(\s*#(?:end)?region.*?)$", RegexOptions.Compiled | RegexOptions.Multiline | RegexOptions.Singleline);
-
-        /// <summary>
-        /// Expression to search for dependency properties.
-        /// </summary>
-        private static readonly Regex DependencyPropertyExpression = new Regex(@"(?<=/// <summary>\s*/// )(?<summary>.*?)(?=\s*/// </summary>\s*public static readonly DependencyProperty (?<PropertyName>.*?)Property)", RegexOptions.Compiled | RegexOptions.Multiline);
 
         /// <summary>
         /// The number of files cleaned.
@@ -103,7 +98,7 @@ namespace CleanSource
         /// <param name="args">The args.</param>
         private static void Main(string[] args)
         {
-            Console.WriteLine(Application.Header);
+            Console.WriteLine(Utilities.ApplicationHeader);
 
             exclude = "AssemblyInfo.cs Packages *.Designer.cs obj bin _*";
 
@@ -187,13 +182,19 @@ namespace CleanSource
                 }
             }
         }
+
+        /// <summary>
+        /// Cleans the code.
+        /// </summary>
+        /// <param name="text">The code.</param>
+        /// <returns>The cleaned code.</returns>
         private static string CleanCode(string text)
         {
-            // dependency property
-            text = Regex.Replace(text, @"(?<=/// <summary>\s*/// )(?<summary>.*?)(?=\s*/// </summary>\s*public static readonly DependencyProperty (?<name>.*?)Property)", 
+            // dependency properties
+            text = Regex.Replace(text, @"(?<=/// <summary>\s*/// )(?<summary>.*?)(?=\s*/// </summary>\s*public static readonly DependencyProperty (?<name>.*?)Property)",
                 "Identifies the <see cref=\"${name}\"/> dependency property.");
 
-            // dependency property
+            // routed events
             text = Regex.Replace(text, @"(?<=/// <summary>\s*/// )(?<summary>.*?)(?=\s*/// </summary>\s*public static readonly RoutedEvent (?<name>.*?)Event)",
                 "Identifies the <see cref=\"${name}\"/> routed event.");
 

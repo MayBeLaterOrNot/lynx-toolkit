@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Program.cs" company="Lynx">
+// <copyright file="Program.cs" company="Lynx Toolkit">
 //   The MIT License (MIT)
 //   
 //   Copyright (c) 2012 Oystein Bjorke
@@ -23,8 +23,10 @@
 //   TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 //   SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // </copyright>
+// <summary>
+//   The WikiT program.
+// </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace WikiT
 {
     using System;
@@ -36,6 +38,9 @@ namespace WikiT
     using LynxToolkit.Documents;
     using LynxToolkit.Documents.OpenXml;
 
+    /// <summary>
+    /// The WikiT program.
+    /// </summary>
     public class Program
     {
         /// <summary>
@@ -95,11 +100,22 @@ namespace WikiT
         /// <value>The defines.</value>
         public static HashSet<string> Defines { get; set; }
 
+        /// <summary>
+        /// Gets or sets the replacement strings.
+        /// </summary>
+        /// <value>
+        /// The replacement strings.
+        /// </value>
         public static Dictionary<string, string> Replacements { get; set; }
 
+        /// <summary>
+        /// The main entry point.
+        /// </summary>
+        /// <param name="args">The args.</param>
+        /// <returns>The exit code, 0 if successful.</returns>
         public static int Main(string[] args)
         {
-            Console.WriteLine(Application.Header);
+            Console.WriteLine(Utilities.ApplicationHeader);
             if (args.Length < 3)
             {
                 Console.WriteLine("Arguments: [/input=folder/search-pattern] [/defaultSyntax=owiki] [/format=html] [/extension=.html] [/output=output-folder]");
@@ -204,17 +220,12 @@ namespace WikiT
             return 0;
         }
 
-        private static bool IsFileModified(string filePath, string newContent)
-        {
-            if (!File.Exists(filePath))
-            {
-                return true;
-            }
-
-            var content = File.ReadAllText(filePath);
-            return !string.Equals(content, newContent);
-        }
-
+        /// <summary>
+        /// Transforms the specified file.
+        /// </summary>
+        /// <param name="filePath">The file path.</param>
+        /// <returns>True if the file was modified.</returns>
+        /// <exception cref="System.FormatException">Invalid format.</exception>
         private static bool Transform(string filePath)
         {
             var doc = WikiParser.ParseFile(filePath, DefaultSyntax, Replacements, Defines);
@@ -267,14 +278,13 @@ namespace WikiT
                     throw new FormatException(string.Format("The output format '{0}' is not supported.", Format));
             }
 
-            if (IsFileModified(outputPath, outputText))
+            if (Utilities.IsFileModified(outputPath, outputText))
             {
                 File.WriteAllText(outputPath, outputText);
                 return true;
             }
 
             return false;
-
         }
     }
 }

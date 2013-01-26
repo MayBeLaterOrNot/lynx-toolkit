@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Utilities.cs" company="Lynx">
+// <copyright file="Utilities.cs" company="Lynx Toolkit">
 //   The MIT License (MIT)
 //   
 //   Copyright (c) 2012 Oystein Bjorke
@@ -23,6 +23,9 @@
 //   TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 //   SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // </copyright>
+// <summary>
+//   Provides static utility methods.
+// </summary>
 // --------------------------------------------------------------------------------------------------------------------
 namespace LynxToolkit
 {
@@ -35,8 +38,57 @@ namespace LynxToolkit
     using System.Text;
     using System.Text.RegularExpressions;
 
+    /// <summary>
+    /// Provides static utility methods.
+    /// </summary>
     public static class Utilities
     {
+        /// <summary>
+        ///     Gets the application comments.
+        /// </summary>
+        public static string ApplicationComments
+        {
+            get
+            {
+                return FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly().Location).Comments;
+            }
+        }
+
+        /// <summary>
+        ///     Gets the application description.
+        /// </summary>
+        public static string ApplicationDescription
+        {
+            get
+            {
+                return FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly().Location).FileDescription;
+            }
+        }
+
+        /// <summary>
+        ///     Gets the application header (product name, version number and copyright notice).
+        /// </summary>
+        public static string ApplicationHeader
+        {
+            get
+            {
+                var sb = new StringBuilder();
+                var fvi = FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly().Location);
+                sb.AppendLine(fvi.ProductName);
+                sb.AppendFormat(
+                    "Version {0}.{1} (build {2})", fvi.ProductMajorPart, fvi.ProductMinorPart, fvi.ProductBuildPart);
+                sb.AppendLine();
+                sb.AppendLine(fvi.LegalCopyright);
+                return sb.ToString();
+            }
+        }
+
+        /// <summary>
+        /// Finds the files in the specified directory and its subdirectories.
+        /// </summary>
+        /// <param name="directory">The directory.</param>
+        /// <param name="searchPattern">The search pattern.</param>
+        /// <returns>A sequence of file paths.</returns>
         public static IEnumerable<string> FindFiles(string directory, string searchPattern)
         {
             foreach (var file in Directory.GetFiles(directory, searchPattern))
@@ -83,6 +135,25 @@ namespace LynxToolkit
             }
 
             return sb.ToString();
+        }
+
+        /// <summary>
+        /// Determines whether the specified file is modified.
+        /// </summary>
+        /// <param name="filePath">The file path.</param>
+        /// <param name="newContent">The new content.</param>
+        /// <returns>
+        ///   <c>true</c> if the file is modified; otherwise, <c>false</c>.
+        /// </returns>
+        public static bool IsFileModified(string filePath, string newContent)
+        {
+            if (!File.Exists(filePath))
+            {
+                return true;
+            }
+
+            var content = File.ReadAllText(filePath);
+            return !string.Equals(content, newContent);
         }
 
         /// <summary>
@@ -135,8 +206,14 @@ namespace LynxToolkit
             return false;
         }
 
-        public static void Match(
-            this Regex regex, string input, Action<string> notMatchAction, Action<Match> matchAction)
+        /// <summary>
+        /// Matches the specified regular expression.
+        /// </summary>
+        /// <param name="regex">The regex.</param>
+        /// <param name="input">The input.</param>
+        /// <param name="notMatchAction">The not match action.</param>
+        /// <param name="matchAction">The match action.</param>
+        public static void Match(this Regex regex, string input, Action<string> notMatchAction, Action<Match> matchAction)
         {
             int index = 0;
 
@@ -220,7 +297,7 @@ namespace LynxToolkit
 
             var psi = new ProcessStartInfo(exe, string.Format(argumentFormatString, filename))
                           {
-                              CreateNoWindow = true, 
+                              CreateNoWindow = true,
                               WindowStyle =
                                   ProcessWindowStyle
                                   .Hidden
@@ -230,7 +307,7 @@ namespace LynxToolkit
         }
 
         /// <summary>
-        ///     Returns the substring from index 0 to the first occurence of the specified string.
+        ///     Returns the substring from index 0 to the first occurrence of the specified string.
         /// </summary>
         /// <param name="input">The input.</param>
         /// <param name="value">The string to search for.</param>
@@ -251,55 +328,6 @@ namespace LynxToolkit
             }
 
             return input;
-        }
-    }
-
-    /// <summary>
-    ///     Provides utility methods for the Lynx toolkit console applications.
-    /// </summary>
-    /// <remarks></remarks>
-    public static class Application
-    {
-        /// <summary>
-        ///     Gets the application comments.
-        /// </summary>
-        /// <remarks></remarks>
-        public static string Comments
-        {
-            get
-            {
-                return FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly().Location).Comments;
-            }
-        }
-
-        /// <summary>
-        ///     Gets the application description.
-        /// </summary>
-        /// <remarks></remarks>
-        public static string Description
-        {
-            get
-            {
-                return FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly().Location).FileDescription;
-            }
-        }
-
-        /// <summary>
-        ///     Gets the application header (product name, version number and copyright notice).
-        /// </summary>
-        public static string Header
-        {
-            get
-            {
-                var sb = new StringBuilder();
-                var fvi = FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly().Location);
-                sb.AppendLine(fvi.ProductName);
-                sb.AppendFormat(
-                    "Version {0}.{1} (build {2})", fvi.ProductMajorPart, fvi.ProductMinorPart, fvi.ProductBuildPart);
-                sb.AppendLine();
-                sb.AppendLine(fvi.LegalCopyright);
-                return sb.ToString();
-            }
         }
     }
 }

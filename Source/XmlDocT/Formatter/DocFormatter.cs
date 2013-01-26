@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DocFormatter.cs" company="Lynx">
+// <copyright file="DocFormatter.cs" company="Lynx Toolkit">
 //   The MIT License (MIT)
 //   
 //   Copyright (c) 2012 Oystein Bjorke
@@ -23,6 +23,9 @@
 //   TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 //   SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // </copyright>
+// <summary>
+//   Adds the text.
+// </summary>
 // --------------------------------------------------------------------------------------------------------------------
 namespace XmlDocT
 {
@@ -119,7 +122,6 @@ namespace XmlDocT
                         break;
                 }
             }
-
 
             var siteMap = new SiteMap();
 
@@ -483,7 +485,6 @@ namespace XmlDocT
 
             return false;
         }
-
 
         private void AddText(string text, Type scope)
         {

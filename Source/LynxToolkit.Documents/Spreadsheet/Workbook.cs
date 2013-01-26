@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Workbook.cs" company="Lynx">
+// <copyright file="Workbook.cs" company="Lynx Toolkit">
 //   The MIT License (MIT)
 //   
 //   Copyright (c) 2012 Oystein Bjorke
@@ -124,24 +124,24 @@ namespace LynxToolkit.Documents.Spreadsheet
         /// A XStyle.
         /// </returns>
         public Style AddStyle(
-            HorizontalAlignment horizontalAlignment = HorizontalAlignment.Auto, 
-            VerticalAlignment verticalAlignment = VerticalAlignment.Auto, 
-            bool bold = false, 
-            bool italic = false, 
-            double fontSize = 11, 
-            string fontName = "Calibri", 
-            uint? foreground = null, 
+            HorizontalAlignment horizontalAlignment = HorizontalAlignment.Auto,
+            VerticalAlignment verticalAlignment = VerticalAlignment.Auto,
+            bool bold = false,
+            bool italic = false,
+            double fontSize = 11,
+            string fontName = "Calibri",
+            uint? foreground = null,
             uint? background = null)
         {
             var style = new Style
                             {
-                                HorizontalAlignment = horizontalAlignment, 
-                                VerticalAlignment = verticalAlignment, 
-                                Bold = bold, 
-                                Italic = italic, 
-                                FontSize = fontSize, 
-                                FontName = fontName, 
-                                Foreground = foreground, 
+                                HorizontalAlignment = horizontalAlignment,
+                                VerticalAlignment = verticalAlignment,
+                                Bold = bold,
+                                Italic = italic,
+                                FontSize = fontSize,
+                                FontName = fontName,
+                                Foreground = foreground,
                                 Background = background
                             };
             this.Styles.Add(style);

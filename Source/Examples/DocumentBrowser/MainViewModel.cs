@@ -1,5 +1,5 @@
-// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MainViewModel.cs" company="Lynx">
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="MainViewModel.cs" company="Lynx Toolkit">
 //   The MIT License (MIT)
 //   
 //   Copyright (c) 2012 Oystein Bjorke
@@ -23,11 +23,7 @@
 //   TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 //   SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // </copyright>
-// <summary>
-//   Defines the MainViewModel type.
-// </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace DocumentBrowser
 {
     using System.IO;

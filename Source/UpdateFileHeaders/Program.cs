@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Program.cs" company="Lynx">
+// <copyright file="Program.cs" company="Lynx Toolkit">
 //   The MIT License (MIT)
 //   
 //   Copyright (c) 2012 Oystein Bjorke
@@ -23,8 +23,10 @@
 //   TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 //   SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // </copyright>
+// <summary>
+//   The program.
+// </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace UpdateFileHeaders
 {
     using System;
@@ -68,11 +70,11 @@ namespace UpdateFileHeaders
         /// Defines the entry point of the application.
         /// </summary>
         /// <param name="args">
-        /// The args. 
+        /// The args.
         /// </param>
         private static void Main(string[] args)
         {
-            Console.WriteLine(Application.Header);
+            Console.WriteLine(Utilities.ApplicationHeader);
 
             string company = null;
             string copyright = null;
@@ -219,8 +221,8 @@ namespace UpdateFileHeaders
                 string fileName = Path.GetFileName(file);
                 string input = File.ReadAllText(file);
                 Match summaryMatch = Regex.Match(
-                    input, 
-                    @"///\s*<summary>\s*^(.*?)$\s*///\s*</summary>", 
+                    input,
+                    @"///\s*<summary>\s*^(.*?)$\s*///\s*</summary>",
                     RegexOptions.Multiline | RegexOptions.Singleline);
                 string summary = string.Empty;
                 if (summaryMatch.Success)

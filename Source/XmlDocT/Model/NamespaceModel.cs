@@ -1,5 +1,5 @@
-// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="NamespaceModel.cs" company="Lynx">
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="NamespaceModel.cs" company="Lynx Toolkit">
 //   The MIT License (MIT)
 //   
 //   Copyright (c) 2012 Oystein Bjorke
@@ -24,7 +24,6 @@
 //   SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace XmlDocT
 {
     using System.Collections.Generic;

@@ -1,5 +1,5 @@
-// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DocumentFormatter.cs" company="Lynx">
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="DocumentFormatter.cs" company="Lynx Toolkit">
 //   The MIT License (MIT)
 //   
 //   Copyright (c) 2012 Oystein Bjorke
@@ -24,7 +24,6 @@
 //   SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace LynxToolkit.Documents
 {
     using System;
@@ -317,7 +316,6 @@ namespace LynxToolkit.Documents
             var path = dir + file;
             return path;
         }
-
 
     }
 }

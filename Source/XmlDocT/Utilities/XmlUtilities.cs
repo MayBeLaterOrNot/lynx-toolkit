@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Utilities.cs" company="Lynx">
+// <copyright file="XmlUtilities.cs" company="Lynx Toolkit">
 //   The MIT License (MIT)
 //   
 //   Copyright (c) 2012 Oystein Bjorke
@@ -23,8 +23,10 @@
 //   TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 //   SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // </copyright>
+// <summary>
+//   Utilities for reading xml doc files.
+// </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace XmlDocT
 {
     using System;
@@ -92,7 +94,7 @@ namespace XmlDocT
             {
                 if (name.EndsWith("#ctor"))
                 {
-                    // auto-generated constructor ? 
+                    // auto-generated constructor ?
                 }
                 else
                 {
@@ -115,7 +117,7 @@ namespace XmlDocT
         public static string GetNiceMethodName(MethodBase mi)
         {
             var name = mi.Name;
-            
+
             // Check if it is an operator name
             if (name.StartsWith("op_"))
             {

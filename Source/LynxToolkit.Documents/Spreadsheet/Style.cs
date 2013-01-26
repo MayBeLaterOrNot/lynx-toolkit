@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Style.cs" company="Lynx">
+// <copyright file="Style.cs" company="Lynx Toolkit">
 //   The MIT License (MIT)
 //   
 //   Copyright (c) 2012 Oystein Bjorke
@@ -27,7 +27,6 @@
 //   Represents a cell format in a spreadsheet.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace LynxToolkit.Documents.Spreadsheet
 {
     /// <summary>
@@ -155,7 +154,9 @@ namespace LynxToolkit.Documents.Spreadsheet
         /// <param name="color">
         /// The border color.
         /// </param>
-        /// <returns>The current instance (for fluid style assignments).</returns>
+        /// <returns>
+        /// The current instance (for fluid style assignments).
+        /// </returns>
         public Style SetBorderColor(uint color)
         {
             this.LeftBorderColor = color;
@@ -168,8 +169,12 @@ namespace LynxToolkit.Documents.Spreadsheet
         /// <summary>
         /// Sets the border style.
         /// </summary>
-        /// <param name="allBorders">All borders.</param>
-        /// <returns>The current instance (for fluid style assignments).</returns>
+        /// <param name="allBorders">
+        /// All borders.
+        /// </param>
+        /// <returns>
+        /// The current instance (for fluid style assignments).
+        /// </returns>
         public Style SetBorderStyle(BorderStyle allBorders)
         {
             this.LeftBorderStyle = allBorders;
@@ -194,7 +199,9 @@ namespace LynxToolkit.Documents.Spreadsheet
         /// <param name="bottomStyle">
         /// The bottom style.
         /// </param>
-        /// <returns>The current instance (for fluid style assignments).</returns>
+        /// <returns>
+        /// The current instance (for fluid style assignments).
+        /// </returns>
         public Style SetBorderStyle(
             BorderStyle leftStyle, BorderStyle topStyle, BorderStyle rightStyle, BorderStyle bottomStyle)
         {

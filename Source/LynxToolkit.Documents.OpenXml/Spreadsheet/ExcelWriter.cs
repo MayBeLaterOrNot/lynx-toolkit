@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ExcelWriter.cs" company="Lynx">
+// <copyright file="ExcelWriter.cs" company="Lynx Toolkit">
 //   The MIT License (MIT)
 //   
 //   Copyright (c) 2012 Oystein Bjorke
@@ -27,7 +27,6 @@
 //   Provides export of spreadsheet models to Excel OpenXML files.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace LynxToolkit.Documents.OpenXml
 {
     using System;

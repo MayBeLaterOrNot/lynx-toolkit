@@ -1,5 +1,5 @@
-// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="HtmlFormatter.cs" company="Lynx">
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="HtmlFormatter.cs" company="Lynx Toolkit">
 //   The MIT License (MIT)
 //   
 //   Copyright (c) 2012 Oystein Bjorke
@@ -23,8 +23,10 @@
 //   TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 //   SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // </copyright>
+// <summary>
+//   Gets or sets the cascading style sheet.
+// </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace LynxToolkit.Documents
 {
     using System.Collections.Generic;
@@ -43,10 +45,10 @@ namespace LynxToolkit.Documents
             this.InternalLinkSpaces = new Dictionary<string, string>
                                           {
                                               {
-                                                  "youtube", 
+                                                  "youtube",
                                                   @"http://www.youtube.com/watch?v={0}"
-                                              }, 
-                                              { "vimeo", @"http://vimeo.com/{0}" }, 
+                                              },
+                                              { "vimeo", @"http://vimeo.com/{0}" },
                                               { "google", @"http://www.google.com/?q={0}" }
                                           };
         }

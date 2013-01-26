@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Program.cs" company="Lynx">
+// <copyright file="Program.cs" company="Lynx Toolkit">
 //   The MIT License (MIT)
 //   
 //   Copyright (c) 2012 Oystein Bjorke
@@ -52,7 +52,7 @@ namespace FtpUpload
 
         private static void Main(string[] args)
         {
-            Console.WriteLine(Application.Header);
+            Console.WriteLine(Utilities.ApplicationHeader);
             if (args.Length < 5)
             {
                 Console.WriteLine("Missing arguments.");
@@ -92,9 +92,9 @@ namespace FtpUpload
             else
             {
                 var length = UploadFile(
-                    remoteFile, 
-                    localFile, 
-                    1024, 
+                    remoteFile,
+                    localFile,
+                    1024,
                     (x, y) =>
                         {
                             Console.Write("#");

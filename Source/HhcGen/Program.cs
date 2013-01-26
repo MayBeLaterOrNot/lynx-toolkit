@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Program.cs" company="Lynx">
+// <copyright file="Program.cs" company="Lynx Toolkit">
 //   The MIT License (MIT)
 //   
 //   Copyright (c) 2012 Oystein Bjorke
@@ -24,7 +24,6 @@
 //   SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace HhcGen
 {
     using System;
@@ -35,12 +34,12 @@ namespace HhcGen
     {
         private static void Main(string[] args)
         {
-            Console.WriteLine(Application.Header);
+            Console.WriteLine(Utilities.ApplicationHeader);
             if (args.Length == 0)
             {
-                Console.WriteLine(Application.Description);
+                Console.WriteLine(Utilities.ApplicationDescription);
                 Console.WriteLine();
-                Console.WriteLine(Application.Comments);
+                Console.WriteLine(Utilities.ApplicationComments);
                 return;
             }
 

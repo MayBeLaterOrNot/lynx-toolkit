@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="HorizontalAlignment.cs" company="Lynx">
+// <copyright file="HorizontalAlignment.cs" company="Lynx Toolkit">
 //   The MIT License (MIT)
 //   
 //   Copyright (c) 2012 Oystein Bjorke
@@ -27,7 +27,6 @@
 //   Defines the horizontal alignment.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace LynxToolkit.Documents.Spreadsheet
 {
     /// <summary>
@@ -38,17 +37,17 @@ namespace LynxToolkit.Documents.Spreadsheet
         /// <summary>
         /// The auto.
         /// </summary>
-        Auto, 
+        Auto,
 
         /// <summary>
         /// The left.
         /// </summary>
-        Left, 
+        Left,
 
         /// <summary>
         /// The center.
         /// </summary>
-        Center, 
+        Center,
 
         /// <summary>
         /// The right.

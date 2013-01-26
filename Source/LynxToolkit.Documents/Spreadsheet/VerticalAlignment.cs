@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="VerticalAlignment.cs" company="Lynx">
+// <copyright file="VerticalAlignment.cs" company="Lynx Toolkit">
 //   The MIT License (MIT)
 //   
 //   Copyright (c) 2012 Oystein Bjorke
@@ -27,7 +27,6 @@
 //   Defines the vertical alignment.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace LynxToolkit.Documents.Spreadsheet
 {
     /// <summary>
@@ -38,17 +37,17 @@ namespace LynxToolkit.Documents.Spreadsheet
         /// <summary>
         /// Automatic alignment.
         /// </summary>
-        Auto, 
+        Auto,
 
         /// <summary>
         /// Aligned at the top.
         /// </summary>
-        Top, 
+        Top,
 
         /// <summary>
         /// Aligned at the middle.
         /// </summary>
-        Middle, 
+        Middle,
 
         /// <summary>
         /// Aligned at the bottom.

@@ -1,5 +1,5 @@
-// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Program.cs" company="Lynx">
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="Program.cs" company="Lynx Toolkit">
 //   The MIT License (MIT)
 //   
 //   Copyright (c) 2012 Oystein Bjorke
@@ -23,6 +23,11 @@
 //   TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 //   SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // </copyright>
+// <summary>
+//   Utility to generate "MSDN-style" documentation. Output to html or wiki format.
+//   - Reads XML comments from the XML documentation files
+//   - Reflects the assemblies to find inheritance hierarchy and syntax
+// </summary>
 // --------------------------------------------------------------------------------------------------------------------
 namespace XmlDocT
 {
@@ -51,7 +56,7 @@ namespace XmlDocT
         public static void Main(string[] args)
         {
             var w = Stopwatch.StartNew();
-            Console.WriteLine(Application.Header);
+            Console.WriteLine(Utilities.ApplicationHeader);
 
             var doc = new DocFormatter();
             var input = new List<string>();
