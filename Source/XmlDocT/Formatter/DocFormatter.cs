@@ -70,6 +70,7 @@ namespace XmlDocT
             this.IndexPage = "Index";
             this.IndexTitle = null;
             this.LongHierarchyTypeNames = false;
+            this.Replacements = new Dictionary<string, string>();
         }
 
         public bool CreateMemberPages { get; set; }
@@ -97,6 +98,17 @@ namespace XmlDocT
         public string Template { get; set; }
 
         public int TopLevel { get; set; }
+
+        /// <summary>
+        /// Gets or sets the replacement strings.
+        /// </summary>
+        /// <value>
+        /// The replacement strings.
+        /// </value>
+        /// <remarks>
+        /// The replacement keys will be prefixed by "$" and replaced by their values.
+        /// </remarks>
+        public Dictionary<string, string> Replacements { get; set; }
 
         private Document doc { get; set; }
 
@@ -683,7 +695,7 @@ namespace XmlDocT
                         p.Content.Add(new NonBreakingSpace());
                     }
 
-                    p.Content.Add(this.CreateTypeLink(t.Type, false, true));
+                    p.Content.Add(this.CreateTypeLink(t.Type, false, this.LongHierarchyTypeNames));
                 }
 
                 this.doc.Blocks.Add(p);
@@ -695,7 +707,7 @@ namespace XmlDocT
             if (syntax != null)
             {
                 this.AddHeader("Syntax", topLevel + 1);
-                this.doc.Blocks.Add(new CodeBlock { Text = syntax });
+                this.doc.Blocks.Add(new CodeBlock { Text = syntax, Language = Language.Cs });
             }
 
             this.AddText(string.Format("The {0} type exposes the following members.", typeModel), null);
@@ -754,7 +766,7 @@ namespace XmlDocT
                 case "html":
                     {
                         var path = this.GetOutputFile(fileName);
-                        var options = new HtmlFormatterOptions { Css = this.StyleSheet, Template = this.Template };
+                        var options = new HtmlFormatterOptions { Css = this.StyleSheet, Template = this.Template, Replacements = this.Replacements };
                         if (this.SinglePage)
                         {
                             options.LocalLinkFormatString = "#{0}";

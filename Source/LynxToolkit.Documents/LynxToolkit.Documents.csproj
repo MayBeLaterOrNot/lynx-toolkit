@@ -46,6 +46,7 @@
     </Compile>
     <Compile Include="Text\Formatters\CodeplexFormatter.cs" />
     <Compile Include="Text\Formatters\ConfluenceFormatter.cs" />
+    <Compile Include="Text\Utilities\CsSyntaxHighlighter.cs" />
     <Compile Include="Text\Formatters\MarkdownFormatter.cs" />
     <Compile Include="Text\Formatters\CreoleFormatter.cs" />
     <Compile Include="Text\Formatters\DocumentFormatter.cs" />
@@ -61,6 +62,7 @@
     <Compile Include="Spreadsheet\Column.cs" />
     <Compile Include="Spreadsheet\Worksheet.cs" />
     <Compile Include="Spreadsheet\Style.cs" />
+    <Compile Include="Text\Utilities\XmlSyntaxHighlighter.cs" />
     <Compile Include="Text\Utilities\SymbolResolver.cs" />
     <Compile Include="Text\Formatters\WikiFormatterBase.cs" />
     <Compile Include="Text\Utilities\CharacterReplacements.cs" />

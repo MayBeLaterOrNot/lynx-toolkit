@@ -31,8 +31,11 @@ namespace WikiT
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Globalization;
     using System.IO;
     using System.Linq;
+    using System.Text;
 
     using LynxToolkit;
     using LynxToolkit.Documents;
@@ -60,6 +63,14 @@ namespace WikiT
         /// </summary>
         /// <value>The output format (html, docx, owiki, md, creole, xml).</value>
         public static string Format { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to force output to be written.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if output files should always be written; otherwise, <c>false</c>.
+        /// </value>
+        public static bool ForceOutput { get; set; }
 
         /// <summary>
         /// Gets or sets the output folder.
@@ -95,9 +106,12 @@ namespace WikiT
         public static string SpaceLinks { get; set; }
 
         /// <summary>
-        /// Gets or sets the defines.
+        /// Gets or sets the define constants.
         /// </summary>
-        /// <value>The defines.</value>
+        /// <value>The define constants.</value>
+        /// <remarks>
+        /// The defines can be used in "@if DEFINE" ... "@endif" blocks
+        /// </remarks>
         public static HashSet<string> Defines { get; set; }
 
         /// <summary>
@@ -106,6 +120,9 @@ namespace WikiT
         /// <value>
         /// The replacement strings.
         /// </value>
+        /// <remarks>
+        /// The replacement keys will be prefixed by "$" and replaced by their values.
+        /// </remarks>
         public static Dictionary<string, string> Replacements { get; set; }
 
         /// <summary>
@@ -152,6 +169,10 @@ namespace WikiT
                             continue;
                         case "/format":
                             Format = kv[1].ToLower();
+                            continue;
+                        case "/f":
+                        case "/forceoutput":
+                            ForceOutput = true;
                             continue;
                         case "/extension":
                             Extension = kv[1];
@@ -206,16 +227,27 @@ namespace WikiT
             var searchPattern = Path.GetFileName(Input);
 
             var files = Utilities.FindFiles(inputDirectory, searchPattern).ToList();
-            foreach (var f in files)
+            var w = Stopwatch.StartNew();
+            try
             {
-                Console.Write(f);
-                if (!Transform(f))
+                foreach (var f in files)
                 {
-                    Console.Write(" (no change)");
-                }
+                    Console.Write(f);
+                    if (!Transform(f))
+                    {
+                        Console.Write(" (no change)");
+                    }
 
-                Console.WriteLine();
+                    Console.WriteLine();
+                }
             }
+            catch (Exception e)
+            {
+                Console.WriteLine("Exception: " + e.Message);
+                return -1;
+            }
+
+            Console.WriteLine(string.Format(CultureInfo.InvariantCulture, "\nExecution time: {0:0.000} s", w.ElapsedMilliseconds * 0.001));
 
             return 0;
         }
@@ -269,7 +301,8 @@ namespace WikiT
                                           Css = Stylesheet,
                                           Template = Template,
                                           LocalLinkFormatString = LocalLinks,
-                                          SpaceLinkFormatString = SpaceLinks
+                                          SpaceLinkFormatString = SpaceLinks,
+                                          Replacements = Replacements,
                                       };
                     outputText = HtmlFormatter.Format(doc, options);
                     break;
@@ -278,9 +311,9 @@ namespace WikiT
                     throw new FormatException(string.Format("The output format '{0}' is not supported.", Format));
             }
 
-            if (Utilities.IsFileModified(outputPath, outputText))
+            if (Utilities.IsFileModified(outputPath, outputText) || ForceOutput)
             {
-                File.WriteAllText(outputPath, outputText);
+                File.WriteAllText(outputPath, outputText, Encoding.UTF8);
                 return true;
             }
 

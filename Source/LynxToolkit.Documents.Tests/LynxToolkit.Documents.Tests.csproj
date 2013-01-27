@@ -43,6 +43,8 @@
   <ItemGroup>
     <Compile Include="Spreadsheet\WorkbookLibrary.cs" />
     <Compile Include="Spreadsheet\WorkbookTests.cs" />
+    <Compile Include="Text\Utilities\XmlSyntaxHighligherTests.cs" />
+    <Compile Include="Text\Utilities\CsSyntaxHighligherTests.cs" />
     <Compile Include="Text\WikiTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

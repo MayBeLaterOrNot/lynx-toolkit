@@ -74,6 +74,28 @@ namespace XmlDocT
                     this.EnumMembers.Add(fm);
                 }
             }
+            else
+            {
+                var fields = type.GetFields(flags);
+                if (fields.Length > 0)
+                {
+                    foreach (var fi in fields)
+                    {
+                        if (fi.DeclaringType.Assembly != type.Assembly)
+                        {
+                            continue;
+                        }
+
+                        var fm = new FieldModel(this, fi);
+                        var memberNode = XmlUtilities.GetMemberNode(xmldoc, fm);
+                        fm.Description = XmlUtilities.GetXmlContent(memberNode, "summary");
+                        fm.Remarks = XmlUtilities.GetXmlContent(memberNode, "remarks");
+                        fm.Example = XmlUtilities.GetXmlContent(memberNode, "example");
+
+                        this.Fields.Add(fm);
+                    }
+                }
+            }
 
             var constructors = type.GetConstructors(flags);
             if (constructors.Length > 0)
@@ -122,27 +144,6 @@ namespace XmlDocT
                     pm.Example = XmlUtilities.GetXmlContent(memberNode, "example");
 
                     this.Properties.Add(pm);
-                }
-            }
-
-            var fields = type.GetFields(flags);
-            if (fields.Length > 0)
-            {
-                foreach (var fi in fields)
-                {
-                    if (fi.DeclaringType.Assembly != type.Assembly)
-                    {
-                        continue;
-                    }
-
-                    var fm = new FieldModel(this, fi);
-                    var memberNode = XmlUtilities.GetMemberNode(xmldoc, fm);
-                    fm.IsOverloaded = properties.Count(p => p.Name == fi.Name) > 1;
-                    fm.Description = XmlUtilities.GetXmlContent(memberNode, "summary");
-                    fm.Remarks = XmlUtilities.GetXmlContent(memberNode, "remarks");
-                    fm.Example = XmlUtilities.GetXmlContent(memberNode, "example");
-
-                    this.Fields.Add(fm);
                 }
             }
 

@@ -199,9 +199,10 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="..\..\LynxToolkit.Documents.Tests\Input\Example.wiki">
+    <Content Include="..\..\LynxToolkit.Documents.Tests\Input\Example.wiki">
       <Link>Example.wiki</Link>
-    </None>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="app.config" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">

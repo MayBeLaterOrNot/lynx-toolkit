@@ -107,6 +107,9 @@ namespace XmlDocT
                         case "/ignore":
                             doc.Model.IgnoreAttributes.Add(kv[1]);
                             continue;
+                        default:
+                            doc.Replacements.Add(kv[0].Trim('/'), kv[1]);
+                            continue;
                     }
                 }
 
@@ -186,10 +189,9 @@ namespace XmlDocT
             // Write the documentation pages
             doc.WritePages();
 
-            Console.WriteLine();
             Console.WriteLine(
                 string.Format(
-                    CultureInfo.InvariantCulture, "Completed in {0:0.0} seconds.", w.ElapsedMilliseconds * 1e-3));
+                    CultureInfo.InvariantCulture, "\nExecution time: {0:0.000} s.", w.ElapsedMilliseconds * 1e-3));
         }
     }
 }

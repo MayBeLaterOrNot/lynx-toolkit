@@ -81,6 +81,17 @@ namespace LynxToolkit.Documents
         public string SpaceLinkFormatString { get; set; }
 
         /// <summary>
+        /// Gets or sets the replacement strings.
+        /// </summary>
+        /// <value>
+        /// The replacement strings.
+        /// </value>
+        /// <remarks>
+        /// The replacement keys will be prefixed by "$" and replaced by their values.
+        /// </remarks>
+        public Dictionary<string, string> Replacements { get; set; }
+
+        /// <summary>
         ///     Gets or sets the template document (this will override the Css style sheet).
         /// </summary>
         public string Template { get; set; }
@@ -132,6 +143,17 @@ namespace LynxToolkit.Documents
 
                 // Read the contents of the template
                 html = File.ReadAllText(options.Template);
+
+                // Replace custom replacement strings
+                if (options.Replacements != null)
+                {
+                    foreach (var kvp in options.Replacements)
+                    {
+                        html = html.Replace("$" + kvp.Key, kvp.Value);
+                    }
+                }
+
+                // Replace standard fields
                 html = html.Replace("$title", doc.Title);
                 html = html.Replace("$keywords", doc.Keywords);
                 html = html.Replace("$description", doc.Description);
@@ -362,7 +384,7 @@ namespace LynxToolkit.Documents
             this.w.WriteStartElement("pre");
             this.WriteAttributes(codeBlock);
             this.w.WriteRaw("<code>");
-            this.w.WriteRaw(codeBlock.Text);
+            this.w.WriteRaw(HighlightSyntax(Encode(codeBlock.Text), codeBlock.Language));
             this.w.WriteRaw("</code>");
             this.w.WriteEndElement();
         }
@@ -417,7 +439,7 @@ namespace LynxToolkit.Documents
         {
             this.w.WriteStartElement("code");
             this.WriteAttributes(inlineCode);
-            this.w.WriteRaw(inlineCode.Code);
+            this.w.WriteRaw(HighlightSyntax(Encode(inlineCode.Code), inlineCode.Language));
             this.w.WriteEndElement();
         }
 
@@ -483,6 +505,19 @@ namespace LynxToolkit.Documents
             }
 
             return text;
+        }
+
+        private static string HighlightSyntax(string text, Language language)
+        {
+            switch (language)
+            {
+                case Language.Cs:
+                    return CsSyntaxHighlighter.Highlight(text);
+                case Language.Xml:
+                    return XmlSyntaxHighlighter.Highlight(text);
+                default:
+                    return text;
+            }
         }
 
         private void WriteStartDocument()
