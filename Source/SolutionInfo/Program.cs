@@ -23,142 +23,208 @@
 //   TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 //   SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // </copyright>
+// <summary>
+//   Defines the Program type.
+// </summary>
 // --------------------------------------------------------------------------------------------------------------------
-using System;
-using System.Collections.Generic;
 
 namespace SolutionInfo
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
     using System.IO;
     using System.Linq;
     using System.Text.RegularExpressions;
     using System.Xml;
 
     using LynxToolkit;
+    using LynxToolkit.Documents.OpenXml;
+    using LynxToolkit.Documents.Spreadsheet;
 
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void ExportSolutionInfo(string solutionFile)
         {
-            Console.WriteLine(LynxToolkit.Utilities.ApplicationHeader);
-
-            var clean = false;
-            foreach (var arg in args)
-            {
-                if (arg == "/Clean")
-                {
-                    clean = true;
-                    continue;
-                }
-
-                ExportSolutionInfo(arg, clean);
-            }
-        }
-
-        static void ExportSolutionInfo(string solutionFile, bool clean)
-        {
-            var dir = Path.GetDirectoryName(solutionFile);
             var solution = new Solution(solutionFile);
-
-            var solutionFileName = Path.GetFileName(solutionFile);
-
-            var projectsFile = Path.ChangeExtension(solutionFileName, ".Projects.csv");
-            var referencesFile = Path.ChangeExtension(solutionFileName, ".References.csv");
-            var projectReferencesFile = Path.ChangeExtension(solutionFileName, ".ProjectReferences.csv");
-            var configurationsFile = Path.ChangeExtension(solutionFileName, ".Configurations.csv");
+            var outputFile = Path.ChangeExtension(solutionFile, ".xlsx");
 
             Console.WriteLine("Solution file:");
             Console.WriteLine("  " + solutionFile);
             Console.WriteLine();
 
             Console.WriteLine("Output files:");
-            Console.WriteLine("  " + projectsFile);
-            Console.WriteLine("  " + referencesFile);
-            Console.WriteLine("  " + projectReferencesFile);
-            Console.WriteLine("  " + configurationsFile);
+            Console.WriteLine("  " + outputFile);
             Console.WriteLine();
 
             Console.WriteLine("Project files:");
             foreach (var p in solution.Projects.Where(IsCSProject))
             {
-                Console.WriteLine("  " + Path.GetFileName(p));
+                Console.WriteLine("  " + Path.GetFileName(p.FilePath));
             }
 
-            var projects = new List<Project>();
-            using (var ps = new StreamWriter(projectsFile))
+            var wb = new Workbook();
+            var s1 = wb.AddSheet("Projects");
+            s1[0, 0] = "Project";
+            s1[0, 1] = "AssemblyName";
+            s1[0, 2] = "RootNamespace";
+            s1[0, 3] = "TargetFrameworkVersion";
+            s1[0, 4] = "TargetFrameworkProfile";
+            s1[0, 5] = "SignAssembly";
+            s1[0, 6] = "ProjectGuid";
+            s1[0, 7] = "ProjectGuid (in .sln)";
+
+            int i = 1;
+            foreach (var project in solution.Projects.Where(IsCSProject))
             {
-                ps.WriteLine("Project;AssemblyName;RootNamespace;TargetFrameworkVersion;TargetFrameworkProfile;SignAssembly");
-                foreach (var projectFile in solution.Projects.Where(IsCSProject))
+                s1[i, 0] = project.File;
+                s1[i, 1] = project.AssemblyName;
+                s1[i, 2] = project.RootNamespace;
+                s1[i, 3] = project.TargetFrameworkVersion;
+                s1[i, 4] = project.TargetFrameworkProfile;
+                s1[i, 5] = project.SignAssembly;
+                s1[i, 6] = project.ProjectGuid;
+                if (string.Compare(
+                    project.SolutionProjectGuid, project.ProjectGuid, StringComparison.InvariantCultureIgnoreCase) != 0)
                 {
-                    var path = Path.Combine(dir, projectFile);
-                    var project = new Project(path, clean);
-                    ps.WriteLine(
-                        "{0};{1};{2};{3};{4};{5}",
-                        projectFile,
-                        project.AssemblyName,
-                        project.RootNamespace,
-                        project.TargetFrameworkVersion,
-                        project.TargetFrameworkProfile,
-                        project.SignAssembly);
-
-                    projects.Add(project);
+                    s1[i, 7] = project.SolutionProjectGuid;
                 }
+                else
+                {
+                    s1[i, 7] = "ok";
+                }
+
+                i++;
             }
 
-            using (var rs = new StreamWriter(referencesFile))
+            s1.AutoSizeColumns();
+
+            var s2 = wb.AddSheet("References");
+            s2[0, 0] = "Project";
+            s2[0, 1] = "Include";
+            s2[0, 2] = "RequiredTargetFramework";
+            s2[0, 3] = "SpecificVersion";
+            s2[0, 4] = "HintPath";
+
+            i = 1;
+            foreach (var r in solution.Projects.SelectMany(p => p.References).OrderBy(r => r.Include))
             {
-                rs.WriteLine("Project;Include;RequiredTargetFramework;SpecificVersion;HintPath");
-                foreach (var r in projects.SelectMany(p => p.References).OrderBy(r => r.Include))
-                {
-                    rs.WriteLine(
-                        "{0};{1};{2};{3};{4}",
-                        r.ReferencingProject.AssemblyName,
-                        r.Include,
-                        r.RequiredTargetFramework == null ? null : string.Format("\"v{0}\"", r.RequiredTargetFramework),
-                        r.SpecificVersion,
-                        r.HintPath);
-                }
+                s2[i, 0] = r.ReferencingProject.AssemblyName;
+                s2[i, 1] = r.Include;
+                s2[i, 2] = r.RequiredTargetFramework;
+                s2[i, 3] = r.SpecificVersion;
+                s2[i, 4] = r.HintPath;
+                i++;
             }
 
-            using (var prs = new StreamWriter(projectReferencesFile))
+            s2.AutoSizeColumns();
+
+            var s3 = wb.AddSheet("ProjectReferences");
+            s3[0, 0] = "Project";
+            s3[0, 1] = "Include";
+            s3[0, 2] = "Name";
+            s3[0, 3] = "Guid";
+            s3[0, 4] = "Guid (in project)";
+
+            i = 1;
+
+            foreach (var r in solution.Projects.SelectMany(p => p.ProjectReferences).OrderBy(r => r.Include))
             {
-                prs.WriteLine("Project;Include;Name;Guid");
+                s3[i, 0] = r.ReferencingProject.AssemblyName;
+                s3[i, 1] = r.Include;
+                s3[i, 2] = r.Name;
+                s3[i, 3] = r.Project;
 
-                foreach (var r in projects.SelectMany(p => p.ProjectReferences).OrderBy(r => r.Include))
+                var p2 = solution.Projects.FirstOrDefault(p => p.FilePath == r.Include);
+                if (p2 != null)
                 {
-                    prs.WriteLine("{0};{1};{2};{3}",
-                        r.ReferencingProject.AssemblyName,
-                        r.Include,
-                        r.Name,
-                        r.Project);
+                    if (string.Equals(p2.ProjectGuid, r.Project, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        s3[i, 4] = "ok";
+                    }
+                    else
+                    {
+                        s3[i, 4] = p2.ProjectGuid;
+                    }
                 }
+                else
+                {
+                    s3[i, 4] = "not found";
+                }
+
+                i++;
             }
 
-            using (var cs = new StreamWriter(configurationsFile))
+            s3.AutoSizeColumns();
+
+            var s4 = wb.AddSheet("Configurations");
+            s4[0, 0] = "Project";
+            s4[0, 1] = "Configuration";
+            s4[0, 2] = "Platform";
+            s4[0, 3] = "DebugType";
+            s4[0, 4] = "Optimize";
+            s4[0, 5] = "OutputPath";
+            s4[0, 6] = "DefineConstants";
+            s4[0, 7] = "ErrorReport";
+            s4[0, 8] = "WarningLevel";
+            s4[0, 9] = "CodeAnalysisRuleSet";
+            s4[0, 10] = "DocumentationFile";
+
+            i = 1;
+            foreach (var c in solution.Projects.SelectMany(p => p.Configurations).OrderBy(c => c.Configuration))
             {
-                cs.WriteLine("Project;Configuration;Platform;DebugType;Optimize;OutputPath;DefineConstants;ErrorReport;WarningLevel;CodeAnalysisRuleSet;DocumentationFile");
-                foreach (var c in projects.SelectMany(p => p.Configurations).OrderBy(c => c.Configuration))
-                {
-                    cs.WriteLine(
-                        "{0};{1};{2};{3};{4};{5};{6};{7};{8};{9};{10}",
-                        c.Project.AssemblyName,
-                        c.Configuration,
-                        c.Platform,
-                        c.DebugType,
-                        c.Optimize,
-                        c.OutputPath,
-                        "\"" + c.DefineConstants + "\"",
-                        c.ErrorReport,
-                        c.WarningLevel,
-                        c.CodeAnalysisRuleSet,
-                        c.DocumentationFile);
-                }
+                s4[i, 0] = c.Project.AssemblyName;
+                s4[i, 1] = c.Configuration;
+                s4[i, 2] = c.Platform;
+                s4[i, 3] = c.DebugType;
+                s4[i, 4] = c.Optimize;
+                s4[i, 5] = c.OutputPath;
+                s4[i, 6] = c.DefineConstants;
+                s4[i, 7] = c.ErrorReport;
+                s4[i, 8] = c.WarningLevel;
+                s4[i, 9] = c.CodeAnalysisRuleSet;
+                s4[i, 10] = c.DocumentationFile;
+
+                i++;
             }
+
+            s4.AutoSizeColumns();
+
+
+            ExcelWriter.Export(wb, outputFile);
+            Process.Start(outputFile);
         }
 
-        private static bool IsCSProject(string s)
+        private static bool IsCSProject(Project p)
         {
-            return s.Contains(".csproj");
+            return p.FilePath.Contains(".csproj");
+        }
+
+        private static void Main(string[] args)
+        {
+            Console.WriteLine(Utilities.ApplicationHeader);
+
+            foreach (var arg in args)
+            {
+                if (arg.Contains("*"))
+                {
+                    var dir = Path.GetDirectoryName(arg);
+                    var pattern = Path.GetFileName(arg);
+                    if (dir == string.Empty)
+                    {
+                        dir = ".";
+                    }
+
+                    foreach (var f in Directory.GetFiles(dir, pattern))
+                    {
+                        ExportSolutionInfo(f);
+                    }
+
+                    continue;
+                }
+
+                ExportSolutionInfo(arg);
+            }
         }
     }
 
@@ -166,273 +232,367 @@ namespace SolutionInfo
     {
         public Solution(string path)
         {
-            Projects = new List<string>(GetSolutionProjects(path));
+            this.Projects = new List<Project>(GetSolutionProjects(path));
         }
 
-        public IList<string> Projects { get; private set; }
+        public IList<Project> Projects { get; private set; }
 
-        private static IEnumerable<string> GetSolutionProjects(string path)
+        private static IEnumerable<Project> GetSolutionProjects(string path)
         {
-            var r = new StreamReader(path);
-            var content = r.ReadToEnd();
-            var regex = new Regex("^Project\\(\".*\"\\) = \"(.*?)\", \"(.*?)\"", RegexOptions.Multiline);
+            var content = File.ReadAllText(path);
+            var dir = Path.GetDirectoryName(path);
+            var regex = new Regex(
+                "^Project\\(\"(.*)\"\\) = \"([^\"]*)\", \"([^\"]*)\", \"([^\"]*)\"", RegexOptions.Multiline);
             foreach (Match m in regex.Matches(content))
             {
-                var name = m.Groups[1].Value;
-                var file = m.Groups[2].Value;
-                yield return file;
+                var projectTypeGuid = m.Groups[1].Value;
+                var name = m.Groups[2].Value;
+                var file = m.Groups[3].Value;
+                var projectGuid = m.Groups[4].Value;
+                var filePath = Path.Combine(dir, file);
+                if (!File.Exists(filePath))
+                {
+                    continue;
+                }
+
+                var project = new Project(filePath, projectGuid);
+                yield return project;
+
+                if (project.ProjectGuid != projectGuid)
+                {
+                    Console.WriteLine("ProjectGuid mismatch (" + file + ")");
+                    Console.WriteLine("  " + path + ": " + projectGuid);
+                    Console.WriteLine("  " + file + ": " + project.ProjectGuid);
+                    Console.WriteLine();
+                }
             }
         }
-
     }
 
     public class Reference
     {
-        public Project ReferencingProject { get; set; }
-        public string Include { get; set; }
-        public string RequiredTargetFramework { get; set; }
-        public bool SpecificVersion { get; set; }
         public string HintPath { get; set; }
+
+        public string Include { get; set; }
+
+        public Project ReferencingProject { get; set; }
+
+        public string RequiredTargetFramework { get; set; }
+
+        public bool SpecificVersion { get; set; }
     }
 
     public class ProjectReference
     {
-        public Project ReferencingProject { get; set; }
         public string Include { get; set; }
-        public string Project { get; set; }
+
         public string Name { get; set; }
+
+        public string Project { get; set; }
+
+        public Project ReferencingProject { get; set; }
     }
 
     public class Condition
     {
-        public Project Project { get; set; }
-        public string Configuration { get; set; }
-        public string Platform { get; set; }
-        public string DebugType { get; set; }
-        public string Optimize { get; set; }
-        public string OutputPath { get; set; }
-        public string DefineConstants { get; set; }
-        public string ErrorReport { get; set; }
-        public string WarningLevel { get; set; }
         public string CodeAnalysisRuleSet { get; set; }
+
+        public string Configuration { get; set; }
+
+        public string DebugType { get; set; }
+
+        public string DefineConstants { get; set; }
+
         public string DocumentationFile { get; set; }
+
+        public string ErrorReport { get; set; }
+
+        public string Optimize { get; set; }
+
+        public string OutputPath { get; set; }
+
+        public string Platform { get; set; }
+
+        public Project Project { get; set; }
+
+        public string WarningLevel { get; set; }
     }
 
     public class Project
     {
-        public IList<string> IncludeFiles { get; set; }
-        public IList<Reference> References { get; set; }
-        public IList<ProjectReference> ProjectReferences { get; set; }
-        public IList<Condition> Configurations { get; set; }
+        private readonly XmlDocument doc;
 
-        public string AssemblyName { get; private set; }
-        public string RootNamespace { get; private set; }
+        private readonly XmlNamespaceManager nsmgr;
 
-        public string SccProjectName { get; private set; }
-        public string SccLocalPath { get; private set; }
-        public string SccAuxPath { get; private set; }
-        public string SccProvider { get; private set; }
+        private bool modified = false;
 
-        public string TargetFrameworkVersion { get; private set; }
-        public string TargetFrameworkProfile { get; private set; }
-        public string SignAssembly { get; set; }
+        public string FilePath { get; set; }
 
-        private XmlDocument doc;
-        private XmlNamespaceManager nsmgr;
-
-        public Project(string path, bool clean = false)
+        public Project(string filePath, string projectGuidInSolutionFile)
         {
-            bool modified = false;
+            this.FilePath = Path.GetFullPath(filePath);
+            var dir = Path.GetDirectoryName(this.FilePath);
 
-            IncludeFiles = new List<string>();
-            References = new List<Reference>();
-            ProjectReferences = new List<ProjectReference>();
-            Configurations = new List<Condition>();
+            this.SolutionProjectGuid = projectGuidInSolutionFile;
+            this.IncludeFiles = new List<string>();
+            this.References = new List<Reference>();
+            this.ProjectReferences = new List<ProjectReference>();
+            this.Configurations = new List<Condition>();
 
             // load xml file
-            doc = new XmlDocument();
-            doc.Load(path);
+            this.doc = new XmlDocument();
+            this.doc.Load(filePath);
 
-            nsmgr = new XmlNamespaceManager(doc.NameTable);
-            nsmgr.AddNamespace("b", "http://schemas.microsoft.com/developer/msbuild/2003");
+            this.nsmgr = new XmlNamespaceManager(this.doc.NameTable);
+            this.nsmgr.AddNamespace("b", "http://schemas.microsoft.com/developer/msbuild/2003");
 
-            var root = doc.DocumentElement;
-            if (root == null) return;
-
-            this.AssemblyName = GetValue(root, "//b:Project/b:PropertyGroup/b:AssemblyName");
-            this.RootNamespace = GetValue(root, "//b:Project/b:PropertyGroup/b:RootNamespace");
-
-            this.SccProjectName = GetValue(root, "//b:Project/b:PropertyGroup/b:SccProjectName");
-            this.SccLocalPath = GetValue(root, "//b:Project/b:PropertyGroup/b:SccLocalPath");
-            this.SccAuxPath = GetValue(root, "//b:Project/b:PropertyGroup/b:SccAuxPath");
-            this.SccProvider = GetValue(root, "//b:Project/b:PropertyGroup/b:SccProvider");
-
-            if (clean)
+            var root = this.doc.DocumentElement;
+            if (root == null)
             {
-                // SAK is a flag that tells Visual Studio/SSMS the project is under source control, and the real bindings
-                // are persisted in the mssccprj.scc files. So, Visual Studio/SSMS reads them from there and uses them when needed.
-                modified |= SetValue(root, "//b:Project/b:PropertyGroup/b:SccProjectName", "SAK");
-                modified |= SetValue(root, "//b:Project/b:PropertyGroup/b:SccLocalPath", "SAK");
-                modified |= SetValue(root, "//b:Project/b:PropertyGroup/b:SccAuxPath", "SAK");
-                modified |= SetValue(root, "//b:Project/b:PropertyGroup/b:SccProvider", "SAK");
+                return;
             }
 
-            this.TargetFrameworkVersion = GetValue(root, "//b:Project/b:PropertyGroup/b:TargetFrameworkVersion");
-            this.TargetFrameworkProfile = GetValue(root, "//b:Project/b:PropertyGroup/b:TargetFrameworkProfile");
-            this.SignAssembly = GetValue(root, "//b:Project/b:PropertyGroup/b:SignAssembly");
+            this.AssemblyName = this.GetValue(root, "//b:Project/b:PropertyGroup/b:AssemblyName");
+            this.RootNamespace = this.GetValue(root, "//b:Project/b:PropertyGroup/b:RootNamespace");
+            this.ProjectGuid = this.GetValue(root, "//b:Project/b:PropertyGroup/b:ProjectGuid");
 
-            var dir = Path.GetDirectoryName(path);
+            this.SccProjectName = this.GetValue(root, "//b:Project/b:PropertyGroup/b:SccProjectName");
+            this.SccLocalPath = this.GetValue(root, "//b:Project/b:PropertyGroup/b:SccLocalPath");
+            this.SccAuxPath = this.GetValue(root, "//b:Project/b:PropertyGroup/b:SccAuxPath");
+            this.SccProvider = this.GetValue(root, "//b:Project/b:PropertyGroup/b:SccProvider");
 
-            foreach (XmlNode node in root.SelectNodes("//b:Compile", nsmgr))
+            this.TargetFrameworkVersion = this.GetValue(root, "//b:Project/b:PropertyGroup/b:TargetFrameworkVersion");
+            this.TargetFrameworkProfile = this.GetValue(root, "//b:Project/b:PropertyGroup/b:TargetFrameworkProfile");
+            this.SignAssembly = this.GetValue(root, "//b:Project/b:PropertyGroup/b:SignAssembly");
+
+            foreach (XmlNode node in root.SelectNodes("//b:Compile", this.nsmgr))
             {
                 var include = GetAttribute(node, "Include");
-                IncludeFiles.Add(Path.Combine(dir, include));
+                this.IncludeFiles.Add(Path.Combine(dir, include));
             }
 
-            foreach (XmlNode node in root.SelectNodes("//b:ItemGroup/b:Reference", nsmgr))
+            foreach (XmlNode node in root.SelectNodes("//b:ItemGroup/b:Reference", this.nsmgr))
             {
-                if (node == null) continue;
+                if (node == null)
+                {
+                    continue;
+                }
 
                 var r = new Reference
-                    {
-                        Include = GetAttribute(node, "Include"),
-                        ReferencingProject = this,
-                        RequiredTargetFramework = this.GetValue(node, "b:RequiredTargetFramework"),
-                        SpecificVersion = string.Equals(this.GetValue(node, "b:SpecificVersion"), "TRUE", StringComparison.InvariantCultureIgnoreCase),
-                        HintPath = this.GetValue(node, "b:HintPath")
-                    };
+                            {
+                                Include = GetAttribute(node, "Include"),
+                                ReferencingProject = this,
+                                RequiredTargetFramework = this.GetValue(node, "b:RequiredTargetFramework"),
+                                SpecificVersion =
+                                    string.Equals(
+                                        this.GetValue(node, "b:SpecificVersion"),
+                                        "TRUE",
+                                        StringComparison.InvariantCultureIgnoreCase),
+                                HintPath = this.GetValue(node, "b:HintPath")
+                            };
 
-                References.Add(r);
-
-                if (clean)
-                {
-                    modified |= SetAttribute(node, "Include", r.Include.SubstringTo(","));
-                    modified |= this.SetValue(node, "b:RequiredTargetFramework", null);
-                    modified |= this.SetValue(node, "b:SpecificVersion", null);
-                }
+                this.References.Add(r);
             }
 
-            foreach (XmlNode node in root.SelectNodes("//b:ItemGroup/b:ProjectReference", nsmgr))
+            foreach (XmlNode node in root.SelectNodes("//b:ItemGroup/b:ProjectReference", this.nsmgr))
             {
-                if (node == null) continue;
+                if (node == null)
+                {
+                    continue;
+                }
 
+                var include = GetAttribute(node, "Include");
+                var includeFullPath = Path.GetFullPath(Path.Combine(dir, include));
                 var pr = new ProjectReference
-                    {
-                        ReferencingProject = this,
-                        Include = GetAttribute(node, "Include"),
-                        Project = this.GetValue(node, "b:Project"),
-                        Name = this.GetValue(node, "b:Name")
-                    };
-                ProjectReferences.Add(pr);
-
-                if (clean)
-                {
-                    modified |= SetAttribute(node, "Include", pr.Include.SubstringTo(","));
-                }
+                             {
+                                 ReferencingProject = this,
+                                 Include = includeFullPath,
+                                 Project = this.GetValue(node, "b:Project"),
+                                 Name = this.GetValue(node, "b:Name")
+                             };
+                this.ProjectReferences.Add(pr);
             }
 
-            foreach (XmlNode node in root.SelectNodes("//b:PropertyGroup", nsmgr))
+            foreach (XmlNode node in root.SelectNodes("//b:PropertyGroup", this.nsmgr))
             {
-                if (node == null) continue;
+                if (node == null)
+                {
+                    continue;
+                }
+
                 var condition = GetAttribute(node, "Condition");
-                if (condition == null) continue;
+                if (condition == null)
+                {
+                    continue;
+                }
 
                 var r1 = new Regex(@".*\|.*==.*'(.+)\|(.+)'");
                 var m = r1.Match(condition);
-                if (!m.Success) continue;
-
-                var c = new Condition
-                    {
-                        Project = this,
-                        Configuration = m.Groups[1].Value.Trim(),
-                        Platform = m.Groups[2].Value.Trim(),
-                        DebugType = this.GetValue(node, "b:DebugType"),
-                        Optimize = this.GetValue(node, "b:Optimize"),
-                        OutputPath = this.GetValue(node, "b:OutputPath"),
-                        DefineConstants = this.GetValue(node, "b:DefineConstants"),
-                        ErrorReport = this.GetValue(node, "b:ErrorReport"),
-                        WarningLevel = this.GetValue(node, "b:WarningLevel"),
-                        CodeAnalysisRuleSet = this.GetValue(node, "b:CodeAnalysisRuleSet"),
-                        DocumentationFile = this.GetValue(node, "b:DocumentationFile"),
-                    };
-
-                if (clean)
+                if (!m.Success)
                 {
-                    if (c.Configuration == "Debug")
-                    {
-                        modified |= this.SetValue(node, "b:OutputPath", @"bin\Debug\");
-                        modified |= this.SetValue(node, "b:DocumentationFile", null);
-                    }
-                    else
-                    {
-                        if (!c.Project.AssemblyName.Contains("Tests"))
-                        {
-                            var docfile = c.OutputPath + c.Project.AssemblyName + ".XML";
-                            modified |= this.SetValue(node, "b:DocumentationFile", docfile);
-                        }
-                    }
-                    modified |= this.SetValue(node, "b:WarningLevel", "4");
-                    modified |= this.SetValue(node, "b:CodeAnalysisRuleSet", "AllRules.ruleset");
+                    continue;
                 }
 
-                Configurations.Add(c);
+                var c = new Condition
+                            {
+                                Project = this,
+                                Configuration = m.Groups[1].Value.Trim(),
+                                Platform = m.Groups[2].Value.Trim(),
+                                DebugType = this.GetValue(node, "b:DebugType"),
+                                Optimize = this.GetValue(node, "b:Optimize"),
+                                OutputPath = this.GetValue(node, "b:OutputPath"),
+                                DefineConstants = this.GetValue(node, "b:DefineConstants"),
+                                ErrorReport = this.GetValue(node, "b:ErrorReport"),
+                                WarningLevel = this.GetValue(node, "b:WarningLevel"),
+                                CodeAnalysisRuleSet = this.GetValue(node, "b:CodeAnalysisRuleSet"),
+                                DocumentationFile = this.GetValue(node, "b:DocumentationFile"),
+                            };
+
+                this.Configurations.Add(c);
+            }
+        }
+
+        public void Clean()
+        {
+            var root = this.doc.DocumentElement;
+            if (root == null)
+            {
+                return;
             }
 
-            if (clean && modified)
+            // SAK is a flag that tells Visual Studio/SSMS the project is under source control, and the real bindings
+            // are persisted in the mssccprj.scc files. So, Visual Studio/SSMS reads them from there and uses them when needed.
+            //modified |= this.SetValue(root, "//b:Project/b:PropertyGroup/b:SccProjectName", "SAK");
+            //modified |= this.SetValue(root, "//b:Project/b:PropertyGroup/b:SccLocalPath", "SAK");
+            //modified |= this.SetValue(root, "//b:Project/b:PropertyGroup/b:SccAuxPath", "SAK");
+            //modified |= this.SetValue(root, "//b:Project/b:PropertyGroup/b:SccProvider", "SAK");
+
+            //foreach (XmlNode node in root.SelectNodes("//b:ItemGroup/b:Reference", this.nsmgr))
+            //{
+            //    if (node == null)
+            //    {
+            //        continue;
+            //    }
+
+            //    modified |= this.SetAttribute(node, "Include", r.Include.SubstringTo(","));
+            //    modified |= this.SetValue(node, "b:RequiredTargetFramework", null);
+            //    modified |= this.SetValue(node, "b:SpecificVersion", null);
+            //}
+
+            //if (clean)
+            //{
+            //    if (c.Configuration == "Debug")
+            //    {
+            //        modified |= this.SetValue(node, "b:OutputPath", @"bin\Debug\");
+            //        modified |= this.SetValue(node, "b:DocumentationFile", null);
+            //    }
+            //    else
+            //    {
+            //        if (!c.Project.AssemblyName.Contains("Tests"))
+            //        {
+            //            var docfile = c.OutputPath + c.Project.AssemblyName + ".XML";
+            //            modified |= this.SetValue(node, "b:DocumentationFile", docfile);
+            //        }
+            //    }
+
+            //    modified |= this.SetValue(node, "b:WarningLevel", "4");
+            //    modified |= this.SetValue(node, "b:CodeAnalysisRuleSet", "AllRules.ruleset");
+            //}
+
+
+        }
+
+        public void SaveIfModified()
+        {
+            if (modified)
             {
                 Console.WriteLine("  Saving changes.");
-                doc.Save(path);
+                this.doc.Save(this.FilePath);
             }
         }
 
-        private bool SetAttribute(XmlNode node, string attributeName, string s)
-        {
-            if (node == null) return false;
-            var value = GetAttribute(node, attributeName);
-            if (string.Equals(s, value)) return false;
-            node.Attributes[attributeName].InnerText = s;
-            Console.WriteLine("  Changed {0}/{1} to {2}", node.Name, attributeName, s);
+        public string AssemblyName { get; private set; }
 
-            return true;
-        }
+        public IList<Condition> Configurations { get; set; }
 
-        private static string GetAttribute(XmlNode node, string attributeName)
-        {
-            if (node == null || node.Attributes[attributeName] == null) return null;
-            return node.Attributes[attributeName].InnerText;
-        }
+        public IList<string> IncludeFiles { get; set; }
 
-        public string GetValue(XmlNode node, string xpath)
+        public IList<ProjectReference> ProjectReferences { get; set; }
+
+        public IList<Reference> References { get; set; }
+
+        public string ProjectGuid { get; private set; }
+
+        public string SolutionProjectGuid { get; private set; }
+
+        public string RootNamespace { get; private set; }
+
+        public string SccAuxPath { get; private set; }
+
+        public string SccLocalPath { get; private set; }
+
+        public string SccProjectName { get; private set; }
+
+        public string SccProvider { get; private set; }
+
+        public string SignAssembly { get; set; }
+
+        public string TargetFrameworkProfile { get; private set; }
+
+        public string TargetFrameworkVersion { get; private set; }
+
+        public string File
         {
-            var node2 = node.SelectSingleNode(xpath, nsmgr);
-            if (node2 == null) return null;
-            return node2.InnerText;
+            get
+            {
+                return Path.GetFileName(this.FilePath);
+            }
         }
 
         public bool CleanElement(XmlNode node)
         {
             // remove end tag from empty element
             var element1 = node as XmlElement;
-            if (element1 != null && string.IsNullOrEmpty(element1.InnerText) && !element1.IsEmpty && !element1.HasChildNodes)
+            if (element1 != null && string.IsNullOrEmpty(element1.InnerText) && !element1.IsEmpty
+                && !element1.HasChildNodes)
             {
                 element1.IsEmpty = true;
                 return true;
             }
+
             return false;
+        }
+
+        public string GetValue(XmlNode node, string xpath)
+        {
+            var node2 = node.SelectSingleNode(xpath, this.nsmgr);
+            if (node2 == null)
+            {
+                return null;
+            }
+
+            return node2.InnerText;
         }
 
         public bool SetValue(XmlNode node, string xpath, string value)
         {
-            var modified = CleanElement(node);
+            var modified = this.CleanElement(node);
 
-            var node2 = node.SelectSingleNode(xpath, nsmgr);
-            if (node2 == null) return modified;
+            var node2 = node.SelectSingleNode(xpath, this.nsmgr);
+            if (node2 == null)
+            {
+                return modified;
+            }
 
-            if (string.Equals(node2.InnerText, value)) return modified;
+            if (string.Equals(node2.InnerText, value))
+            {
+                return modified;
+            }
+
             if (value == null)
             {
                 node2.ParentNode.RemoveChild(node2);
-                CleanElement(node2.ParentNode);
+                this.CleanElement(node2.ParentNode);
             }
             else
             {
@@ -442,6 +602,34 @@ namespace SolutionInfo
             Console.WriteLine("  Changed {0} to {1}", node2.Name, value ?? "null");
             return true;
         }
-    }
 
+        private static string GetAttribute(XmlNode node, string attributeName)
+        {
+            if (node == null || node.Attributes[attributeName] == null)
+            {
+                return null;
+            }
+
+            return node.Attributes[attributeName].InnerText;
+        }
+
+        private bool SetAttribute(XmlNode node, string attributeName, string s)
+        {
+            if (node == null)
+            {
+                return false;
+            }
+
+            var value = GetAttribute(node, attributeName);
+            if (string.Equals(s, value))
+            {
+                return false;
+            }
+
+            node.Attributes[attributeName].InnerText = s;
+            Console.WriteLine("  Changed {0}/{1} to {2}", node.Name, attributeName, s);
+
+            return true;
+        }
+    }
 }

@@ -315,5 +315,20 @@ namespace LynxToolkit.Documents.Spreadsheet
                 }
             }
         }
+
+        public void AutoSizeColumns()
+        {
+            var maxColumn = this.Cells.Max(c => c.Column);
+            while (this.Columns.Count <= maxColumn)
+            {
+                this.AddColumn();
+            }
+
+            for (int i = 0; i < this.Columns.Count; i++)
+            {
+                var maxLength = this.Cells.Where(c => c.Column == i).Max(c => c.ToString().Length);
+                this.Columns[i].Width = maxLength;
+            }
+        }
     }
 }
