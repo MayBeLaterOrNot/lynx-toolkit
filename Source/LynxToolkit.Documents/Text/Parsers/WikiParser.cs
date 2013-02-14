@@ -40,9 +40,9 @@ namespace LynxToolkit.Documents
 
         private static readonly Regex DirectivesExpression;
 
-        private static readonly Regex IncludeExpression;
+        private static readonly Regex ContentExpression;
 
-        private static readonly Regex ImportExpression;
+        private static readonly Regex IncludeExpression;
 
         static WikiParser()
         {
@@ -61,16 +61,15 @@ namespace LynxToolkit.Documents
 (?:includepath \s (?<includepath>.+?) \r?\n)
 )", RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
-            IncludeExpression = new Regex(@"(?<=[^\\]|^)     # Not escaped
+            ContentExpression = new Regex(@"(?<=[^\\]|^)     # Not escaped
 (?:
-(@include \s (?<include>.+?) \r?\n)|
 (@import \s (?<import>.+?) \r?\n)|
 (?<index>@index .*? \r?\n)|
 (?<toc>@toc \s* (?<levels>\d+)? .*? \r?\n)
 )", RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
-            ImportExpression = new Regex(@"(?<=[^\\]|^)     # Not escaped
-(@import \s (?<import>.+?) \r?\n)", RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+            IncludeExpression = new Regex(@"(?<=[^\\]|^)     # Not escaped
+(@include \s (?<include>.+?) \r?\n)", RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
             DefineExpression = new Regex(
                 @"^\s*@if\s+(?<criteria>.+?)\s*$(?<block>.*?)^@endif",
@@ -164,24 +163,25 @@ namespace LynxToolkit.Documents
                     return string.Empty;
                 });
 
-            text = ImportExpression.Replace(
+            text = IncludeExpression.Replace(
                 text,
                 m =>
                 {
-                    var importFile = m.Groups["import"].Value;
-                    var importFilePath = ResolveInclude(importFile, documentFolder, includepaths, includeDefaultExtension);
-                    if (importFilePath == null)
+                    var includeFile = m.Groups["include"].Value;
+                    var includeFilePath = ResolveInclude(includeFile, documentFolder, includepaths, includeDefaultExtension);
+                    if (includeFilePath == null)
                     {
-                        throw new FileNotFoundException("Import file not found (" + importFile + ")", importFile);
+                        throw new FileNotFoundException("Include file not found (" + includeFile + ")", includeFile);
                     }
 
-                    return File.ReadAllText(importFilePath);
+                    var content = File.ReadAllText(includeFilePath);
+                    return content + "\r\n";
                 });
 
             var doc = new Document();
             int index = 0;
 
-            foreach (Match match in IncludeExpression.Matches(text))
+            foreach (Match match in ContentExpression.Matches(text))
             {
                 if (match.Index > index)
                 {
@@ -194,21 +194,21 @@ namespace LynxToolkit.Documents
 
                 index = match.Index + match.Length;
 
-                string include = null;
-                if (match.SetIfSuccess("include", ref include))
+                string import = null;
+                if (match.SetIfSuccess("import", ref import))
                 {
                     // todo: support wildcards?
-                    var includeFilePath = ResolveInclude(include, documentFolder, includepaths, includeDefaultExtension);
-                    if (includeFilePath == null)
+                    var importFilePath = ResolveInclude(import, documentFolder, includepaths, includeDefaultExtension);
+                    if (importFilePath == null)
                     {
-                        throw new FileNotFoundException("Include file not found (" + include + ")", include);
+                        throw new FileNotFoundException("Import file not found (" + import + ")", import);
                     }
 
-                    var includeText = File.ReadAllText(includeFilePath);
+                    var importText = File.ReadAllText(importFilePath);
                     doc.Append(
                         Parse(
-                            includeText,
-                            Path.GetDirectoryName(includeFilePath),
+                            importText,
+                            Path.GetDirectoryName(importFilePath),
                             includeDefaultExtension,
                             defaultSyntax,
                             replacements,

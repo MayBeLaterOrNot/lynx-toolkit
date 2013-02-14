@@ -1,5 +1,6 @@
 ﻿namespace WikiPad
 {
+    using System;
     using System.Windows;
     using System.Windows.Controls;
 
@@ -28,6 +29,32 @@
             if (wb != null)
             {
                 wb.NavigateToString((string)e.NewValue);
+            }
+        }
+
+        public static readonly DependencyProperty SourceProperty = DependencyProperty.RegisterAttached(
+        "Source",
+        typeof(Uri),
+        typeof(WebBrowserBehavior),
+        new FrameworkPropertyMetadata(OnSourceChanged));
+
+        [AttachedPropertyBrowsableForType(typeof(WebBrowser))]
+        public static Uri GetSource(WebBrowser d)
+        {
+            return (Uri)d.GetValue(SourceProperty);
+        }
+
+        public static void SetSource(WebBrowser d, Uri value)
+        {
+            d.SetValue(SourceProperty, value);
+        }
+
+        static void OnSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var wb = d as WebBrowser;
+            if (wb != null)
+            {
+                wb.Source = (Uri)e.NewValue;
             }
         }
     }

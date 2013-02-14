@@ -30,6 +30,7 @@
             <Button Content="Open project..." Command="{Binding OpenProjectCommand}"/>
             <Separator/>
             <Button Content="Revert changes" Command="{Binding RevertCommand}"/>
+            <Separator/>
             <Button Content="Save" Command="{Binding SaveCommand}"/>
             <Separator/>
             <Button Content="Save all" Command="{Binding SaveAllCommand}"/>
@@ -50,7 +51,7 @@
                 </ListBox.ItemTemplate>
             </ListBox>
             <TextBox Grid.Column="1" AcceptsReturn="True" FontFamily="Consolas" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" FontSize="13" BorderThickness="1 0 1 0" Text="{Binding Input, UpdateSourceTrigger=PropertyChanged}"/>
-            <WebBrowser local:WebBrowserBehavior.Html="{Binding Html}" Grid.Column="2"/>
+            <WebBrowser local:WebBrowserBehavior.Source="{Binding OutputSource}" Grid.Column="2"/>
             <GridSplitter Width="4" VerticalAlignment="Stretch" Background="Transparent"/>
             <GridSplitter Grid.Column="1" Width="4" VerticalAlignment="Stretch" Background="Transparent"/>
         </Grid>

@@ -29,12 +29,14 @@ namespace WikiPad
     using System;
     using System.IO;
     using System.Linq;
+    using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Documents;
     using System.Windows.Input;
 
+    using LynxToolkit;
     using LynxToolkit.Documents;
 
     using Microsoft.Win32;
@@ -59,7 +61,7 @@ namespace WikiPad
         {
             this.OpenProjectCommand = new DelegateCommand(this.OpenProject);
             this.SaveCommand = new DelegateCommand(
-                () => this.SelectedDocument.Save(), 
+                () => this.SelectedDocument.Save(this.Project.Scc),
                 () => this.SelectedDocument != null && this.SelectedDocument.IsModified);
             this.RevertCommand = new DelegateCommand(
                 this.Revert, () => this.SelectedDocument != null && this.SelectedDocument.IsModified);
@@ -91,6 +93,21 @@ namespace WikiPad
             set
             {
                 this.SetValue(ref this.flowDocument, value, "FlowDocument");
+            }
+        }
+
+        private Uri outputSource;
+
+        public Uri OutputSource
+        {
+            get
+            {
+                return this.outputSource;
+            }
+
+            set
+            {
+                this.SetValue(ref this.outputSource, value, "OutputSource");
             }
         }
 
@@ -180,7 +197,7 @@ namespace WikiPad
                         "Do you want to save " + doc.FileName + "?", this.Project.FileName, MessageBoxButton.YesNoCancel);
                     if (r == MessageBoxResult.Yes)
                     {
-                        doc.Save();
+                        doc.Save(this.Project.Scc);
                         continue;
                     }
 
@@ -251,7 +268,7 @@ namespace WikiPad
 
             foreach (var d in this.Project.Documents)
             {
-                d.Save();
+                d.Save(this.Project.Scc);
             }
         }
 
@@ -277,8 +294,8 @@ namespace WikiPad
             var template = Path.Combine(this.Project.Directory, this.Project.Template);
             var options = new HtmlFormatterOptions
                               {
-                                  Template = template, 
-                                  LocalLinkFormatString = this.Project.LocalLinks, 
+                                  Template = template,
+                                  LocalLinkFormatString = this.Project.LocalLinks,
                                   Replacements = this.Project.GetReplacements()
                               };
             try
@@ -286,10 +303,10 @@ namespace WikiPad
                 cancellationToken.ThrowIfCancellationRequested();
 
                 var doc = WikiParser.Parse(
-                    this.Input, 
-                    documentFolder, 
-                    includeDefaultExtension, 
-                    this.Project.DefaultSyntax, 
+                    this.Input,
+                    documentFolder,
+                    includeDefaultExtension,
+                    this.Project.DefaultSyntax,
                     this.Project.GetReplacements());
 
                 cancellationToken.ThrowIfCancellationRequested();
@@ -299,7 +316,15 @@ namespace WikiPad
                 // this.WikiMarkdown = MarkdownFormatter.Format(doc);
                 // this.WikiConfluence = ConfluenceFormatter.Format(doc);
                 // this.WikiCodeplex = CodeplexFormatter.Format(doc);
-                this.Html = HtmlFormatter.Format(doc, options);
+                var outputHtml = HtmlFormatter.Format(doc, options);
+                this.Html = outputHtml;
+
+                var outputPath = Path.GetFullPath(Path.ChangeExtension(
+                    Path.Combine(this.Project.Output, this.SelectedDocument.FileName), ".html"));
+                Utilities.CreateDirectoryIfMissing(Path.GetDirectoryName(outputPath));
+                File.WriteAllText(outputPath, outputHtml, Encoding.UTF8);
+                this.OutputSource = null;
+                this.OutputSource = new Uri(outputPath, UriKind.Absolute);
             }
             catch (Exception e)
             {

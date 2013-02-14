@@ -67,6 +67,7 @@
         public string LocalLinks { get; set; }
         public string Input { get; set; }
         public string Output { get; set; }
+        public string Scc { get; set; }
 
         [XmlArrayItem("String")]
         public List<Replacement> Replacements { get; set; }

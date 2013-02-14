@@ -3,6 +3,8 @@
     using System.IO;
     using System.Text;
 
+    using LynxToolkit;
+
     public class WikiDocument : Observable
     {
         private string content;
@@ -63,8 +65,13 @@
             this.IsModified = false;
         }
 
-        public void Save()
+        public void Save(string scc = null)
         {
+            if (scc != null)
+            {
+                Utilities.OpenForEdit(this.FullPath, scc);
+            }
+
             File.WriteAllText(this.FullPath, this.Content, Encoding.UTF8);
             this.IsModified = false;
         }

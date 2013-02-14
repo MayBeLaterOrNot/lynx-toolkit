@@ -108,10 +108,20 @@ namespace LynxToolkit
         /// <param name="path">The path.</param>
         public static void CreateDirectoryIfMissing(string path)
         {
-            var outputdir = Path.GetFullPath(path);
-            if (!Directory.Exists(outputdir))
+            path = Path.GetFullPath(path);
+            var current = string.Empty;
+            foreach (var d in path.Split('\\'))
             {
-                Directory.CreateDirectory(outputdir);
+                current = Path.Combine(current, d);
+                if (current.EndsWith(":"))
+                {
+                    current += "\\";
+                }
+
+                if (!Directory.Exists(current))
+                {
+                    Directory.CreateDirectory(current);
+                }
             }
         }
 
@@ -269,6 +279,7 @@ namespace LynxToolkit
         {
             switch (scc)
             {
+                case "P4":
                 case "p4":
                     OpenForEdit(filename, "p4.exe", "edit {0}");
                     break;
