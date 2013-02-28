@@ -46,6 +46,7 @@ namespace LynxToolkit.Documents.Wpf
     using ListItem = System.Windows.Documents.ListItem;
     using Paragraph = System.Windows.Documents.Paragraph;
     using Run = System.Windows.Documents.Run;
+    using Span = LynxToolkit.Documents.Span;
     using Style = System.Windows.Style;
     using Table = System.Windows.Documents.Table;
     using TableCell = System.Windows.Documents.TableCell;
@@ -56,13 +57,10 @@ namespace LynxToolkit.Documents.Wpf
     {
         public FlowDocument Document { get; private set; }
 
-        private Dictionary<LynxToolkit.Documents.Style, Style> styles =
-            new Dictionary<LynxToolkit.Documents.Style, Style>();
+        private Dictionary<LynxToolkit.Documents.Style, Style> styles = new Dictionary<LynxToolkit.Documents.Style, Style>();
 
-        protected FlowDocumentFormatter(LynxToolkit.Documents.Document doc)
-            : base(doc)
+        public FlowDocumentFormatter()
         {
-            this.Document = new FlowDocument();
         }
 
         private Style Format(LynxToolkit.Documents.Style style)
@@ -134,14 +132,17 @@ namespace LynxToolkit.Documents.Wpf
             return new SolidColorBrush(Color.FromArgb(c.Alpha, c.Red, c.Green, c.Blue));
         }
 
-        public static FlowDocument Format(LynxToolkit.Documents.Document doc, string symbolDirectory = null)
+        public override bool Format(LynxToolkit.Documents.Document doc, string outputFile)
         {
-            var wf = new FlowDocumentFormatter(doc) { SymbolDirectory = symbolDirectory };
-            wf.Format();
-            return wf.Document;
+            this.source = doc;
+            this.Document = new FlowDocument();
+            if (this.StyleSheet == null) this.StyleSheet = new StyleSheet();
+            this.WriteBlocks(doc.Blocks, null);
+            //this.Document
+            return true;
         }
 
-        protected override void Write(LynxToolkit.Documents.Header header)
+        protected override void Write(LynxToolkit.Documents.Header header, object parent)
         {
             var p = new Paragraph();
             WriteInlines(header.Content, p.Inlines);
@@ -149,7 +150,15 @@ namespace LynxToolkit.Documents.Wpf
             Document.Blocks.Add(p);
         }
 
-        protected override void Write(TableOfContents toc)
+        protected override void Write(LynxToolkit.Documents.Section section, object parent)
+        {
+            var p = new System.Windows.Documents.Section();
+            WriteBlocks(section.Blocks, p.Blocks);
+            // p.Style = this.Format(GetStyle(header));
+            Document.Blocks.Add(p);
+        }
+
+        protected override void Write(TableOfContents toc, object parent)
         {
         }
 
@@ -167,7 +176,7 @@ namespace LynxToolkit.Documents.Wpf
         //    outputStack.Pop();
         //}
 
-        protected override void Write(LynxToolkit.Documents.Paragraph paragraph)
+        protected override void Write(LynxToolkit.Documents.Paragraph paragraph, object parent)
         {
             var p = new Paragraph();
             WriteInlines(paragraph.Content, p.Inlines);
@@ -175,39 +184,34 @@ namespace LynxToolkit.Documents.Wpf
             p.Style = this.Format(GetStyle(paragraph));
         }
 
-        private Stack<List> listStack = new Stack<List>();
-
-        protected override void Write(LynxToolkit.Documents.UnorderedList list)
+        protected override void Write(LynxToolkit.Documents.UnorderedList list, object parent)
         {
             var p = new List();
-            listStack.Push(p);
             foreach (var item in list.Items)
-                Write(item);
-            listStack.Pop();
+                Write(item, p);
             Document.Blocks.Add(p);
             p.Style = this.Format(GetStyle(list));
         }
 
-        protected override void Write(LynxToolkit.Documents.OrderedList list)
+        protected override void Write(LynxToolkit.Documents.OrderedList list, object parent)
         {
             var p = new List();
             p.MarkerStyle = TextMarkerStyle.Decimal;
-            listStack.Push(p);
             foreach (var item in list.Items)
-                Write(item);
-            listStack.Pop();
+                Write(item, p);
             Document.Blocks.Add(p);
             p.Style = this.Format(GetStyle(list));
         }
 
-        protected override void Write(LynxToolkit.Documents.ListItem item)
+        protected override void Write(LynxToolkit.Documents.ListItem item, object parent)
         {
             var li = new ListItem();
             var p = new Paragraph();
             li.Blocks.Add(p);
             WriteInlines(item.Content, p.Inlines);
             // Write(item.NestedList);
-            listStack.Peek().ListItems.Add(li);
+
+            ((List)parent).ListItems.Add(li);
         }
 
         protected override void Write(LynxToolkit.Documents.Symbol symbol, object parent)
@@ -222,7 +226,7 @@ namespace LynxToolkit.Documents.Wpf
             ((InlineCollection)parent).Add(new Run { Name = anchor.Name });
         }
 
-        protected override void Write(LynxToolkit.Documents.Table table)
+        protected override void Write(LynxToolkit.Documents.Table table, object parent)
         {
             var t = new Table();
             t.CellSpacing = 0;
@@ -246,9 +250,8 @@ namespace LynxToolkit.Documents.Wpf
                     td.BorderBrush = Brushes.Gray;
                     td.Background = cell is LynxToolkit.Documents.TableHeaderCell ? Brushes.LightGray : null;
 
-                    var p = new Paragraph();
-                    td.Blocks.Add(p);
-                    WriteInlines(cell.Content, p.Inlines);
+                    WriteBlocks(cell.Blocks, td.Blocks);
+
                     if (cell.HorizontalAlignment == LynxToolkit.Documents.HorizontalAlignment.Center)
                         td.TextAlignment = TextAlignment.Center;
                     if (cell.HorizontalAlignment == LynxToolkit.Documents.HorizontalAlignment.Right)
@@ -261,7 +264,7 @@ namespace LynxToolkit.Documents.Wpf
 
         }
 
-        protected override void Write(LynxToolkit.Documents.Quote quote)
+        protected override void Write(LynxToolkit.Documents.Quote quote, object parent)
         {
             var p = new Paragraph();
             WriteInlines(quote.Content, p.Inlines);
@@ -269,7 +272,7 @@ namespace LynxToolkit.Documents.Wpf
             p.Style = this.Format(GetStyle(quote));
         }
 
-        protected override void Write(LynxToolkit.Documents.CodeBlock codeBlock)
+        protected override void Write(LynxToolkit.Documents.CodeBlock codeBlock, object parent)
         {
             var p = new Paragraph();
             Write(new LynxToolkit.Documents.Run(codeBlock.Text), p.Inlines);
@@ -277,7 +280,7 @@ namespace LynxToolkit.Documents.Wpf
             p.Style = this.Format(GetStyle(codeBlock));
         }
 
-        protected override void Write(LynxToolkit.Documents.HorizontalRuler ruler)
+        protected override void Write(LynxToolkit.Documents.HorizontalRuler ruler, object parent)
         {
             var line = new Rectangle() { Fill = Brushes.Black, Height = 1, Margin = new Thickness(4), SnapsToDevicePixels = true };
             Document.Blocks.Add(new BlockUIContainer(line));
@@ -293,18 +296,41 @@ namespace LynxToolkit.Documents.Wpf
             ((InlineCollection)parent).Add(new Run(run.Text));
         }
 
+        protected override void Write(LynxToolkit.Documents.Span span, object parent)
+        {
+            var element = new System.Windows.Documents.Span();
+            this.SetElementProperties(span, element);
+            this.WriteInlines(span.Content, element.Inlines);
+            ((InlineCollection)parent).Add(element);
+        }
+
+        private void SetElementProperties(Element x, FrameworkContentElement element)
+        {
+            element.Name = x.ID;
+            element.ToolTip = x.Title;
+            element.Style = this.GetElementStyle(x.Class);
+        }
+
+        private Style GetElementStyle(string name)
+        {
+            // TODO
+            return null;
+        }
+
         protected override void Write(LynxToolkit.Documents.Strong strong, object parent)
         {
-            var bold = new Bold();
-            WriteInlines(strong.Content, bold.Inlines);
-            ((InlineCollection)parent).Add(bold);
+            var element = new Bold();
+            this.SetElementProperties(strong, element);
+            WriteInlines(strong.Content, element.Inlines);
+            ((InlineCollection)parent).Add(element);
         }
 
         protected override void Write(LynxToolkit.Documents.Emphasized em, object parent)
         {
-            var italic = new Italic();
-            WriteInlines(em.Content, italic.Inlines);
-            ((InlineCollection)parent).Add(italic);
+            var element = new Italic();
+            this.SetElementProperties(em, element);
+            WriteInlines(em.Content, element.Inlines);
+            ((InlineCollection)parent).Add(element);
         }
 
         protected override void Write(LynxToolkit.Documents.LineBreak linebreak, object parent)
@@ -329,6 +355,11 @@ namespace LynxToolkit.Documents.Wpf
             WriteInlines(hyperlink.Content, a.Inlines);
             ((InlineCollection)parent).Add(a);
         }
+
+        protected override void Write(Documents.Equation equation, object parent)
+        {
+        }
+
 
         protected override void Write(LynxToolkit.Documents.Image image, object parent)
         {

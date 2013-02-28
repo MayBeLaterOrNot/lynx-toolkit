@@ -46,7 +46,7 @@ namespace LynxToolkit.Documents
             return this.sb.ToString().Trim(newlineChars);
         }
 
-        protected void WriteItems(ListItemCollection items, string prefix)
+        protected void WriteItems(ListItemCollection items, object parent, string prefix)
         {
             int i = 1;
             foreach (var item in items)
@@ -54,7 +54,7 @@ namespace LynxToolkit.Documents
                 this.sb.AppendFormat(prefix, i++);
                 var tmp = this.sb;
                 this.sb = new StringBuilder();
-                this.WriteInlines(item.Content);
+                this.WriteInlines(item.Content, parent);
                 var text = this.sb.ToString();
                 this.sb = tmp;
                 text = this.Wrap(text, this.LineLength);
@@ -153,16 +153,16 @@ namespace LynxToolkit.Documents
 
         public int LineLength { get; set; }
 
-        protected override void Write(TableOfContents toc)
+        protected override void Write(TableOfContents toc, object parent)
         {
             this.WriteLine("@toc");
         }
 
-        protected override void Write(Paragraph paragraph)
+        protected override void Write(Paragraph paragraph, object parent)
         {
             var tmp = sb;
             sb = new StringBuilder();
-            WriteInlines(paragraph.Content);
+            WriteInlines(paragraph.Content, parent);
             var text = Wrap(sb.ToString(), LineLength);
             sb = tmp;
             Write(text);
@@ -170,47 +170,52 @@ namespace LynxToolkit.Documents
             WriteLine();
         }
 
-        protected override void Write(Quote quote)
+        protected override void Write(Section section, object parent)
+        {
+            this.WriteBlocks(section.Blocks, parent);
+        }
+
+        protected override void Write(Quote quote, object parent)
         {
             var tmp = sb;
             sb = new StringBuilder();
-            WriteInlines(quote.Content);
+            WriteInlines(quote.Content, parent);
             var text = Wrap(sb.ToString(), LineLength);
             sb = tmp;
             WriteLine("///");
-            WriteInlines(quote.Content);
+            WriteInlines(quote.Content, parent);
             WriteLines(text);
             WriteLine("///");
             WriteLine();
         }
 
-        protected override void Write(UnorderedList list)
+        protected override void Write(UnorderedList list, object parent)
         {
-            WriteItems(list.Items, "- ");
+            WriteItems(list.Items, parent, "- ");
             WriteLine();
         }
 
-        protected override void Write(OrderedList list)
+        protected override void Write(OrderedList list, object parent)
         {
-            WriteItems(list.Items, "# ");
+            WriteItems(list.Items, parent, "# ");
             WriteLine();
         }
 
-        protected override void Write(Table table)
+        protected override void Write(Table table, object parent)
         {
             foreach (var r in table.Rows)
             {
                 foreach (var c in r.Cells)
                 {
                     Write(c is TableHeaderCell ? "||" : "|");
-                    WriteInlines(c.Content);
+                    WriteBlocks(c.Blocks, parent);
                 }
                 WriteLine("|");
             }
             WriteLine();
         }
 
-        protected override void Write(CodeBlock codeBlock)
+        protected override void Write(CodeBlock codeBlock, object parent)
         {
             WriteLine("{{{");
             WriteLines(codeBlock.Text);
@@ -218,7 +223,7 @@ namespace LynxToolkit.Documents
             WriteLine();
         }
 
-        protected override void Write(HorizontalRuler ruler)
+        protected override void Write(HorizontalRuler ruler, object parent)
         {
             WriteLine("----");
             WriteLine();
@@ -240,17 +245,22 @@ namespace LynxToolkit.Documents
             Write(symbol.Name);
         }
 
+        protected override void Write(Span span, object parent)
+        {
+            WriteInlines(span.Content, parent);
+        }
+
         protected override void Write(Strong strong, object parent)
         {
             Write("**");
-            WriteInlines(strong.Content);
+            WriteInlines(strong.Content, parent);
             Write("**");
         }
 
         protected override void Write(Emphasized em, object parent)
         {
             Write("//");
-            WriteInlines(em.Content);
+            WriteInlines(em.Content, parent);
             Write("//");
         }
 
@@ -264,5 +274,8 @@ namespace LynxToolkit.Documents
             Write("{{", inlineCode.Code, "}}");
         }
 
+        protected override void Write(Equation equation, object parent)
+        {
+        }
     }
 }

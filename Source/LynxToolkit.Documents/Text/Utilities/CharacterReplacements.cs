@@ -34,7 +34,7 @@ namespace LynxToolkit.Documents
         static readonly Regex EncodeExpressions;
         static readonly Regex DecodeExpressions;
 
-        static readonly Dictionary<string, string> Replacements;
+        public static Dictionary<string, string> Replacements { get; private set; }
 
         static CharacterReplacements()
         {

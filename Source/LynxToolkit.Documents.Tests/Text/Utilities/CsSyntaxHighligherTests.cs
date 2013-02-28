@@ -34,11 +34,6 @@ namespace LynxToolkit.Documents.Tests
         [Test]
         public void Strings()
         {
-            string s;
-            s = "abc";
-            s = @"abc";
-            s = @"ab""c";
-            s = "ab\"c";
             Assert.AreEqual("s = <span class=\"string\">\"abc\"</span>;", CsSyntaxHighlighter.Highlight("s = \"abc\";"));
             Assert.AreEqual("s = <span class=\"string\">@\"abc\"</span>;", CsSyntaxHighlighter.Highlight("s = @\"abc\";"));
             Assert.AreEqual("s = <span class=\"string\">@\"ab\"\"c\"</span>;", CsSyntaxHighlighter.Highlight("s = @\"ab\"\"c\";"));

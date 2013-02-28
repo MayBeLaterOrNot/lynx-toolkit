@@ -310,17 +310,21 @@ namespace XmlDocT
 
                 var tr = new TableRow();
                 var td0 = new TableCell();
+                var p0 = new Paragraph();
+                td0.Blocks.Add(p0);
                 if (createLinks)
                 {
-                    td0.Content.Add(this.CreateLink(t, strong: !inherited));
+                    p0.Content.Add(this.CreateLink(t, strong: !inherited));
                 }
                 else
                 {
-                    td0.Content.Add(new Run(t.ToString()));
+                    p0.Content.Add(new Run(t.ToString()));
                 }
 
                 var td1 = new TableCell();
-                this.AddText(td1.Content, description, scope);
+                var p = new Paragraph();
+                this.AddText(p.Content, description, scope);
+                td0.Blocks.Add(p);
                 tr.Cells.Add(td0);
                 tr.Cells.Add(td1);
                 table.Rows.Add(tr);
@@ -349,13 +353,19 @@ namespace XmlDocT
             {
                 var tr = new TableRow();
                 var td0 = new TableCell();
-                this.AddText(td0.Content, t.ToString(), scope);
+                var p0 = new Paragraph();
+                td0.Blocks.Add(p0);
+                this.AddText(p0.Content, t.ToString(), scope);
 
                 var td1 = new TableCell();
-                td1.Content.Add(this.CreateLink(t.Type));
+                var p1 = new Paragraph();
+                td1.Blocks.Add(p1);                
+                p1.Content.Add(this.CreateLink(t.Type));
 
                 var td2 = new TableCell();
-                this.AddText(td2.Content, t.Description, scope);
+                var p2 = new Paragraph();
+                td2.Blocks.Add(p2);
+                this.AddText(p2.Content, t.Description, scope);
                 tr.Cells.Add(td0);
                 tr.Cells.Add(td1);
                 tr.Cells.Add(td2);
@@ -710,7 +720,7 @@ namespace XmlDocT
                 this.doc.Blocks.Add(new CodeBlock { Text = syntax, Language = Language.Cs });
             }
 
-            this.AddText(string.Format("The {0} type exposes the following members.", typeModel), null);
+            // this.AddText(string.Format("The {0} type exposes the following members.", typeModel), null);
 
             this.AddTable("Constructors", typeModel.Constructors, typeModel.Type, createMemberPages, topLevel + 1);
             this.AddTable("Properties", typeModel.Properties, typeModel.Type, createMemberPages, topLevel + 1);
@@ -761,52 +771,51 @@ namespace XmlDocT
             this.doc.Title = title;
             this.doc.Description = description;
 
+            DocumentFormatter formatter=null;
             switch (this.Format)
             {
                 case "html":
                     {
-                        var path = this.GetOutputFile(fileName);
-                        var options = new HtmlFormatterOptions { Css = this.StyleSheet, Template = this.Template, Replacements = this.Replacements };
+                        formatter = new HtmlFormatter { Css = this.StyleSheet, Template = this.Template, Variables = this.Replacements };
                         if (this.SinglePage)
                         {
-                            options.LocalLinkFormatString = "#{0}";
+                            ((HtmlFormatter)formatter).LocalLinkFormatString = "#{0}";
                         }
 
-                        var html = HtmlFormatter.Format(this.doc, options);
-                        File.WriteAllText(path, html);
                         break;
                     }
 
-                case "owiki":
-                    {
-                        var path = this.GetOutputFile(fileName);
-                        var src = OWikiFormatter.Format(this.doc);
-                        File.WriteAllText(path, src);
-                        break;
-                    }
+                //case "owiki":
+                //    {
+                //        var path = this.GetOutputFile(fileName);
+                //        var src = OWikiFormatter.Format(this.doc);
+                //        File.WriteAllText(path, src);
+                //        break;
+                //    }
 
-                case "xml":
-                    {
-                        var path = this.GetOutputFile(fileName);
-                        var src = XmlFormatter.Format(this.doc);
-                        File.WriteAllText(path, src);
-                        break;
-                    }
+                //case "xml":
+                //    {
+                //        var path = this.GetOutputFile(fileName);
+                //        var src = XmlFormatter.Format(this.doc);
+                //        File.WriteAllText(path, src);
+                //        break;
+                //    }
 
                 case "word":
                     {
-                        var path = this.GetOutputFile(fileName);
-                        var options = new WordFormatterOptions { Template = this.Template };
-                        if (this.SinglePage)
-                        {
-                            // options.LocalLinkFormatString = "#{0}";
-                        }
-
-                        WordFormatter.Format(this.doc, path, options);
+                        formatter = new WordFormatter { Template = this.Template };                    
                         break;
                     }
             }
 
+            if (formatter == null)
+            {
+                throw new FormatException(string.Format("The output format '{0}' is not supported.", Format));
+            }
+
+            var path = this.GetOutputFile(fileName);
+            formatter.Format(this.doc, path);
+            
             this.doc = null;
         }
     }

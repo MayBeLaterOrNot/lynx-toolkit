@@ -14,7 +14,7 @@
         <KeyBinding Key="S" Modifiers="Control+Shift" Command="{Binding SaveAllCommand}"/>
     </Window.InputBindings>
     <DockPanel>
-        <Menu DockPanel.Dock="Top" Visibility="Collapsed">
+        <Menu DockPanel.Dock="Top">
             <MenuItem Header="File">
                 <MenuItem Header="Open project..." Command="{Binding OpenProjectCommand}"/>
                 <Separator/>
@@ -26,7 +26,7 @@
                 <MenuItem Header="Exit" Command="{Binding ExitCommand}" InputGestureText="Alt+F4"/>
             </MenuItem>
         </Menu>
-        <ToolBar DockPanel.Dock="Top">
+        <ToolBar DockPanel.Dock="Top" Visibility="Collapsed">
             <Button Content="Open project..." Command="{Binding OpenProjectCommand}"/>
             <Separator/>
             <Button Content="Revert changes" Command="{Binding RevertCommand}"/>

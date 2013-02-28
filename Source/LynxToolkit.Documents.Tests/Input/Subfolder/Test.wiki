@@ -1,0 +1,8 @@
+﻿= Image in parent folder
+
+{..\lorem.jpg}
+
+= Included code
+```xml
+@include ..\Example.xml
+```

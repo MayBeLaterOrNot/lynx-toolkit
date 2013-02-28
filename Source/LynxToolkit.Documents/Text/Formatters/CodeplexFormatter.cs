@@ -31,7 +31,7 @@ namespace LynxToolkit.Documents
         public static string Format(Document doc)
         {
             var wf = new CodeplexFormatter(doc);
-            wf.Format();
+            wf.Format(doc);
             return wf.ToString();
         }
 
@@ -41,10 +41,10 @@ namespace LynxToolkit.Documents
 
         }
 
-        protected override void Write(Header header)
+        protected override void Write(Header header, object parent)
         {
             Write(Repeat("!", header.Level), " ");
-            WriteInlines(header.Content);
+            WriteInlines(header.Content, parent);
             WriteLine();
             WriteLine();
         }
@@ -52,14 +52,14 @@ namespace LynxToolkit.Documents
         protected override void Write(Strong strong, object parent)
         {
             Write("*");
-            WriteInlines(strong.Content);
+            WriteInlines(strong.Content, parent);
             Write("*");
         }
 
         protected override void Write(Emphasized em, object parent)
         {
             Write("_");
-            WriteInlines(em.Content);
+            WriteInlines(em.Content, parent);
             Write("_");
         }
 
@@ -80,7 +80,7 @@ namespace LynxToolkit.Documents
             if (hyperlink.Content.Count > 0)
             {
                 Write("|");
-                WriteInlines(hyperlink.Content);
+                WriteInlines(hyperlink.Content, parent);
             }
             Write("]");
         }
@@ -93,6 +93,10 @@ namespace LynxToolkit.Documents
                 Write("|", image.AlternateText);
             }
             Write("]");
+        }
+
+        protected override void Write(Equation equation, object parent)
+        {
         }
 
         protected override void Write(Anchor anchor, object parent)

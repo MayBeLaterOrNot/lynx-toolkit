@@ -42,10 +42,10 @@ namespace LynxToolkit.Documents
             return wf.ToString();
         }
 
-        protected override void Write(Header header)
+        protected override void Write(Header header, object parent)
         {
             Write(Repeat("=", header.Level), " ");
-            WriteInlines(header.Content);
+            WriteInlines(header.Content, parent);
             WriteLine(" ", Repeat("=", header.Level));
             if (header.Level < 3)
             {
@@ -64,7 +64,7 @@ namespace LynxToolkit.Documents
             if (hyperlink.Content.Count > 0)
             {
                 Write("|");
-                WriteInlines(hyperlink.Content);
+                WriteInlines(hyperlink.Content, parent);
             }
             Write("]]");
         }

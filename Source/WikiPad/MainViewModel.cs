@@ -234,11 +234,17 @@ namespace WikiPad
             {
                 return;
             }
-
-            this.Project = WikiProject.Load(filePath);
-            Environment.CurrentDirectory = this.Project.Directory;
-            this.OnPropertyChanged("Title");
-            this.SelectedDocument = this.Project.Documents.FirstOrDefault();
+            
+            try
+            {
+                this.Project = WikiProject.Load(filePath);
+                Environment.CurrentDirectory = this.Project.Directory;
+                this.OnPropertyChanged("Title");
+                this.SelectedDocument = this.Project.Documents.FirstOrDefault();
+            }
+            catch (Exception)
+            {
+            }
         }
 
         private void OpenProject()
@@ -292,37 +298,34 @@ namespace WikiPad
             var documentFolder = Path.GetDirectoryName(this.SelectedDocument.FullPath);
             var includeDefaultExtension = Path.GetExtension(this.SelectedDocument.FileName);
             var template = Path.Combine(this.Project.Directory, this.Project.Template);
-            var options = new HtmlFormatterOptions
+            var formatter = new HtmlFormatter
                               {
                                   Template = template,
                                   LocalLinkFormatString = this.Project.LocalLinks,
-                                  Replacements = this.Project.GetReplacements()
+                                  Variables = this.Project.GetVariables()
                               };
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
+                var parser = new WikiParser(this.Project.GetDefines(), this.Project.GetVariables());
 
-                var doc = WikiParser.Parse(
-                    this.Input,
-                    documentFolder,
-                    includeDefaultExtension,
-                    this.Project.DefaultSyntax,
-                    this.Project.GetReplacements());
+                parser.CurrentDirectory = documentFolder;
+                parser.IncludeDefaultExtension = includeDefaultExtension;
+                var doc = parser.Parse(this.Input);
 
                 cancellationToken.ThrowIfCancellationRequested();
+
+                var outputPath = Path.GetFullPath(Path.ChangeExtension(
+                    Path.Combine(this.Project.Output, this.SelectedDocument.FileName), ".html"));
 
                 // this.Wiki = OWikiFormatter.Format(doc);
                 // this.WikiCreole = CreoleFormatter.Format(doc);
                 // this.WikiMarkdown = MarkdownFormatter.Format(doc);
                 // this.WikiConfluence = ConfluenceFormatter.Format(doc);
                 // this.WikiCodeplex = CodeplexFormatter.Format(doc);
-                var outputHtml = HtmlFormatter.Format(doc, options);
-                this.Html = outputHtml;
-
-                var outputPath = Path.GetFullPath(Path.ChangeExtension(
-                    Path.Combine(this.Project.Output, this.SelectedDocument.FileName), ".html"));
                 Utilities.CreateDirectoryIfMissing(Path.GetDirectoryName(outputPath));
-                File.WriteAllText(outputPath, outputHtml, Encoding.UTF8);
+                formatter.Format(doc, outputPath);
+
                 this.OutputSource = null;
                 this.OutputSource = new Uri(outputPath, UriKind.Absolute);
             }

@@ -65,6 +65,11 @@ namespace LynxToolkit.Documents
                                        { "(h)", "home.png" }
                                    };
         }
+        
+        public static IEnumerable<string> GetSymbolNames()
+        {
+            return symbolDictionary.Keys;
+        }
 
         public static string Decode(string input)
         {

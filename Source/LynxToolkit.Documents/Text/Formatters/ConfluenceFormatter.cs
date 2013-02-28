@@ -40,24 +40,24 @@ namespace LynxToolkit.Documents
             return wf.ToString();
         }
 
-        protected override void Write(Header header)
+        protected override void Write(Header header, object parent)
         {
             Write("h", header.Level, ". ");
-            WriteInlines(header.Content);
+            WriteInlines(header.Content,parent);
             WriteLine();
             WriteLine();
         }
 
-        protected override void Write(Quote quote)
+        protected override void Write(Quote quote, object parent)
         {
             WriteLine("///");
-            WriteInlines(quote.Content);
+            WriteInlines(quote.Content,parent);
             WriteLine();
             WriteLine("///");
             WriteLine();
         }
 
-        protected override void Write(CodeBlock codeBlock)
+        protected override void Write(CodeBlock codeBlock, object parent)
         {
             WriteLine("{code", codeBlock.Language != Language.Unknown ? ":" + codeBlock.Language : "", "}");
             foreach (var line in codeBlock.Text.Split('\n'))
@@ -71,14 +71,14 @@ namespace LynxToolkit.Documents
         protected override void Write(Strong strong, object parent)
         {
             Write("*");
-            WriteInlines(strong.Content);
+            WriteInlines(strong.Content, parent);
             Write("*");
         }
 
         protected override void Write(Emphasized em, object parent)
         {
             Write("_");
-            WriteInlines(em.Content);
+            WriteInlines(em.Content, parent);
             Write("_");
         }
 
@@ -97,7 +97,7 @@ namespace LynxToolkit.Documents
             Write("[");
             if (hyperlink.Content.Count > 0)
             {
-                WriteInlines(hyperlink.Content);
+                WriteInlines(hyperlink.Content, parent);
                 Write("|");
             }
             Write(hyperlink.Url);

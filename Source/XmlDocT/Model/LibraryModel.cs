@@ -86,7 +86,7 @@ namespace XmlDocT
 
         public Dictionary<string, NamespaceModel> Namespaces { get; private set; }
 
-        public string FileName {get;set;}
+        public string FileName { get; set; }
 
         public string Title
         {
@@ -108,11 +108,20 @@ namespace XmlDocT
 
         public void Add(string assemblyFile)
         {
+            var searchDirectories = new List<string>();
+
             string assemblyPath = Path.GetFullPath(assemblyFile);
 
             string xmlPath = Path.ChangeExtension(assemblyPath, ".xml");
-
             string assemblyDirectory = Path.GetDirectoryName(assemblyPath) ?? string.Empty;
+            searchDirectories.Add(assemblyDirectory);
+
+            // TODO: how to get silverlight/metro/mono assemblies from .NET 4.5 console application?
+            var silverlightFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Microsoft Silverlight");
+            foreach (var slf in Directory.GetDirectories(silverlightFolder))
+            {
+                searchDirectories.Add(slf);
+            }
 
             AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
                 {
@@ -120,14 +129,17 @@ namespace XmlDocT
                     var assemblyFileName = an.Name + ".dll";
 
                     //// Console.WriteLine("Loading {0}", assemblyFileName);
-                    var file = Path.Combine(assemblyDirectory, assemblyFileName);
-                    if (File.Exists(file))
+                    foreach (var f in searchDirectories)
                     {
-                        var asm = Assembly.LoadFile(file);
-                        return asm;
+                        var file = Path.Combine(f, assemblyFileName);
+                        if (File.Exists(file))
+                        {
+                            var asm = Assembly.LoadFile(file);
+                            return asm;
+                        }
                     }
 
-                    throw new FileNotFoundException("Assembly not found.", file);
+                    return null;
                 };
 
             Console.WriteLine();
@@ -140,7 +152,35 @@ namespace XmlDocT
                 return;
             }
 
+            // var assembly = System.AppDomain.CurrentDomain.Load(assemblyPath);
             var assembly = Assembly.LoadFile(assemblyPath);
+            bool missingAssemblies = false;
+            foreach (var an in assembly.GetReferencedAssemblies())
+            {
+                Console.Write("    " + an.Name);
+                try
+                {
+                    if (Assembly.Load(an) == null)
+                    {
+                        Console.Write(" (not found)");
+                        missingAssemblies = true;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.Write(" (" + e.Message + ")");
+                    missingAssemblies = true;
+                }
+
+                Console.WriteLine();
+            }
+
+            if (missingAssemblies)
+            {
+                Console.WriteLine("  Missing dependencies. Skipping assembly.");
+                return;                
+            }
+
             var xmldoc = new XmlDocument();
             xmldoc.Load(xmlPath);
 

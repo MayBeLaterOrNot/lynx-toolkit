@@ -42,14 +42,14 @@ namespace LynxToolkit.Documents
             return wf.ToString();
         }
 
-        protected override void Write(Header header)
+        protected override void Write(Header header, object parent)
         {
             if (header.Level > 2)
             {
                 Write(Repeat("#", header.Level), " ");
             }
             int l0 = sb.Length;
-            WriteInlines(header.Content);
+            WriteInlines(header.Content, parent);
             int l1 = sb.Length - l0;
             WriteLine();
             if (header.Level == 1)
@@ -64,15 +64,15 @@ namespace LynxToolkit.Documents
             }
         }
 
-        protected override void Write(UnorderedList list)
+        protected override void Write(UnorderedList list, object parent)
         {
-            WriteItems(list.Items, "- ");
+            WriteItems(list.Items,parent, "- ");
             WriteLine();
         }
 
-        protected override void Write(OrderedList list)
+        protected override void Write(OrderedList list, object parent)
         {
-            WriteItems(list.Items, "{0}. ");
+            WriteItems(list.Items, parent,"{0}. ");
             WriteLine();
         }
 
@@ -81,7 +81,7 @@ namespace LynxToolkit.Documents
             Write("#", anchor.Name, " ");
         }
 
-        protected override void Write(Table table)
+        protected override void Write(Table table, object parent)
         {
             foreach (var r in table.Rows)
             {
@@ -89,7 +89,7 @@ namespace LynxToolkit.Documents
                 {
                     Write(c is TableHeaderCell ? "||" : "|");
                     this.Write(c.HorizontalAlignment != HorizontalAlignment.Left ? "  " : " ");
-                    WriteInlines(c.Content);
+                    WriteBlocks(c.Blocks, parent);
                     this.Write(c.HorizontalAlignment == HorizontalAlignment.Center ? "  " : " ");
                 }
                 WriteLine("|");
@@ -112,11 +112,11 @@ namespace LynxToolkit.Documents
             if (inline is LineBreak) firstInline = true;
         }
 
-        protected override void Write(Quote quote)
+        protected override void Write(Quote quote, object parent)
         {
             var tmp = sb;
             sb = new StringBuilder();
-            WriteInlines(quote.Content);
+            WriteInlines(quote.Content, parent);
             var text = Wrap(sb.ToString(), LineLength);
             sb = tmp;
 
@@ -124,7 +124,7 @@ namespace LynxToolkit.Documents
             WriteLine();
         }
 
-        protected override void Write(CodeBlock codeBlock)
+        protected override void Write(CodeBlock codeBlock, object parent)
         {
             WriteLine("```", codeBlock.Language.ToString().ToLower());
             foreach (var line in codeBlock.Text.Split('\n'))
@@ -135,7 +135,7 @@ namespace LynxToolkit.Documents
             WriteLine();
         }
 
-        protected override void Write(HorizontalRuler ruler)
+        protected override void Write(HorizontalRuler ruler, object parent)
         {
             WriteLine();
             WriteLine("----");
@@ -150,14 +150,14 @@ namespace LynxToolkit.Documents
         protected override void Write(Strong strong, object parent)
         {
             Write("**");
-            WriteInlines(strong.Content);
+            WriteInlines(strong.Content, parent);
             Write("**");
         }
 
         protected override void Write(Emphasized em, object parent)
         {
             Write("*");
-            WriteInlines(em.Content);
+            WriteInlines(em.Content, parent);
             Write("*");
         }
 
@@ -174,7 +174,7 @@ namespace LynxToolkit.Documents
         protected override void Write(Hyperlink hyperlink, object parent)
         {
             Write("[");
-            WriteInlines(hyperlink.Content);
+            WriteInlines(hyperlink.Content, parent);
             Write("]");
             Write("(", hyperlink.Url);
             if (hyperlink.Title != null)

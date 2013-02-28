@@ -211,7 +211,8 @@ namespace DocumentBrowser
 
         private void Update()
         {
-            var doc = WikiParser.Parse(this.Input, null, null, null);
+            var parser = new WikiParser();
+            var doc = parser.Parse(this.Input);
 
             this.Wiki = OWikiFormatter.Format(doc);
             this.WikiCreole = CreoleFormatter.Format(doc);
@@ -219,7 +220,7 @@ namespace DocumentBrowser
             this.WikiConfluence = ConfluenceFormatter.Format(doc);
             this.WikiCodeplex = CodeplexFormatter.Format(doc);
             var options = new HtmlFormatterOptions { Css = "style.css", SymbolDirectory = "images" };
-            this.Html = HtmlFormatter.Format(doc, options);
+            this.Html = HtmlFormatter.Format(doc, "temp.html", options);
 
             // File.WriteAllText("temp.txt", Html, Encoding.UTF8);
             // System.Diagnostics.Process.Start("temp.txt");

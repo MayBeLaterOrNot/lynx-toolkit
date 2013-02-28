@@ -26,6 +26,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 namespace LynxToolkit.Documents
 {
+    using System;
     using System.Collections.Generic;
     using System.Xml.Serialization;
 
@@ -34,7 +35,6 @@ namespace LynxToolkit.Documents
         public Document()
         {
             this.Blocks = new BlockCollection();
-            this.StyleSheet = new StyleSheet();
         }
 
         [XmlArrayItem("Paragraph", typeof(Paragraph))]
@@ -59,8 +59,6 @@ namespace LynxToolkit.Documents
         public string Keywords { get; set; }
 
         public string Revision { get; set; }
-
-        public StyleSheet StyleSheet { get; set; }
 
         public string Subject { get; set; }
 
@@ -125,10 +123,28 @@ namespace LynxToolkit.Documents
 
     public abstract class Element
     {
+        /// <summary>
+        /// Gets or sets the class.
+        /// </summary>
+        /// <remarks>
+        /// For HTML output, this will be written to the class attribute.
+        /// For Word output, this will override the style of the element.
+        /// </remarks>
         public string Class { get; set; }
 
+        /// <summary>
+        /// Gets or sets the ID.
+        /// </summary>
+        /// <remarks>
+        /// The ID can be used to create references. 
+        /// For HTML output, this will be written to the id attribute.
+        /// </remarks>
         public string ID { get; set; }
 
+        /// <summary>
+        /// Gets or sets the title.
+        /// </summary>
+        /// <value>The title.</value>
         public string Title { get; set; }
     }
 
@@ -198,17 +214,59 @@ namespace LynxToolkit.Documents
 
     public enum Language
     {
+        /// <summary>
+        /// C# language
+        /// </summary>
         Cs = 1,
 
+        /// <summary>
+        /// JavaScript language
+        /// </summary>
         Js = 2,
 
+        /// <summary>
+        /// XML/XAML language
+        /// </summary>
         Xml = 3,
 
+        /// <summary>
+        /// C language
+        /// </summary>
+        C = 4,
+
+        /// <summary>
+        /// C++ language
+        /// </summary>
+        Cpp = 5,
+
+        /// <summary>
+        /// Fortran language
+        /// </summary>
+        Fortran = 5,
+
+        /// <summary>
+        /// Unknown language
+        /// </summary>
         Unknown = 0
     }
 
     public class CodeBlock : Block
     {
+        public CodeBlock()
+        {
+        }
+
+        public CodeBlock(string language, string code)
+        {
+            Language l;
+            if (Enum.TryParse(language, true, out l))
+            {
+                this.Language = l;
+            }
+
+            this.Text = code;
+        }
+
         public Language Language { get; set; }
 
         public string Text { get; set; }
@@ -333,18 +391,23 @@ namespace LynxToolkit.Documents
     {
         public TableCell()
         {
-            this.Content = new InlineCollection();
+            this.Blocks = new BlockCollection();
+            this.RowSpan = 1;
+            this.ColumnSpan = 1;
         }
 
         public TableCell(string content)
             : this()
         {
-            this.Content.Add(new Run(content));
+            this.Blocks.Add(new Paragraph(new Run(content)));
         }
 
-        public InlineCollection Content { get; private set; }
+        public BlockCollection Blocks { get; private set; }
 
         public HorizontalAlignment HorizontalAlignment { get; set; }
+
+        public int ColumnSpan { get; set; }
+        public int RowSpan { get; set; }
     }
 
     public class TableHeaderCell : TableCell
@@ -355,7 +418,7 @@ namespace LynxToolkit.Documents
 
         public TableHeaderCell(string content)
         {
-            this.Content.Add(new Run(content));
+            this.Blocks.Add(new Paragraph(new Run(content)));
         }
     }
 
@@ -491,6 +554,25 @@ namespace LynxToolkit.Documents
         }
 
         public string Text { get; set; }
+
+        public override string ToString()
+        {
+            return Text;
+        }
+    }
+
+    public class Equation : Inline
+    {
+        public Equation()
+        {
+        }
+
+        public Equation(string content)
+        {
+            this.Content = content;
+        }
+
+        public string Content { get; set; }
     }
 
     public abstract class InlineContent : Inline
@@ -529,6 +611,10 @@ namespace LynxToolkit.Documents
         {
             this.Content.Add(new Run(text));
         }
+    }
+
+    public class Span : InlineContent
+    {
     }
 
     public class Strong : InlineContent
@@ -598,7 +684,5 @@ namespace LynxToolkit.Documents
         public string Link { get; set; }
 
         public string Source { get; set; }
-
-        public string BaseDirectory { get; set; }
     }
 }

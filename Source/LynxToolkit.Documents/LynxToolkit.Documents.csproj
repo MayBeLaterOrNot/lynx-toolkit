@@ -44,13 +44,14 @@
     <Compile Include="..\Utilities.cs">
       <Link>Utilities.cs</Link>
     </Compile>
-    <Compile Include="Text\Formatters\CodeplexFormatter.cs" />
-    <Compile Include="Text\Formatters\ConfluenceFormatter.cs" />
+    <None Include="Text\Formatters\CodeplexFormatter.cs" />
+    <None Include="Text\Formatters\ConfluenceFormatter.cs" />
+    <Compile Include="Text\Parsers\WikiParser.cs" />
     <Compile Include="Text\Utilities\CsSyntaxHighlighter.cs" />
-    <Compile Include="Text\Formatters\MarkdownFormatter.cs" />
-    <Compile Include="Text\Formatters\CreoleFormatter.cs" />
+    <None Include="Text\Formatters\MarkdownFormatter.cs" />
+    <None Include="Text\Formatters\CreoleFormatter.cs" />
     <Compile Include="Text\Formatters\DocumentFormatter.cs" />
-    <Compile Include="Text\Formatters\XmlFormatter.cs" />
+    <None Include="Text\Formatters\XmlFormatter.cs" />
     <Compile Include="Spreadsheet\BorderStyle.cs" />
     <Compile Include="Spreadsheet\HorizontalAlignment.cs" />
     <Compile Include="Spreadsheet\TableBuilder.cs" />
@@ -62,20 +63,21 @@
     <Compile Include="Spreadsheet\Column.cs" />
     <Compile Include="Spreadsheet\Worksheet.cs" />
     <Compile Include="Spreadsheet\Style.cs" />
+    <Compile Include="Text\Utilities\TexConverter.cs" />
     <Compile Include="Text\Utilities\XmlSyntaxHighlighter.cs" />
     <Compile Include="Text\Utilities\SymbolResolver.cs" />
-    <Compile Include="Text\Formatters\WikiFormatterBase.cs" />
+    <None Include="Text\Formatters\WikiFormatterBase.cs" />
     <Compile Include="Text\Utilities\CharacterReplacements.cs" />
-    <Compile Include="Text\Parsers\CreoleParser.cs" />
+    <None Include="Text\Parsers\obsolete\CreoleParser.cs" />
     <Compile Include="Text\Parsers\DocumentParser.cs" />
     <Compile Include="Text\Formatters\HtmlFormatter.cs" />
     <Compile Include="Text\Parsers\HtmlParser.cs" />
-    <Compile Include="Text\Formatters\OWikiFormatter.cs" />
-    <Compile Include="Text\Parsers\MarkdownParser.cs" />
-    <Compile Include="Text\Parsers\OWikiParser.cs" />
+    <None Include="Text\Formatters\OWikiFormatter.cs" />
+    <None Include="Text\Parsers\obsolete\MarkdownParser.cs" />
+    <None Include="Text\Parsers\obsolete\OWikiParser1.cs" />
     <Compile Include="Text\DocumentModel.cs" />
-    <Compile Include="Text\Parsers\WikiParser.cs" />
-    <Compile Include="Text\Parsers\WikiParserBase.cs" />
+    <None Include="Text\Parsers\obsolete\WikiParser1.cs" />
+    <None Include="Text\Parsers\obsolete\WikiParserBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

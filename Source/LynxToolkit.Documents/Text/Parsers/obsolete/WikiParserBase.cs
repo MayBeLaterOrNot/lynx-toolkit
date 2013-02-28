@@ -260,7 +260,7 @@ namespace LynxToolkit.Documents
                         td.HorizontalAlignment = HorizontalAlignment.Right;
                     }
 
-                    this.ParseInlines(content.Trim(), td.Content);
+                    // this.ParseInlines(content.Trim(), td.Content);
                     tr.Cells.Add(td);
                 }
 
@@ -364,7 +364,6 @@ namespace LynxToolkit.Documents
                     var img = new Image
                                   {
                                       Source = src,
-                                      BaseDirectory = this.BaseDirectory,
                                       AlternateText = alt,
                                       Link = imglink
                                   };

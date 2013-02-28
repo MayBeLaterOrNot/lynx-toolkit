@@ -40,7 +40,7 @@ namespace LynxToolkit.Documents
             return wf.ToString();
         }
 
-        protected override void Write(HorizontalRuler ruler)
+        protected override void Write(HorizontalRuler ruler, object parent)
         {
             WriteLine("- - -");
             WriteLine();
@@ -61,7 +61,7 @@ namespace LynxToolkit.Documents
             if (hyperlink.Content.Count > 0 && !isDefaultTitle)
             {
                 Write("|");
-                WriteInlines(hyperlink.Content);
+                WriteInlines(hyperlink.Content, parent);
             }
 
             if (!string.IsNullOrWhiteSpace(hyperlink.Title))

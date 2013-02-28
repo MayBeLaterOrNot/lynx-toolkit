@@ -53,12 +53,6 @@ namespace WikiT
         public static string Input { get; set; }
 
         /// <summary>
-        /// Gets or sets the default syntax of the input files.
-        /// </summary>
-        /// <value>The following values are accepted: owiki, md, creole, xml.</value>
-        public static string DefaultSyntax { get; set; }
-
-        /// <summary>
         /// Gets or sets the output format.
         /// </summary>
         /// <value>The output format (html, docx, owiki, md, creole, xml).</value>
@@ -96,16 +90,6 @@ namespace WikiT
         public static string Stylesheet { get; set; }
 
         /// <summary>
-        /// Gets or sets the format string for local links.
-        /// </summary>
-        public static string LocalLinks { get; set; }
-
-        /// <summary>
-        /// Gets or sets the format string for links containing a space identifier.
-        /// </summary>
-        public static string SpaceLinks { get; set; }
-
-        /// <summary>
         /// Gets or sets the define constants.
         /// </summary>
         /// <value>The define constants.</value>
@@ -115,15 +99,15 @@ namespace WikiT
         public static HashSet<string> Defines { get; set; }
 
         /// <summary>
-        /// Gets or sets the replacement strings.
+        /// Gets or sets the variables.
         /// </summary>
         /// <value>
-        /// The replacement strings.
+        /// The variable strings.
         /// </value>
         /// <remarks>
-        /// The replacement keys will be prefixed by "$" and replaced by their values.
+        /// The variable keys will be prefixed by "$" and replaced by their values.
         /// </remarks>
-        public static Dictionary<string, string> Replacements { get; set; }
+        public static Dictionary<string, string> Variables { get; set; }
 
         /// <summary>
         /// The main entry point.
@@ -133,23 +117,20 @@ namespace WikiT
         public static int Main(string[] args)
         {
             Console.WriteLine(Utilities.ApplicationHeader);
-            if (args.Length < 3)
+            if (args.Length == 0)
             {
-                Console.WriteLine("Arguments: [/input=folder/search-pattern] [/defaultSyntax=owiki] [/format=html] [/extension=.html] [/output=output-folder]");
+                Console.WriteLine("Arguments: [/input=folder/search-pattern] [/format=html] [/output=output-folder] [/forceoutput] [/extension=.html] [/template=template.html] [/stylesheet=style.css] [/define=XYZ]");
                 Console.WriteLine(@"Example: /input=..\docs\*.wiki /output=..\output");
                 return -1;
             }
 
             // set default values
             Input = "*.wiki";
-            DefaultSyntax = null;
             Format = "html";
             Extension = null;
             Output = "output";
-            LocalLinks = string.Empty;
-            SpaceLinks = string.Empty;
             Defines = new HashSet<string>();
-            Replacements = new Dictionary<string, string>();
+            Variables = new Dictionary<string, string>();
 
             foreach (var arg in args)
             {
@@ -163,9 +144,6 @@ namespace WikiT
                             break;
                         case "/output":
                             Output = kv[1];
-                            continue;
-                        case "/defaultsyntax":
-                            DefaultSyntax = kv[1].ToLower();
                             continue;
                         case "/format":
                             Format = kv[1].ToLower();
@@ -183,17 +161,11 @@ namespace WikiT
                         case "/stylesheet":
                             Stylesheet = kv[1];
                             continue;
-                        case "/locallinks":
-                            LocalLinks = kv[1];
-                            continue;
-                        case "/spacelinks":
-                            SpaceLinks = kv[1];
-                            continue;
                         case "/define":
                             Defines.Add(kv[1]);
                             continue;
                         default:
-                            Replacements.Add(kv[0].Trim('/'), kv[1]);
+                            Variables.Add(kv[0].Trim('/'), kv[1]);
                             continue;
                     }
                 }
@@ -221,32 +193,54 @@ namespace WikiT
                 }
             }
 
+            if (!Extension.StartsWith("."))
+            {
+                Console.WriteLine("The output extension should start with '.'");
+                return 2;
+            }
+            
             Utilities.CreateDirectoryIfMissing(Output);
 
-            var inputDirectory = Path.GetDirectoryName(Input);
+            var inputDirectory = Path.GetFullPath(Path.GetDirectoryName(Input));
             var searchPattern = Path.GetFileName(Input);
 
+            Console.WriteLine("Input directory:  '{0}'", Path.GetFullPath(inputDirectory));
+            Console.WriteLine("Search pattern:   '{0}'", searchPattern);
+            Console.WriteLine("Output directory: '{0}'", Path.GetFullPath(Output));
+            Console.WriteLine("Output extension: '{0}'", Extension);
+
             var files = Utilities.FindFiles(inputDirectory, searchPattern).ToList();
+
+            Console.WriteLine();
+            Console.WriteLine(files.Count + " input files found.");
+
+            Console.WriteLine();
+
             var w = Stopwatch.StartNew();
+#if !XDEBUG
             try
             {
+#endif
                 foreach (var f in files)
                 {
-                    Console.Write(f);
-                    if (!Transform(f))
+                    var relativePath = Utilities.MakeRelativePath(f, inputDirectory);
+                    Console.Write(relativePath);
+                    if (!Transform(inputDirectory, relativePath))
                     {
                         Console.Write(" (no change)");
                     }
 
                     Console.WriteLine();
                 }
+#if !XDEBUG
             }
             catch (Exception e)
             {
-                Console.WriteLine("Exception: " + e.Message);
-                return -1;
+                Console.WriteLine();
+                Console.WriteLine("  Exception: " + e.Message);
+                return 1;
             }
-
+#endif
             Console.WriteLine(string.Format(CultureInfo.InvariantCulture, "\nExecution time: {0:0.000} s", w.ElapsedMilliseconds * 0.001));
 
             return 0;
@@ -255,69 +249,71 @@ namespace WikiT
         /// <summary>
         /// Transforms the specified file.
         /// </summary>
-        /// <param name="filePath">The file path.</param>
+        /// <param name="inputFolder">The input folder.</param>
+        /// <param name="relativeFilePath">The relative file path.</param>
         /// <returns>True if the file was modified.</returns>
-        /// <exception cref="System.FormatException">Invalid format.</exception>
-        private static bool Transform(string filePath)
+        private static bool Transform(string inputFolder, string relativeFilePath)
         {
-            var doc = WikiParser.ParseFile(filePath, DefaultSyntax, Replacements, Defines);
-            var outputPath = filePath;
-            if (Output != null && filePath != null)
+            if (inputFolder == null)
             {
-                var fileName = Path.GetFileName(filePath) ?? string.Empty;
-                outputPath = Path.Combine(Output, fileName);
+                throw new ArgumentNullException("inputFolder");
             }
 
+            if (relativeFilePath == null)
+            {
+                throw new ArgumentNullException("relativeFilePath");
+            }
+
+            var filePath = Path.Combine(inputFolder, relativeFilePath);
+            var parser = new WikiParser(Defines, Variables) { IncludeDefaultExtension = Path.GetExtension(Input) };
+            var doc = parser.ParseFile(filePath);
+
+            var outputPath = Output != null ? Path.Combine(Output, relativeFilePath) : relativeFilePath;
             outputPath = Path.ChangeExtension(outputPath, Extension);
 
-            string outputText;
-
+            DocumentFormatter formatter = null;
             switch (Format)
             {
                 case "word":
-                    {
-                        WordFormatter.Format(doc, outputPath, new WordFormatterOptions { Template = Template });
-                        return true;
-                    }
+                    formatter = new WordFormatter { Template = Template };
+                    break;
 
-                case "owiki":
-                    outputText = OWikiFormatter.Format(doc);
+                case "wiki":
+                    //formatter = new WikiFormatter();
                     break;
 
                 case "creole":
-                    outputText = CreoleFormatter.Format(doc);
+                    // formatter = new CreoleFormatter();
                     break;
 
                 case "markdown":
-                    outputText = MarkdownFormatter.Format(doc);
+                    // formatter = new MarkdownFormatter();
                     break;
                 case "xml":
-                    outputText = XmlFormatter.Format(doc);
+                    //outputText = XmlFormatter.Format(doc);
                     break;
 
                 case "html":
-                    var options = new HtmlFormatterOptions
+                    formatter = new HtmlFormatter
                                       {
                                           Css = Stylesheet,
                                           Template = Template,
-                                          LocalLinkFormatString = LocalLinks,
-                                          SpaceLinkFormatString = SpaceLinks,
-                                          Replacements = Replacements,
+                                          LocalLinkFormatString = "{0}." + Extension,
+                                          SpaceLinkFormatString = "{0}/{1}." + Extension,
+                                          Variables = Variables,
                                       };
-                    outputText = HtmlFormatter.Format(doc, options);
                     break;
-
-                default:
-                    throw new FormatException(string.Format("The output format '{0}' is not supported.", Format));
             }
 
-            if (Utilities.IsFileModified(outputPath, outputText) || ForceOutput)
+            if (formatter == null)
             {
-                File.WriteAllText(outputPath, outputText, Encoding.UTF8);
-                return true;
+                throw new FormatException(string.Format("The output format '{0}' is not supported.", Format));
             }
 
-            return false;
+            var outputDirectory = Path.GetDirectoryName(outputPath);
+            Utilities.CreateDirectoryIfMissing(outputDirectory);
+
+            return formatter.Format(doc, outputPath);
         }
     }
 }

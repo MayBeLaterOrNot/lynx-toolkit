@@ -7,13 +7,15 @@
     using System.Xml;
     using System.Xml.Serialization;
 
-    [XmlInclude(typeof(Replacement))]
+    [XmlInclude(typeof(Variable))]
     [XmlRoot]
     public class WikiProject
     {
         public WikiProject()
         {
             this.Documents = new ObservableCollection<WikiDocument>();
+            this.Variables = new List<Variable>();
+            this.Defines = new List<string>();
         }
 
         public static WikiProject Load(string filePath)
@@ -69,12 +71,20 @@
         public string Output { get; set; }
         public string Scc { get; set; }
 
-        [XmlArrayItem("String")]
-        public List<Replacement> Replacements { get; set; }
+        [XmlArrayItem("Variable")]
+        public List<Variable> Variables { get; set; }
 
-        public Dictionary<string, string> GetReplacements()
+        [XmlArrayItem("Define")]
+        public List<string> Defines { get; set; }
+
+        public Dictionary<string, string> GetVariables()
         {
-            return this.Replacements.ToDictionary(r => r.Key, r => r.Value);
+            return this.Variables.ToDictionary(r => r.Key, r => r.Value);
+        }
+
+        public HashSet<string> GetDefines()
+        {
+            return new HashSet<string>(this.Defines);
         }
 
         [XmlIgnore]
