@@ -9,7 +9,7 @@
     {
         public TexConverter()
         {
-            this.LatexInstallationDirectory = @"C:\Program Files (x86)\MiKTeX 2.9\miktex\bin";
+            this.LatexInstallationDirectory = @"C:\Program Files\MiKTeX 2.9\miktex\bin\x64";
             this.TemporaryDirectory = "~temp";
             this.MagnificationRatio = 1440;
             this.Background = "transparent";

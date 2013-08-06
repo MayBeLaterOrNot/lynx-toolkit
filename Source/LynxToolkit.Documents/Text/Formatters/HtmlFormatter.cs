@@ -628,8 +628,13 @@ namespace LynxToolkit.Documents
                 this.w.WriteStartElement("a");
                 this.w.WriteAttributeString("href", image.Link);
             }
-            var src = image.Source.Replace(this.SourceDirectory, this.OutputDirectory);
-            src = Utilities.MakeRelativePath(src, this.OutputDirectory);
+
+            var src = image.Source;
+            if (!string.IsNullOrEmpty(this.SourceDirectory))
+            {
+                src = src.Replace(this.SourceDirectory, this.OutputDirectory);
+                src = Utilities.MakeRelativePath(src, this.OutputDirectory);
+            }
 
             this.w.WriteStartElement("img");
             this.WriteAttributes(image);

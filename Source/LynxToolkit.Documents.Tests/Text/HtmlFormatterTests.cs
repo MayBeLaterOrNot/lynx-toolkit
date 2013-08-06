@@ -10,8 +10,7 @@
         {
             var parser = new WikiParser();
             var doc = parser.ParseFile(@"Input/Example.wiki");
-            var formatter = new HtmlFormatter();
-            formatter.SymbolDirectory = @"Input\Images";
+            var formatter = new HtmlFormatter { SymbolDirectory = @"Input\Images" };
             formatter.Format(doc, "Example.html");
         }
     }
