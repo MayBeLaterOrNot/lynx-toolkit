@@ -61,6 +61,7 @@ namespace PropertyCG
             this.ReferencePropertyType = "Reference<{0}>";
             this.ReferenceResolve = "this.ResolveReference(ref this.{0})";
             this.PropertyChangeCallback = "this.On{0}Changed(oldValue, value)";
+            this.UseDataMemberAttribute = true;
             this.ValidateCallback = "this.Validate{0}(value)";
             this.ValidateDependencies = false;
         }
@@ -165,6 +166,12 @@ namespace PropertyCG
         /// <value><c>true</c> if dependency names should be validated; otherwise, <c>false</c>.</value>
         /// <remarks>Disabling this feature will make it possible to set dependencies to properties that are not auto-generated.</remarks>
         public bool ValidateDependencies { get; private set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to use DataMemberAttribute.
+        /// </summary>
+        /// <value><c>true</c> if DataMemberAttribute should be used; otherwise, <c>false</c>.</value>
+        public bool UseDataMemberAttribute { get; set; }
 
         /// <summary>
         /// Gets or sets the format string for the validation callback statement.

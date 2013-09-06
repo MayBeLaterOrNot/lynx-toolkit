@@ -118,5 +118,11 @@ namespace PropertyCG
         /// <value><c>true</c> if dependency names should be validated; otherwise, <c>false</c>.</value>
         /// <remarks>Disabling this feature will make it possible to set dependencies to properties that are not auto-generated.</remarks>
         bool ValidateDependencies { get; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to use DataMemberAttribute.
+        /// </summary>
+        /// <value><c>true</c> if DataMemberAttribute should be used; otherwise, <c>false</c>.</value>
+        bool UseDataMemberAttribute { get; set; }
     }
 }

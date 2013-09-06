@@ -56,7 +56,7 @@ namespace PropertyCG
         public string AccessModifier { get; set; }
         public bool IsAbstract { get; set; }
         public string Name { get; set; }
-        public IList<string> Using { get; private set; }
+        public IList<string> UsedNamespaces { get; private set; }
         public Dictionary<string, Property> Properties { get; private set; }
         public IList<EnumType> EnumTypes { get; private set; }
 
@@ -65,7 +65,7 @@ namespace PropertyCG
         /// </summary>
         public PropertyClassModel()
         {
-            this.Using = new List<string>();
+            this.UsedNamespaces = new List<string>();
             this.Properties = new Dictionary<string, Property>();
             this.EnumTypes = new List<EnumType>();
             this.AccessModifier = "public";
@@ -95,7 +95,7 @@ namespace PropertyCG
                 var usingMatch = usingExpression.Match(line);
                 if (usingMatch.Success)
                 {
-                    this.Using.Add(usingMatch.Groups[1].Value);
+                    this.UsedNamespaces.Add(usingMatch.Groups[1].Value);
                 }
 
                 var namespaceMatch = namespaceExpression.Match(line);
@@ -177,7 +177,7 @@ $",
                 var usingMatch = usingExpression.Match(line);
                 if (usingMatch.Success)
                 {
-                    this.Using.Add(usingMatch.Groups[1].Value);
+                    this.UsedNamespaces.Add(usingMatch.Groups[1].Value);
                     continue;
                 }
 
@@ -298,7 +298,14 @@ $",
             sb.AppendLine("{");
             string previousUsing = null;
             sb.Indent();
-            foreach (var u in this.Using.OrderBy(s => s, new NamespaceComparer()))
+            
+            var usedNamespaces = new List<string>(this.UsedNamespaces);
+            if (options.UseDataMemberAttribute)
+            {
+                usedNamespaces.Add("System.Runtime.Serialization");
+            }
+
+            foreach (var u in usedNamespaces.OrderBy(s => s, new NamespaceComparer()).Distinct())
             {
                 if (previousUsing != null && previousUsing[0] != u[0])
                 {
@@ -339,6 +346,11 @@ $",
                 foreach (var a in p.Attributes)
                 {
                     sb.AppendLine(a);
+                }
+
+                if (options.UseDataMemberAttribute)
+                {
+                    sb.AppendLine("[DataMember]");
                 }
 
                 sb.AppendLine("public {0} {1}", p.Type, p.Name);
