@@ -45,6 +45,7 @@ _TeamCity*/
 *.dotCover
 *.ncrunchproject
 *.ncrunchsolution
+*.GhostDoc.xml
 
 [Tt]est[Rr]esult*
 [Bb]uild[Ll]og.*
