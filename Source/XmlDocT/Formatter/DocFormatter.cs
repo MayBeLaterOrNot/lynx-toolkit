@@ -322,9 +322,9 @@ namespace XmlDocT
                 }
 
                 var td1 = new TableCell();
-                var p = new Paragraph();
-                this.AddText(p.Content, description, scope);
-                td0.Blocks.Add(p);
+                var p1 = new Paragraph();
+                this.AddText(p1.Content, description, scope);
+                td1.Blocks.Add(p1);
                 tr.Cells.Add(td0);
                 tr.Cells.Add(td1);
                 table.Rows.Add(tr);
