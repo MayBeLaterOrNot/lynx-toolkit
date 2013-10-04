@@ -118,7 +118,7 @@ namespace UpdateFileHeaders
                         break;
                 }
 
-                var updater = new Updater(copyright, company, exclude);
+                var updater = new HeaderUpdater(copyright, company, exclude);
                 updater.ScanFolder(directory);
 
                 Console.WriteLine("{0} files updated (of {1})", filesCleaned, fileCount);
@@ -126,18 +126,18 @@ namespace UpdateFileHeaders
         }
 
         /// <summary>
-        /// The updater.
+        /// Implements the header updater tool.
         /// </summary>
-        public class Updater
+        public class HeaderUpdater
         {
             /// <summary>
             /// The ruler comment.
             /// </summary>
-            private const string rulerComment =
+            private const string RulerComment =
                 "// --------------------------------------------------------------------------------------------------------------------";
 
             /// <summary>
-            /// Initializes a new instance of the <see cref="Updater"/> class.
+            /// Initializes a new instance of the <see cref="HeaderUpdater"/> class.
             /// </summary>
             /// <param name="copyright">
             /// The copyright.
@@ -148,7 +148,7 @@ namespace UpdateFileHeaders
             /// <param name="exclude">
             /// The exclude.
             /// </param>
-            public Updater(string copyright, string company, string exclude)
+            public HeaderUpdater(string copyright, string company, string exclude)
             {
                 if (copyright == null && company != null)
                 {
@@ -182,10 +182,10 @@ namespace UpdateFileHeaders
             public string Exclude { get; set; }
 
             /// <summary>
-            /// The scan folder.
+            /// Scans the specified folder.
             /// </summary>
             /// <param name="path">
-            /// The path.
+            /// The path to the folder.
             /// </param>
             public void ScanFolder(string path)
             {
@@ -194,33 +194,33 @@ namespace UpdateFileHeaders
                     return;
                 }
 
-                foreach (string file in Directory.GetFiles(path, "*.cs"))
+                foreach (var file in Directory.GetFiles(path, "*.cs"))
                 {
                     this.UpdateFile(file);
                 }
 
-                foreach (string dir in Directory.GetDirectories(path))
+                foreach (var dir in Directory.GetDirectories(path))
                 {
                     this.ScanFolder(dir);
                 }
             }
 
             /// <summary>
-            /// The update file.
+            /// Updates the specified file.
             /// </summary>
-            /// <param name="file">
-            /// The file.
+            /// <param name="path">
+            /// The path to the file.
             /// </param>
-            private void UpdateFile(string file)
+            private void UpdateFile(string path)
             {
-                if (Utilities.IsExcluded(this.Exclude, file))
+                if (Utilities.IsExcluded(this.Exclude, path))
                 {
                     return;
                 }
 
-                string fileName = Path.GetFileName(file);
-                string input = File.ReadAllText(file);
-                Match summaryMatch = Regex.Match(
+                string fileName = Path.GetFileName(path);
+                string input = File.ReadAllText(path);
+                var summaryMatch = Regex.Match(
                     input,
                     @"///\s*<summary>\s*^(.*?)$\s*///\s*</summary>",
                     RegexOptions.Multiline | RegexOptions.Singleline);
@@ -233,7 +233,7 @@ namespace UpdateFileHeaders
                 }
 
                 var sb = new StringBuilder();
-                sb.AppendLine(rulerComment);
+                sb.AppendLine(RulerComment);
                 sb.AppendFormat("// <copyright file=\"{0}\" company=\"{1}\">", fileName, this.Company);
                 sb.AppendLine();
                 foreach (string line in this.Copyright.Split('\n'))
@@ -249,9 +249,10 @@ namespace UpdateFileHeaders
                     sb.AppendLine("// </summary>");
                 }
 
-                sb.AppendLine(rulerComment);
+                sb.AppendLine(RulerComment);
+                sb.AppendLine();
 
-                using (var r = new StreamReader(file))
+                using (var r = new StreamReader(path))
                 {
                     bool isHeader = true;
                     while (!r.EndOfStream)
@@ -271,15 +272,15 @@ namespace UpdateFileHeaders
 
                 fileCount++;
                 string output = sb.ToString().Trim();
-                string original = File.ReadAllText(file);
+                string original = File.ReadAllText(path);
                 if (string.Equals(original, output))
                 {
                     return;
                 }
 
-                Console.WriteLine("  " + file);
-                Utilities.OpenForEdit(file, openForEditExecutable, openForEditArguments);
-                File.WriteAllText(file, output, Encoding.UTF8);
+                Console.WriteLine("  " + path);
+                Utilities.OpenForEdit(path, openForEditExecutable, openForEditArguments);
+                File.WriteAllText(path, output, Encoding.UTF8);
 
                 filesCleaned++;
             }
