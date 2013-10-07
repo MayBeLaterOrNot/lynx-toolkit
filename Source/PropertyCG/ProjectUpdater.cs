@@ -30,7 +30,9 @@
 namespace PropertyCG
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using System.Xml;
 
     /// <summary>
@@ -69,6 +71,7 @@ namespace PropertyCG
 
             foreach (XmlNode itemGroup in root.SelectNodes("//b:ItemGroup", nsmgr))
             {
+                var propertyFiles = new List<string>();
                 foreach (XmlNode item in itemGroup.ChildNodes)
                 {
                     if (item == null)
@@ -98,6 +101,8 @@ namespace PropertyCG
                             modified = true;
                         }
 
+                        propertyFiles.Add(include);
+
                         // Make property source file dependen upon main class?
                         //if (dependentUponNode == null)
                         //{
@@ -109,42 +114,59 @@ namespace PropertyCG
                         //var dependentUponFileName = Path.GetFileName(include.Replace(this.Extension, ".cs"));
                         //modified |= ChangeInnerText(dependentUponNode, dependentUponFileName);
                     }
+                }
 
-                    if (include.Contains(".Properties.cs"))
+                foreach (var omlFile in propertyFiles)
+                {
+                    var propertiesFile = Path.ChangeExtension(omlFile, ".cs");
+                    var item = itemGroup.SelectSingleNode("//b:Compile[@Include='" + propertiesFile + "']", nsmgr);
+                    if (item == null)
                     {
+                        item = doc.CreateElement("Compile", itemGroup.NamespaceURI);
+                        var include = doc.CreateAttribute("Include");
+                        include.Value = propertiesFile;
+                        item.Attributes.Append(include);
+                        itemGroup.AppendChild(item);
+                    }
+                    else
+                    {
+                        var include = item.Attributes["Include"].Value;
                         if (item.Name != "Compile")
                         {
                             Console.WriteLine(include + " should have build action = Compile.");
                         }
-
-                        var dependentUponFileName = Path.GetFileName(include.Replace(".Properties.cs", this.Extension));
-                        var dependentUponNode = item.SelectSingleNode("b:DependentUpon", nsmgr);
-                        if (dependentUponNode == null)
-                        {
-                            dependentUponNode = doc.CreateElement("DependentUpon", NamespaceUri);
-                            item.AppendChild(dependentUponNode);
-                            modified = true;
-                        }
-                        modified |= changeInnerText(dependentUponNode, dependentUponFileName);
-
-                        var autogenNode = item.SelectSingleNode("b:AutoGen", nsmgr);
-                        if (autogenNode == null)
-                        {
-                            autogenNode = doc.CreateElement("AutoGen", NamespaceUri);
-                            item.AppendChild(autogenNode);
-                            modified = true;
-                        }
-                        modified |= changeInnerText(autogenNode, "True");
                     }
+
+                    var dependentUponFileName = omlFile; //  Path.GetFileName(include.Replace(".Properties.cs", this.Extension));
+                    var dependentUponNode = item.SelectSingleNode("b:DependentUpon", nsmgr);
+                    if (dependentUponNode == null)
+                    {
+                        dependentUponNode = doc.CreateElement("DependentUpon", NamespaceUri);
+                        item.AppendChild(dependentUponNode);
+                        modified = true;
+                    }
+
+                    modified |= changeInnerText(dependentUponNode, dependentUponFileName);
+
+                    var autogenNode = item.SelectSingleNode("b:AutoGen", nsmgr);
+                    if (autogenNode == null)
+                    {
+                        autogenNode = doc.CreateElement("AutoGen", NamespaceUri);
+                        item.AppendChild(autogenNode);
+                        modified = true;
+                    }
+
+                    modified |= changeInnerText(autogenNode, "True");
 
                 }
             }
 
             if (modified)
             {
-                PropertyCodeGenerator.OpenForEdit(FileName, this.OpenForEditExecutable, this.OpenForEditArguments);
-                doc.Save(FileName);
+                PropertyCodeGenerator.OpenForEdit(this.FileName, this.OpenForEditExecutable, this.OpenForEditArguments);
+                doc.Save(this.FileName);
             }
+
             return modified;
         }
 

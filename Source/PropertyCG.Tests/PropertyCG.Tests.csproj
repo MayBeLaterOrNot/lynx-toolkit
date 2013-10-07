@@ -34,6 +34,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -47,13 +48,13 @@
     <Compile Include="PropertyChangedEventArgsEx.cs" />
     <Compile Include="Reference.cs" />
     <Compile Include="TestObject.cs" />
-    <Compile Include="TestObject.Properties.cs">
-      <DependentUpon>TestObject.oml</DependentUpon>
-      <AutoGen>True</AutoGen>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="TestObject.oml" />
+    <None Include="TestObject.Properties.oml" />
+    <Compile Include="TestObject.Properties.cs">
+      <DependentUpon>TestObject.Properties.oml</DependentUpon>
+      <AutoGen>True</AutoGen>
+    </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="BeforeBuild">

@@ -47,12 +47,28 @@ namespace PropertyCG
         public PropertyCodeGenerator(string fileName)
         {
             this.FileName = fileName;
-            this.ClassFileName = Path.ChangeExtension(this.FileName, ".cs");
-            this.PropertiesFileName = Path.ChangeExtension(this.FileName, ".Properties.cs");
+
+            var dir = Path.GetDirectoryName(fileName) ?? ".";
+            var name = Path.GetFileNameWithoutExtension(fileName);
+            var i = name != null ? name.IndexOf('.') : -1;
+            if (i > 0 && name != null)
+            {
+                var firstName = name.Substring(0, name.IndexOf('.'));
+                this.ClassFileName = Path.Combine(dir, firstName + ".cs");
+                this.PropertiesFileName = Path.ChangeExtension(this.FileName, ".cs");
+            }
+            else
+            {
+                this.ClassFileName = Path.ChangeExtension(this.FileName, ".cs");
+                this.PropertiesFileName = Path.ChangeExtension(this.FileName, ".Properties.cs");
+            }
+
             this.PropertyClassModel = new PropertyClassModel();
-            this.Flags = new Dictionary<string, string>();
-            this.Flags.Add("+", "PropertyChangedFlags.AffectsRender");
-            this.Flags.Add("$", "PropertyChangedFlags.AffectsResults");
+            this.Flags = new Dictionary<string, string>
+                             {
+                                 { "+", "PropertyChangedFlags.AffectsRender" },
+                                 { "$", "PropertyChangedFlags.AffectsResults" }
+                             };
 
             this.PropertySetter = "this.SetValue(ref this.{0}, value, \"{1}\"{2})";
             this.ReferencePropertySetter = "this.SetReference(ref this.{0}, value, \"{1}\"{2})";
@@ -77,7 +93,7 @@ namespace PropertyCG
         public string AffectsResultsFlag { get; set; }
 
         /// <summary>
-        /// Gets the name of the class file.
+        /// Gets the name of the main C# class file.
         /// </summary>
         /// <value>The name of the class file.</value>
         public string ClassFileName { get; private set; }
@@ -101,7 +117,7 @@ namespace PropertyCG
         public string OpenForEditExecutable { get; set; }
 
         /// <summary>
-        /// Gets the name of the properties file.
+        /// Gets the name of the generated C# properties file.
         /// </summary>
         /// <value>The name of the properties file.</value>
         public string PropertiesFileName { get; private set; }
