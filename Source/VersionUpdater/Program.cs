@@ -41,7 +41,7 @@ namespace VersionUpdater
     //   The program updates version and company/copyright information.
     //
     // Syntax:
-    //   VersionUpdater.exe [/Directory=xxx] [/Version=x.x.x.x] [/Company=xxx] [/Copyright=xxx]
+    //   VersionUpdater.exe [/Directory=..\src] [/VersionFile=..\version.txt] [/Version=x.x.x.x] [/Build=x] [/Revision=x] [/Company=xxx] [/Copyright=xxx]
     // Arguments:
     //   /Directory specifies the root directory (all subdirectories will be scanned)
     //   /Version specifies the version number (Major.Minor.Build.Revision)
@@ -49,6 +49,9 @@ namespace VersionUpdater
     //      yyyy = year
     //      MM = month
     //      dd = day
+    //   /VersionFile gets the version number from a file
+    //   /Build - overwrites the build number
+    //   /Revision - overwrites the revision number
     //   /Company
     //   /Copyright
 
@@ -67,6 +70,8 @@ namespace VersionUpdater
             string company = null;
             string copyright = null;
             string directory = Directory.GetCurrentDirectory();
+            string build = null;
+            string revision = null;
 
             // command line argument parsing
             foreach (string arg in args)
@@ -76,6 +81,9 @@ namespace VersionUpdater
                 {
                     switch (kv[0])
                     {
+                        case "/VersionFile":
+                            version = GetVersionFromFile(kv[1]);
+                            break;
                         case "/Version":
                             version = kv[1];
                             break;
@@ -91,6 +99,12 @@ namespace VersionUpdater
                         case "/Copyright":
                             copyright = kv[1];
                             break;
+                        case "/Build":
+                            build = kv[1];
+                            break;
+                        case "/Revision":
+                            revision = kv[1];
+                            break;
                     }
                 }
                 else
@@ -104,52 +118,110 @@ namespace VersionUpdater
                 copyright = string.Format("Copyright © {0} {1}", company, DateTime.Now.Year);
             }
 
-            var updater = new Updater(version, informationalVersion, copyright, company);
+            var updater = new Updater(version, informationalVersion, copyright, company, build, revision);
 
             updater.ScanFolder(directory);
         }
 
+        /// <summary>
+        /// Gets the version number from a text file.
+        /// </summary>
+        /// <param name="fileName">Path to a text file.</param>
+        /// <returns>The version number, or nothing if the file was empty.</returns>
+        private static string GetVersionFromFile(string fileName)
+        {
+            var lines = File.ReadAllLines(fileName);
+
+            // search for a line containing 'version' (case-insensitive)
+            foreach (var line in lines)
+            {
+                var i = line.IndexOf("version", StringComparison.InvariantCultureIgnoreCase);
+                if (i >= 0)
+                {
+                    // return the remaining part of this line
+                    return line.Substring(i + 7).Trim();
+                }
+            }
+
+            if (lines.Length == 0)
+            {
+                return string.Empty;
+            }
+
+            return lines[0];
+        }
+
         public class Updater
         {
-            public Updater(string version, string informationalVersion, string copyright, string company)
+            public Updater(string version, string informationalVersion, string copyright, string company, string build, string revision)
             {
-                Copyright = copyright;
-                Company = company;
+                this.Copyright = copyright;
+                this.Company = company;
 
                 version = version.Replace("yyyy", DateTime.Now.Year.ToString(CultureInfo.InvariantCulture));
                 version = version.Replace("MM", DateTime.Now.Month.ToString(CultureInfo.InvariantCulture));
                 version = version.Replace("dd", DateTime.Now.Day.ToString(CultureInfo.InvariantCulture));
 
-                version = To16BitVersionNumbers(version);
-                Version = version;
-                InformationalVersion = informationalVersion ?? version;
-
-                string nuSpecVersion = version.Replace(".*", ".0");
-
-                FileVersion = nuSpecVersion;
-
-                NuSpecReplacements = new Dictionary<Regex, string> { { new Regex(@"<version>.*</version>"), string.Format(@"<version>{0}</version>", nuSpecVersion) } };
-                AssemblyInfoReplacements = new Dictionary<Regex, string>
+                // split up the version number string
+                var versionNumbers = version.Split('.');
+                if (versionNumbers.Length < 4)
+                {
+                    var tmp = new string[4];
+                    for (int i = 0; i < 4; i++)
                     {
-                        { new Regex(@"AssemblyVersion\(.*\)"), string.Format("AssemblyVersion(\"{0}\")", Version) },
+                        tmp[i] = i < versionNumbers.Length ? versionNumbers[i] : "0";
+                    }
+
+                    versionNumbers = tmp;
+                }
+
+                // replace build and revision number if they are specified
+                if (build != null)
+                {
+                    versionNumbers[2] = build;
+                }
+
+                if (revision != null)
+                {
+                    versionNumbers[3] = revision;
+                }
+
+                // rebuild the version number string
+                version = string.Format("{0}.{1}.{2}.{3}", versionNumbers[0], versionNumbers[1], versionNumbers[2], versionNumbers[3]);
+
+                // truncate to 16 bit values
+                version = To16BitVersionNumbers(version);
+
+                this.Version = version;
+                this.InformationalVersion = informationalVersion ?? version;
+
+                string nuspecVersion = version.Replace(".*", ".0");
+
+                this.FileVersion = nuspecVersion;
+
+                this.NuSpecReplacements = new Dictionary<Regex, string> { { new Regex(@"<version>.*</version>"), string.Format(@"<version>{0}</version>", nuspecVersion) } };
+                this.AssemblyInfoReplacements = new Dictionary<Regex, string>
+                    {
+                        { new Regex(@"AssemblyVersion\(.*\)"), string.Format("AssemblyVersion(\"{0}\")", this.Version) },
                         {
                             new Regex(@"AssemblyInformationalVersion\(.*\)"),
-                            string.Format("AssemblyInformationalVersion(\"{0}\")", InformationalVersion)
+                            string.Format("AssemblyInformationalVersion(\"{0}\")", this.InformationalVersion)
                         },
                         {
                             new Regex(@"AssemblyFileVersion\(.*\)"),
-                            string.Format("AssemblyFileVersion(\"{0}\")", FileVersion)
+                            string.Format("AssemblyFileVersion(\"{0}\")", this.FileVersion)
                         }
                     };
-                if (Company != null)
+
+                if (this.Company != null)
                 {
-                    AssemblyInfoReplacements.Add(
-                        new Regex(@"AssemblyCompany\(.*\)"), string.Format("AssemblyCompany(\"{0}\")", Company));
+                    this.AssemblyInfoReplacements.Add(
+                        new Regex(@"AssemblyCompany\(.*\)"), string.Format("AssemblyCompany(\"{0}\")", this.Company));
                 }
 
-                if (Copyright != null)
+                if (this.Copyright != null)
                 {
-                    AssemblyInfoReplacements.Add(
+                    this.AssemblyInfoReplacements.Add(
                         new Regex(@"AssemblyCopyright\(.*\)"), string.Format("AssemblyCopyright(\"{0}\")", Copyright));
                 }
             }
@@ -176,7 +248,7 @@ namespace VersionUpdater
                     {
                         if (i > 65534)
                         {
-                            // only use the last 4 digts
+                            // only use the last 4 digits
                             i = i % 10000;
                         }
 
@@ -209,15 +281,18 @@ namespace VersionUpdater
             {
                 foreach (string file in Directory.GetFiles(path, "*AssemblyInfo.cs"))
                 {
-                    UpdateFile(file, AssemblyInfoReplacements);
+                    this.UpdateFile(file, this.AssemblyInfoReplacements);
                 }
 
                 foreach (string file in Directory.GetFiles(path, "*.nuspec"))
                 {
-                    UpdateFile(file, NuSpecReplacements);
+                    this.UpdateFile(file, this.NuSpecReplacements);
                 }
 
-                foreach (string dir in Directory.GetDirectories(path)) ScanFolder(dir);
+                foreach (string dir in Directory.GetDirectories(path))
+                {
+                    this.ScanFolder(dir);
+                }
             }
 
             private void UpdateFile(string file, Dictionary<Regex, string> replacements)
@@ -229,7 +304,7 @@ namespace VersionUpdater
 
                     foreach (var kvp in replacements)
                     {
-                        Regex regex = kvp.Key;
+                        var regex = kvp.Key;
                         string replacement = kvp.Value;
                         text = regex.Replace(text, replacement);
                     }
