@@ -137,7 +137,8 @@ namespace PropertyCG
                         }
                     }
 
-                    var dependentUponFileName = omlFile; //  Path.GetFileName(include.Replace(".Properties.cs", this.Extension));
+                    // the dependent upon (source) file name - note that this should not contain any path, only file name
+                    var dependentUponFileName = Path.GetFileName(omlFile); 
                     var dependentUponNode = item.SelectSingleNode("b:DependentUpon", nsmgr);
                     if (dependentUponNode == null)
                     {
@@ -157,7 +158,6 @@ namespace PropertyCG
                     }
 
                     modified |= changeInnerText(autogenNode, "True");
-
                 }
             }
 
@@ -169,6 +169,5 @@ namespace PropertyCG
 
             return modified;
         }
-
     }
 }

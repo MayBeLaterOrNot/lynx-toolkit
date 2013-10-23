@@ -37,6 +37,7 @@ namespace PropertyCG.Tests
             {
                 return false;
             }
+
             var oldValue = value;
             property = value;
 
@@ -62,6 +63,7 @@ namespace PropertyCG.Tests
             {
                 return false;
             }
+
             var oldValue = value;
             property = value;
 
