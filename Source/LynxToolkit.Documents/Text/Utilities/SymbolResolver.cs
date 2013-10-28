@@ -23,19 +23,32 @@
 //   TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 //   SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // </copyright>
+// <summary>
+//   Provides functionality to encode and decode symbols.
+// </summary>
 // --------------------------------------------------------------------------------------------------------------------
+
 namespace LynxToolkit.Documents
 {
     using System.Collections.Generic;
     using System.Linq;
 
+    /// <summary>
+    /// Provides functionality to encode and decode symbols.
+    /// </summary>
     public static class SymbolResolver
     {
-        private static readonly Dictionary<string, string> symbolDictionary;
+        /// <summary>
+        /// The symbol dictionary
+        /// </summary>
+        private static readonly Dictionary<string, string> SymbolDictionary;
 
+        /// <summary>
+        /// Initializes static members of the <see cref="SymbolResolver"/> class.
+        /// </summary>
         static SymbolResolver()
         {
-            symbolDictionary = new Dictionary<string, string>
+            SymbolDictionary = new Dictionary<string, string>
                                    {
                                        { ":-)", "smile.png" },
                                        { ":-(", "sad.png" },
@@ -65,16 +78,25 @@ namespace LynxToolkit.Documents
                                        { "(h)", "home.png" }
                                    };
         }
-        
+
+        /// <summary>
+        /// Gets the symbol names.
+        /// </summary>
+        /// <returns>The names.</returns>
         public static IEnumerable<string> GetSymbolNames()
         {
-            return symbolDictionary.Keys;
+            return SymbolDictionary.Keys;
         }
 
+        /// <summary>
+        /// Decodes the specified symbol name.
+        /// </summary>
+        /// <param name="input">The symbol name.</param>
+        /// <returns>The symbol file name.</returns>
         public static string Decode(string input)
         {
             string file;
-            if (!symbolDictionary.TryGetValue(input, out file))
+            if (!SymbolDictionary.TryGetValue(input, out file))
             {
                 return null;
             }
@@ -82,9 +104,14 @@ namespace LynxToolkit.Documents
             return file;
         }
 
-        public static string Encode(string file)
+        /// <summary>
+        /// Encodes symbols from the specified input string (symbol file name).
+        /// </summary>
+        /// <param name="input">The symbol file name.</param>
+        /// <returns>The symbol name.</returns>
+        public static string Encode(string input)
         {
-            var keyValuePair = symbolDictionary.FirstOrDefault(kvp => kvp.Value == file);
+            var keyValuePair = SymbolDictionary.FirstOrDefault(kvp => kvp.Value == input);
             return keyValuePair.Key;
         }
     }

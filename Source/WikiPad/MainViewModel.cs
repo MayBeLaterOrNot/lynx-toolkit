@@ -38,6 +38,7 @@ namespace WikiPad
 
     using LynxToolkit;
     using LynxToolkit.Documents;
+    using LynxToolkit.Documents.Html;
 
     using Microsoft.Win32;
 
@@ -234,7 +235,7 @@ namespace WikiPad
             {
                 return;
             }
-            
+
             try
             {
                 this.Project = WikiProject.Load(filePath);
@@ -295,9 +296,9 @@ namespace WikiPad
                 return;
             }
 
-            var documentFolder = Path.GetDirectoryName(this.SelectedDocument.FullPath);
-            var includeDefaultExtension = Path.GetExtension(this.SelectedDocument.FileName);
-            var template = Path.Combine(this.Project.Directory, this.Project.Template);
+            var documentFolder = System.IO.Path.GetDirectoryName(this.SelectedDocument.FullPath);
+            var includeDefaultExtension = System.IO.Path.GetExtension(this.SelectedDocument.FileName);
+            var template = System.IO.Path.Combine(this.Project.Directory, this.Project.Template);
             var formatter = new HtmlFormatter
                               {
                                   Template = template,
@@ -307,7 +308,7 @@ namespace WikiPad
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                var parser = new WikiParser(this.Project.GetDefines(), this.Project.GetVariables());
+                var parser = new WikiParser(this.Project.GetDefines(), this.Project.GetVariables(), File.OpenRead);
 
                 parser.CurrentDirectory = documentFolder;
                 parser.IncludeDefaultExtension = includeDefaultExtension;
@@ -315,16 +316,17 @@ namespace WikiPad
 
                 cancellationToken.ThrowIfCancellationRequested();
 
-                var outputPath = Path.GetFullPath(Path.ChangeExtension(
-                    Path.Combine(this.Project.Output, this.SelectedDocument.FileName), ".html"));
+                var outputPath = System.IO.Path.GetFullPath(System.IO.Path.ChangeExtension(
+                    System.IO.Path.Combine(this.Project.Output, this.SelectedDocument.FileName), ".html"));
 
                 // this.Wiki = OWikiFormatter.Format(doc);
                 // this.WikiCreole = CreoleFormatter.Format(doc);
                 // this.WikiMarkdown = MarkdownFormatter.Format(doc);
                 // this.WikiConfluence = ConfluenceFormatter.Format(doc);
                 // this.WikiCodeplex = CodeplexFormatter.Format(doc);
-                Utilities.CreateDirectoryIfMissing(Path.GetDirectoryName(outputPath));
-                formatter.Format(doc, outputPath);
+                Utilities.CreateDirectoryIfMissing(System.IO.Path.GetDirectoryName(outputPath));
+                using (var stream = File.OpenWrite(outputPath))
+                    formatter.Format(doc, stream);
 
                 this.OutputSource = null;
                 this.OutputSource = new Uri(outputPath, UriKind.Absolute);

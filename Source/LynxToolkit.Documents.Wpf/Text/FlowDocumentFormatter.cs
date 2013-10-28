@@ -28,6 +28,7 @@ namespace LynxToolkit.Documents.Wpf
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Windows;
     using System.Windows.Documents;
     using System.Windows.Media;
@@ -53,7 +54,7 @@ namespace LynxToolkit.Documents.Wpf
     using TableRow = System.Windows.Documents.TableRow;
     using Thickness = System.Windows.Thickness;
 
-    public class FlowDocumentFormatter : DocumentFormatter
+    public class FlowDocumentFormatter : DocumentFormatter<object>
     {
         public FlowDocument Document { get; private set; }
 
@@ -132,14 +133,14 @@ namespace LynxToolkit.Documents.Wpf
             return new SolidColorBrush(Color.FromArgb(c.Alpha, c.Red, c.Green, c.Blue));
         }
 
-        public override bool Format(LynxToolkit.Documents.Document doc, string outputFile)
+        public override void Format(LynxToolkit.Documents.Document doc, Stream stream)
         {
-            this.source = doc;
+            this.Source = doc;
             this.Document = new FlowDocument();
             if (this.StyleSheet == null) this.StyleSheet = new StyleSheet();
             this.WriteBlocks(doc.Blocks, null);
-            //this.Document
-            return true;
+
+            // TODO...
         }
 
         protected override void Write(LynxToolkit.Documents.Header header, object parent)

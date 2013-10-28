@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DocumentParser.cs" company="Lynx Toolkit">
+// <copyright file="DocumentParserExtensions.cs" company="Lynx Toolkit">
 //   The MIT License (MIT)
 //   
 //   Copyright (c) 2012 Oystein Bjorke
@@ -24,43 +24,32 @@
 //   SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // </copyright>
 // <summary>
-//   Creates a regular expression.
+//   Provides extension methods for the <see cref="IDocumentParser" />s.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
+
 namespace LynxToolkit.Documents
 {
-    using System.Text.RegularExpressions;
+    using System.IO;
+    using System.Text;
 
-    public abstract class DocumentParser
+    /// <summary>
+    /// Provides extension methods for the <see cref="IDocumentParser"/>s.
+    /// </summary>
+    public static class DocumentParserExtensions
     {
-        protected DocumentParser()
-        {
-            this.Document = new Document();
-        }
-
-        public Document Document { get; private set; }
-
         /// <summary>
-        /// Creates a regular expression.
+        /// Parses the specified string to a <see cref="Document"/>.
         /// </summary>
-        /// <param name="s">The expression.</param>
-        /// <param name="multiline">Multiline mode. Changes the meaning of ^ and$ so they match at the beginning and end, respectively, of any line, and not just the beginning and end of the entire string.</param>
-        /// <param name="singleline">Specifies single-line mode. Changes the meaning of the dot (.) so it matches every character (instead of every character except \n).</param>
-        /// <returns>The compiled regular expression.</returns>
-        public static Regex CreateRegex(string s, bool multiline = true, bool singleline = true)
+        /// <param name="parser">The parser.</param>
+        /// <param name="input">The input string.</param>
+        /// <returns>A <see cref="Document"/>.</returns>
+        public static Document Parse(this IDocumentParser parser, string input)
         {
-            var o = RegexOptions.IgnorePatternWhitespace | RegexOptions.CultureInvariant;
-            if (multiline)
+            using (var s = new MemoryStream(Encoding.UTF8.GetBytes(input)))
             {
-                o |= RegexOptions.Multiline;
+                return parser.Parse(s);
             }
-            
-            if (singleline)
-            {
-                o |= RegexOptions.Singleline;
-            }
-
-            return new Regex(s, o);
         }
     }
 }

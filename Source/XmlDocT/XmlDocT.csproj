@@ -55,6 +55,9 @@
     <Compile Include="..\HhcGen\SiteMap.cs">
       <Link>HtmlHelp\SiteMap.cs</Link>
     </Compile>
+    <Compile Include="..\Utilities.cs">
+      <Link>Utilities.cs</Link>
+    </Compile>
     <Compile Include="Formatter\DocFormatter.cs" />
     <Compile Include="Model\ConstructorModel.cs" />
     <Compile Include="Model\FieldModel.cs" />
@@ -78,6 +81,10 @@
     </Resource>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\LynxToolkit.Documents.Html\LynxToolkit.Documents.Html.csproj">
+      <Project>{C4E1B55A-CBFD-4EE0-9033-7F7D41C51AFC}</Project>
+      <Name>LynxToolkit.Documents.Html</Name>
+    </ProjectReference>
     <ProjectReference Include="..\LynxToolkit.Documents.OpenXml\LynxToolkit.Documents.OpenXml.csproj">
       <Project>{a4e4a901-66d5-45ba-b8de-14e4ae6d66e9}</Project>
       <Name>LynxToolkit.Documents.OpenXml</Name>

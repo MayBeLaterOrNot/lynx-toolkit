@@ -60,6 +60,9 @@
     <Compile Include="..\GlobalAssemblyInfo.cs">
       <Link>Properties\GlobalAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="..\Utilities.cs">
+      <Link>Utilities.cs</Link>
+    </Compile>
     <Compile Include="WebBrowserBehavior.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -107,6 +110,10 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\LynxToolkit.Documents.Html\LynxToolkit.Documents.Html.csproj">
+      <Project>{C4E1B55A-CBFD-4EE0-9033-7F7D41C51AFC}</Project>
+      <Name>LynxToolkit.Documents.Html</Name>
+    </ProjectReference>
     <ProjectReference Include="..\LynxToolkit.Documents.Wpf\LynxToolkit.Documents.Wpf.csproj">
       <Project>{08e223e5-a9ee-472e-9ced-4ab424d04d57}</Project>
       <Name>LynxToolkit.Documents.Wpf</Name>

@@ -26,6 +26,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 namespace LynxToolkit.Documents.Tests
 {
+    using LynxToolkit.Documents.Html;
+
     using NUnit.Framework;
 
     [TestFixture]

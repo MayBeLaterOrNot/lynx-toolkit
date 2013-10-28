@@ -1,4 +1,4 @@
-﻿namespace LynxToolkit.Documents
+﻿namespace LynxToolkit.Documents.Html
 {
     using System;
     using System.Diagnostics;
@@ -43,7 +43,7 @@
 
         public bool Convert(string tex, string fileName)
         {
-            var tempTexFileName = Path.Combine(this.TemporaryDirectory, Path.ChangeExtension("~" + Path.GetFileName(fileName), ".tex"));
+            var tempTexFileName = Path.Combine(this.TemporaryDirectory, Path.ChangeExtension("~" + System.IO.Path.GetFileName(fileName), ".tex"));
             if (!Directory.Exists(this.TemporaryDirectory))
             {
                 Directory.CreateDirectory(this.TemporaryDirectory);
@@ -62,6 +62,11 @@
                                                  this.TemporaryDirectory,
                                                  tempTexFileName)
                                      };
+            if (!File.Exists(latexStartInfo.FileName))
+            {
+                return false;
+            }
+
             var latexProcess = Process.Start(latexStartInfo);
             latexProcess.WaitForExit();
             if (latexProcess.ExitCode != 0)

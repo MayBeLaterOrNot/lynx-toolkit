@@ -1,18 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
+    <MinimumVisualStudioVersion>10.0</MinimumVisualStudioVersion>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{3C23AABF-5CCB-4000-8D1C-1FE055CCBC5E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>LynxToolkit.Documents</RootNamespace>
     <AssemblyName>LynxToolkit.Documents</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Profile2</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -32,26 +33,25 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="..\GlobalAssemblyInfo.cs">
       <Link>Properties\GlobalAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="..\Utilities.cs">
-      <Link>Utilities.cs</Link>
-    </Compile>
-    <None Include="Text\Formatters\CodeplexFormatter.cs" />
-    <None Include="Text\Formatters\ConfluenceFormatter.cs" />
+    <Compile Include="Text\Parsers\DocumentParserExtensions.cs" />
+    <Compile Include="Text\Formatters\DocumentFormatterExtensions.cs" />
+    <Compile Include="Text\Formatters\IDocumentFormatter.cs" />
+    <Compile Include="Text\Parsers\IDocumentParser.cs" />
+    <Compile Include="Utilities\JsonSerializer.cs" />
+    <Compile Include="Text\Formatters\XmlFormatter.cs" />
+    <Compile Include="Utilities\Path.cs" />
+    <None Include="Text\Formatters\obsolete\CodeplexFormatter.cs" />
+    <None Include="Text\Formatters\obsolete\ConfluenceFormatter.cs" />
+    <Compile Include="Text\Parsers\JsonParser.cs" />
+    <Compile Include="Text\Formatters\JsonFormatter.cs" />
     <Compile Include="Text\Parsers\WikiParser.cs" />
-    <Compile Include="Text\Utilities\CsSyntaxHighlighter.cs" />
-    <None Include="Text\Formatters\MarkdownFormatter.cs" />
-    <None Include="Text\Formatters\CreoleFormatter.cs" />
+    <None Include="Text\Formatters\obsolete\MarkdownFormatter.cs" />
+    <None Include="Text\Formatters\obsolete\CreoleFormatter.cs" />
     <Compile Include="Text\Formatters\DocumentFormatter.cs" />
-    <None Include="Text\Formatters\XmlFormatter.cs" />
+    <Compile Include="Text\Parsers\XmlParser.cs" />
     <Compile Include="Spreadsheet\BorderStyle.cs" />
     <Compile Include="Spreadsheet\HorizontalAlignment.cs" />
     <Compile Include="Spreadsheet\TableBuilder.cs" />
@@ -63,16 +63,13 @@
     <Compile Include="Spreadsheet\Column.cs" />
     <Compile Include="Spreadsheet\Worksheet.cs" />
     <Compile Include="Spreadsheet\Style.cs" />
-    <Compile Include="Text\Utilities\TexConverter.cs" />
-    <Compile Include="Text\Utilities\XmlSyntaxHighlighter.cs" />
     <Compile Include="Text\Utilities\SymbolResolver.cs" />
-    <None Include="Text\Formatters\WikiFormatterBase.cs" />
+    <Compile Include="Text\Formatters\WikiFormatterBase.cs" />
     <Compile Include="Text\Utilities\CharacterReplacements.cs" />
     <None Include="Text\Parsers\obsolete\CreoleParser.cs" />
     <Compile Include="Text\Parsers\DocumentParser.cs" />
-    <Compile Include="Text\Formatters\HtmlFormatter.cs" />
-    <Compile Include="Text\Parsers\HtmlParser.cs" />
-    <None Include="Text\Formatters\OWikiFormatter.cs" />
+    <None Include="Text\Parsers\obsolete\HtmlParser.cs" />
+    <Compile Include="Text\Formatters\OWikiFormatter.cs" />
     <None Include="Text\Parsers\obsolete\MarkdownParser.cs" />
     <None Include="Text\Parsers\obsolete\OWikiParser1.cs" />
     <Compile Include="Text\DocumentModel.cs" />
@@ -83,8 +80,7 @@
   <ItemGroup>
     <None Include="Text\DocumentModel.cd" />
   </ItemGroup>
-  <ItemGroup />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <UsingTask TaskName="PepitaGet.RestorePackagesTask" AssemblyFile="$(SolutionDir)..\Tools\Pepita\PepitaGet.dll" />
   <Target Name="BeforeBuild">
     <PepitaGet.RestorePackagesTask />

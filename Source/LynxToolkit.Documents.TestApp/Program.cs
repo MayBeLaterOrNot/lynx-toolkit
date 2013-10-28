@@ -27,8 +27,8 @@ namespace LynxToolkit.Documents.TestApp
             var input = File.ReadAllText(fileName);
             input = input + input;
 
-            var o2 = new WikiParser();
-            o2.ParseFile(fileName);
+            var wikiParser = new WikiParser(File.OpenRead);
+            wikiParser.ParseFile(fileName);
 
             Console.WriteLine(fileName);
             for (int j = 0; j < 5; j++)
@@ -37,8 +37,7 @@ namespace LynxToolkit.Documents.TestApp
                 int n = 1000;
                 for (int i = 0; i < n; i++)
                 {
-                    // OWikiParser.Parse(input, null);
-                    o2.Parse(input);
+                    wikiParser.Parse(input);
                 }
 
                 var bps = input.Length * n / (w.ElapsedMilliseconds * 0.001) / 1024 / 1024;

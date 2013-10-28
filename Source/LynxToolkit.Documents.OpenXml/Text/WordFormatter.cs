@@ -67,7 +67,7 @@ namespace LynxToolkit.Documents.OpenXml
     using TopBorder = DocumentFormat.OpenXml.Wordprocessing.TopBorder;
     using Transform2D = DocumentFormat.OpenXml.Drawing.Transform2D;
 
-    public class WordFormatter : DocumentFormatter
+    public class WordFormatter : DocumentFormatter<OpenXmlElement>
     {
         /// <summary>
         /// The body text id.
@@ -149,26 +149,18 @@ namespace LynxToolkit.Documents.OpenXml
 
         public WordprocessingDocument Package { get; private set; }
 
-        public override bool Format(Document doc, string filePath)
+        public override void Format(Document doc, Stream stream)
         {
-            base.source = doc;
+            this.Source = doc;
             this.Create();
             this.WriteBlocks(doc.Blocks, null);
-            this.Save(filePath);
-            return true;
-        }
-
-        /// <summary>
-        /// Saves this document.
-        /// </summary>
-        public void Save(string filepath)
-        {
             this.document.Save();
             this.Package.Close();
-            File.WriteAllBytes(filepath, stream.ToArray());
+            var buffer = this.stream.ToArray();
+            stream.Write(buffer, 0, (int)buffer.Length);
         }
 
-        protected override void Write(Header header, object parent)
+        protected override void Write(Header header, OpenXmlElement parent)
         {
             var headerID = string.Format(HeaderID, header.Level);
             var p = CreateParagraph(headerID);
@@ -176,27 +168,27 @@ namespace LynxToolkit.Documents.OpenXml
             this.body.AppendChild(p);
         }
 
-        protected override void Write(Section section, object parent)
+        protected override void Write(Section section, OpenXmlElement parent)
         {
             //var p = new Section();
             //this.WriteBlocks(section.Blocks, p);
             //this.body.AppendChild(p);
         }
 
-        protected override void Write(TableOfContents toc, object parent)
+        protected override void Write(TableOfContents toc, OpenXmlElement parent)
         {
             var sdt = new SdtContentBlock();
             this.body.AppendChild(sdt);
         }
 
-        protected override void Write(Paragraph paragraph, object parent)
+        protected override void Write(Paragraph paragraph, OpenXmlElement parent)
         {
             var p = CreateParagraph(BodyTextID);
             this.WriteInlines(paragraph.Content, p);
             this.body.AppendChild(p);
         }
 
-        protected override void Write(Documents.Table t, object parent)
+        protected override void Write(Documents.Table t, OpenXmlElement parent)
         {
             var table = new DocumentFormat.OpenXml.Wordprocessing.Table();
 
@@ -292,12 +284,12 @@ namespace LynxToolkit.Documents.OpenXml
             this.body.Append(table);
         }
 
-        protected override void Write(UnorderedList list, object parent)
+        protected override void Write(UnorderedList list, OpenXmlElement parent)
         {
             WriteListItems(list, parent, 0);
         }
 
-        private void WriteListItems(List list, object parent, int level)
+        private void WriteListItems(List list, OpenXmlElement parent, int level)
         {
             foreach (var item in list.Items)
             {
@@ -335,19 +327,19 @@ namespace LynxToolkit.Documents.OpenXml
             return p;
         }
 
-        protected override void Write(OrderedList list, object parent)
+        protected override void Write(OrderedList list, OpenXmlElement parent)
         {
             WriteListItems(list, parent, 0);
         }
 
-        protected override void Write(Quote quote, object parent)
+        protected override void Write(Quote quote, OpenXmlElement parent)
         {
             var p = CreateParagraph(QuoteID);
             this.WriteInlines(quote.Content, p);
             this.body.AppendChild(p);
         }
 
-        protected override void Write(CodeBlock codeBlock, object parent)
+        protected override void Write(CodeBlock codeBlock, OpenXmlElement parent)
         {
             var p = CreateParagraph(CodeID);
             var runStyle = new RunStyle { Val = CodeID };
@@ -357,21 +349,21 @@ namespace LynxToolkit.Documents.OpenXml
             this.body.AppendChild(p);
         }
 
-        protected override void Write(HorizontalRuler ruler, object parent)
+        protected override void Write(HorizontalRuler ruler, OpenXmlElement parent)
         {
         }
 
-        protected override void Write(NonBreakingSpace nbsp, object parent)
+        protected override void Write(NonBreakingSpace nbsp, OpenXmlElement parent)
         {
             this.AppendElement(new DocumentFormat.OpenXml.Wordprocessing.Run(new Text(" ") { Space = SpaceProcessingModeValues.Preserve }), parent);
         }
 
-        protected override void Write(Run r, object parent)
+        protected override void Write(Run r, OpenXmlElement parent)
         {
             this.AppendElement(new DocumentFormat.OpenXml.Wordprocessing.Run(new Text(r.Text) { Space = SpaceProcessingModeValues.Preserve }), parent);
         }
 
-        protected override void Write(Span span, object parent)
+        protected override void Write(Span span, OpenXmlElement parent)
         {
             var r = new DocumentFormat.OpenXml.Wordprocessing.Run();
             // todo: apply style
@@ -379,7 +371,7 @@ namespace LynxToolkit.Documents.OpenXml
             this.AppendElement(r, parent);
         }
 
-        protected override void Write(Strong strong, object parent)
+        protected override void Write(Strong strong, OpenXmlElement parent)
         {
             var r = new DocumentFormat.OpenXml.Wordprocessing.Run
                         {
@@ -398,7 +390,7 @@ namespace LynxToolkit.Documents.OpenXml
             this.AppendElement(r, parent);
         }
 
-        protected override void Write(Emphasized em, object parent)
+        protected override void Write(Emphasized em, OpenXmlElement parent)
         {
             var r = new DocumentFormat.OpenXml.Wordprocessing.Run
                         {
@@ -418,12 +410,12 @@ namespace LynxToolkit.Documents.OpenXml
             this.AppendElement(r, parent);
         }
 
-        protected override void Write(LineBreak linebreak, object parent)
+        protected override void Write(LineBreak linebreak, OpenXmlElement parent)
         {
             this.AppendElement(new DocumentFormat.OpenXml.Wordprocessing.Break(), parent);
         }
 
-        protected override void Write(InlineCode inlineCode, object parent)
+        protected override void Write(InlineCode inlineCode, OpenXmlElement parent)
         {
             var runStyle = new RunStyle { Val = InlineCodeID };
             var runProperties = new RunProperties(runStyle);
@@ -431,7 +423,7 @@ namespace LynxToolkit.Documents.OpenXml
             this.AppendElement(run, parent);
         }
 
-        protected override void Write(Hyperlink hyperlink, object parent)
+        protected override void Write(Hyperlink hyperlink, OpenXmlElement parent)
         {
             var h = new DocumentFormat.OpenXml.Wordprocessing.Hyperlink();
             h.Anchor = hyperlink.Url;
@@ -440,24 +432,24 @@ namespace LynxToolkit.Documents.OpenXml
             this.AppendElement(h, parent);
         }
 
-        private void AppendElement(OpenXmlElement element, object parent)
+        private void AppendElement(OpenXmlElement element, OpenXmlElement parent)
         {
             var compositeElement = (OpenXmlCompositeElement)parent;
             compositeElement.AppendChild(element);
         }
 
-        protected override void Write(Image image, object parent)
+        protected override void Write(Image image, OpenXmlElement parent)
         {
             var p = new DocumentFormat.OpenXml.Wordprocessing.Paragraph();
             p.AppendChild(this.CreateImageRun(image.Source, image.AlternateText));
             body.AppendChild(p);
         }
 
-        protected override void Write(Equation equation, object parent)
+        protected override void Write(Equation equation, OpenXmlElement parent)
         {
         }
 
-        protected override void Write(Symbol symbol, object parent)
+        protected override void Write(Symbol symbol, OpenXmlElement parent)
         {
             var path = this.ResolveSymbolPath(symbol);
             var p = new DocumentFormat.OpenXml.Wordprocessing.Paragraph();
@@ -469,7 +461,7 @@ namespace LynxToolkit.Documents.OpenXml
         /// The append image.
         /// </summary>
         /// <param name="source">
-        /// The source.
+        /// The Source.
         /// </param>
         /// <param name="description">
         /// The name.
@@ -654,7 +646,7 @@ namespace LynxToolkit.Documents.OpenXml
         }
         private int bookmarkId;
 
-        protected override void Write(Anchor anchor, object parent)
+        protected override void Write(Anchor anchor, OpenXmlElement parent)
         {
             string id = bookmarkId.ToString();
             bookmarkId++;
@@ -857,17 +849,17 @@ namespace LynxToolkit.Documents.OpenXml
         /// </param>
         private void SetPackageProperties(OpenXmlPackage p)
         {
-            p.PackageProperties.Creator = base.source.Creator;
-            p.PackageProperties.Title = base.source.Title;
-            p.PackageProperties.Subject = base.source.Subject;
-            p.PackageProperties.Category = base.source.Category;
-            p.PackageProperties.Description = base.source.Description;
-            p.PackageProperties.Keywords = base.source.Keywords;
-            p.PackageProperties.Version = base.source.Version;
-            p.PackageProperties.Revision = base.source.Revision;
+            p.PackageProperties.Creator = base.Source.Creator;
+            p.PackageProperties.Title = base.Source.Title;
+            p.PackageProperties.Subject = base.Source.Subject;
+            p.PackageProperties.Category = base.Source.Category;
+            p.PackageProperties.Description = base.Source.Description;
+            p.PackageProperties.Keywords = base.Source.Keywords;
+            p.PackageProperties.Version = base.Source.Version;
+            p.PackageProperties.Revision = base.Source.Revision;
             p.PackageProperties.Created = DateTime.Now;
             p.PackageProperties.Modified = DateTime.Now;
-            p.PackageProperties.LastModifiedBy = base.source.Creator;
+            p.PackageProperties.LastModifiedBy = base.Source.Creator;
         }
     }
 }

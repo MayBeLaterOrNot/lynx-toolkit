@@ -26,30 +26,101 @@
 // --------------------------------------------------------------------------------------------------------------------
 namespace LynxToolkit.Documents
 {
-    public class OWikiFormatter : MarkdownFormatter
+    using System.IO;
+
+    public class OWikiFormatter : WikiFormatterBase
     {
-        protected OWikiFormatter(Document doc)
-            : base(doc)
+        public override void Format(Document doc, Stream stream)
         {
+            var w = new StreamWriter(stream);
+            this.WriteBlocks(doc.Blocks, w);
         }
 
-        public static new string Format(Document doc)
+        protected override void Write(Header header, TextWriter context)
         {
-            var wf = new OWikiFormatter(doc);
-            wf.Format();
-            return wf.ToString();
+            throw new System.NotImplementedException();
         }
 
-        protected override void Write(HorizontalRuler ruler, object parent)
+        protected override void Write(TableOfContents toc, TextWriter context)
         {
-            WriteLine("- - -");
-            WriteLine();
+            throw new System.NotImplementedException();
         }
 
-        protected override void Write(Hyperlink hyperlink, object parent)
+        protected override void Write(Paragraph paragraph, TextWriter context)
         {
-            Write("[");
-            Write(hyperlink.Url);
+            throw new System.NotImplementedException();
+        }
+
+        protected override void Write(UnorderedList list, TextWriter context)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        protected override void Write(OrderedList list, TextWriter context)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        protected override void Write(Quote quote, TextWriter context)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        protected override void Write(Section section, TextWriter context)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        protected override void Write(CodeBlock codeBlock, TextWriter context)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        protected override void Write(HorizontalRuler ruler, TextWriter context)
+        {
+            context.WriteLine("- - -");
+            context.WriteLine();
+        }
+
+        protected override void Write(NonBreakingSpace nbsp, TextWriter context)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        protected override void Write(Run run, TextWriter context)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        protected override void Write(Span span, TextWriter context)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        protected override void Write(Strong strong, TextWriter context)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        protected override void Write(Emphasized em, TextWriter context)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        protected override void Write(LineBreak linebreak, TextWriter context)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        protected override void Write(InlineCode inlineCode, TextWriter context)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        protected override void Write(Hyperlink hyperlink, TextWriter context)
+        {
+            context.Write("[");
+            context.Write(hyperlink.Url);
             bool isDefaultTitle = false;
             if (hyperlink.Content.Count == 1)
             {
@@ -60,30 +131,45 @@ namespace LynxToolkit.Documents
 
             if (hyperlink.Content.Count > 0 && !isDefaultTitle)
             {
-                Write("|");
-                WriteInlines(hyperlink.Content, parent);
+                context.Write("|");
+                WriteInlines(hyperlink.Content, context);
             }
 
-            if (!string.IsNullOrWhiteSpace(hyperlink.Title))
+            if (!string.IsNullOrEmpty(hyperlink.Title))
             {
-                Write("|");
-                Write(hyperlink.Title);
+                context.Write("|");
+                context.Write(hyperlink.Title);
             }
-            Write("]");
+            context.Write("]");
         }
 
-        protected override void Write(Image image, object parent)
+        protected override void Write(Image image, TextWriter context)
         {
-            Write("{", image.Source);
-            if (!string.IsNullOrWhiteSpace(image.AlternateText))
+            context.Write("{" + image.Source);
+            if (!string.IsNullOrEmpty(image.AlternateText))
             {
-                Write("|", image.AlternateText);
+                context.Write("|" + image.AlternateText);
             }
-            if (!string.IsNullOrWhiteSpace(image.Link))
+            if (!string.IsNullOrEmpty(image.Link))
             {
-                Write("|", image.Link);
+                context.Write("|" + image.Link);
             }
-            Write("}");
+            context.Write("}");
+        }
+
+        protected override void Write(Equation equation, TextWriter context)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        protected override void Write(Symbol symbol, TextWriter context)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        protected override void Write(Anchor anchor, TextWriter context)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

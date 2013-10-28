@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DocumentParser.cs" company="Lynx Toolkit">
+// <copyright file="JsonSerializerTests.cs" company="Lynx Toolkit">
 //   The MIT License (MIT)
 //   
 //   Copyright (c) 2012 Oystein Bjorke
@@ -23,44 +23,23 @@
 //   TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 //   SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // </copyright>
-// <summary>
-//   Creates a regular expression.
-// </summary>
 // --------------------------------------------------------------------------------------------------------------------
-namespace LynxToolkit.Documents
+namespace LynxToolkit.Documents.Tests
 {
-    using System.Text.RegularExpressions;
+    using System.IO;
 
-    public abstract class DocumentParser
+    using NUnit.Framework;
+
+    [TestFixture]
+    public class JsonSerializerTests
     {
-        protected DocumentParser()
+        [Test, ExpectedException]
+        public void Serialize_Integer()
         {
-            this.Document = new Document();
-        }
-
-        public Document Document { get; private set; }
-
-        /// <summary>
-        /// Creates a regular expression.
-        /// </summary>
-        /// <param name="s">The expression.</param>
-        /// <param name="multiline">Multiline mode. Changes the meaning of ^ and$ so they match at the beginning and end, respectively, of any line, and not just the beginning and end of the entire string.</param>
-        /// <param name="singleline">Specifies single-line mode. Changes the meaning of the dot (.) so it matches every character (instead of every character except \n).</param>
-        /// <returns>The compiled regular expression.</returns>
-        public static Regex CreateRegex(string s, bool multiline = true, bool singleline = true)
-        {
-            var o = RegexOptions.IgnorePatternWhitespace | RegexOptions.CultureInvariant;
-            if (multiline)
-            {
-                o |= RegexOptions.Multiline;
-            }
-            
-            if (singleline)
-            {
-                o |= RegexOptions.Singleline;
-            }
-
-            return new Regex(s, o);
+            var s = new JsonSerializer();
+            var w = new StringWriter();
+            s.Serialize(w, 1);
+            Assert.AreEqual("1", w.ToString());
         }
     }
 }

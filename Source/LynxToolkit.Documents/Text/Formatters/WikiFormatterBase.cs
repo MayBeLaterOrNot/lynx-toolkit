@@ -28,41 +28,37 @@ using System.Text;
 
 namespace LynxToolkit.Documents
 {
-    public abstract class WikiFormatterBase : DocumentFormatter
-    {
-        protected StringBuilder sb;
+    using System.IO;
 
-        protected WikiFormatterBase(Document doc)
-            : base(doc)
+    public abstract class WikiFormatterBase : DocumentFormatter<TextWriter>
+    {
+        protected WikiFormatterBase()
         {
-            this.sb = new StringBuilder();
             this.LineLength = 72;
         }
 
-        private static char[] newlineChars = new[] { '\r', '\n' };
+        protected static char[] NewlineChars = new[] { '\r', '\n' };
 
-        public override string ToString()
+        public string ToString(TextWriter context)
         {
-            return this.sb.ToString().Trim(newlineChars);
+            return context.ToString().Trim(NewlineChars);
         }
 
-        protected void WriteItems(ListItemCollection items, object parent, string prefix)
+        protected void WriteItems(ListItemCollection items, TextWriter context, string prefix)
         {
             int i = 1;
             foreach (var item in items)
             {
-                this.sb.AppendFormat(prefix, i++);
-                var tmp = this.sb;
-                this.sb = new StringBuilder();
-                this.WriteInlines(item.Content, parent);
-                var text = this.sb.ToString();
-                this.sb = tmp;
-                text = this.Wrap(text, this.LineLength);
-                this.WriteLines(text, Repeat(" ", prefix.Length), string.Empty);
+                context.Write(prefix, i++);
+                var innerWriter = new StringWriter();
+                this.WriteInlines(item.Content, innerWriter);
+                var text = innerWriter.ToString();
+                text = Wrap(text, this.LineLength);
+                this.WriteLines(context, text, Repeat(" ", prefix.Length), string.Empty);
             }
         }
 
-        protected string Wrap(string text, int maxlength)
+        protected static string Wrap(string text, int maxlength)
         {
             var b = new StringBuilder();
             int i0 = 0;
@@ -72,7 +68,7 @@ namespace LynxToolkit.Documents
                 int i = i1;
                 for (i = i1; i > i0; i--)
                 {
-                    if (string.IsNullOrWhiteSpace(text[i].ToString()))
+                    if (string.IsNullOrEmpty(text[i].ToString()))
                     {
                         break;
                     }
@@ -112,169 +108,148 @@ namespace LynxToolkit.Documents
             return sb.ToString();
         }
 
-        protected void Write(params object[] args)
-        {
-            foreach (var a in args)
-            {
-                if (a != null)
-                {
-                    sb.Append(a);
-                }
-            }
-        }
-
-        protected void WriteLines(string text, string prefix = null, string firstprefix = null)
+        protected void WriteLines(TextWriter context, string text, string prefix = null, string firstprefix = null)
         {
             bool first = true;
             foreach (var line in text.Split('\n'))
             {
                 if (first && firstprefix != null)
                 {
-                    sb.Append(firstprefix);
+                    context.Write(firstprefix);
                     first = false;
                 }
                 else
                 {
                     if (prefix != null)
                     {
-                        sb.Append(prefix);
+                        context.Write(prefix);
                     }
                 }
 
-                sb.AppendLine(line.Trim('\r'));
+                context.WriteLine(line.Trim('\r'));
             }
-        }
-
-        protected void WriteLine(params object[] args)
-        {
-            Write(args);
-            sb.AppendLine();
         }
 
         public int LineLength { get; set; }
 
-        protected override void Write(TableOfContents toc, object parent)
+        protected override void Write(TableOfContents toc, TextWriter context)
         {
-            this.WriteLine("@toc");
+            context.WriteLine("@toc");
         }
 
-        protected override void Write(Paragraph paragraph, object parent)
+        protected override void Write(Paragraph paragraph, TextWriter context)
         {
-            var tmp = sb;
-            sb = new StringBuilder();
-            WriteInlines(paragraph.Content, parent);
+            var sb = new StringWriter();
+            WriteInlines(paragraph.Content, sb);
             var text = Wrap(sb.ToString(), LineLength);
-            sb = tmp;
-            Write(text);
-            WriteLine();
-            WriteLine();
+            context.Write(text);
+            context.WriteLine();
+            context.WriteLine();
         }
 
-        protected override void Write(Section section, object parent)
+        protected override void Write(Section section, TextWriter context)
         {
-            this.WriteBlocks(section.Blocks, parent);
+            this.WriteBlocks(section.Blocks, context);
         }
 
-        protected override void Write(Quote quote, object parent)
+        protected override void Write(Quote quote, TextWriter context)
         {
-            var tmp = sb;
-            sb = new StringBuilder();
-            WriteInlines(quote.Content, parent);
+            var sb = new StringWriter();
+            WriteInlines(quote.Content, sb);
             var text = Wrap(sb.ToString(), LineLength);
-            sb = tmp;
-            WriteLine("///");
-            WriteInlines(quote.Content, parent);
-            WriteLines(text);
-            WriteLine("///");
-            WriteLine();
+            context.WriteLine("///");
+            WriteInlines(quote.Content, context);
+            WriteLines(context, text);
+            context.WriteLine("///");
+            context.WriteLine();
         }
 
-        protected override void Write(UnorderedList list, object parent)
+        protected override void Write(UnorderedList list, TextWriter context)
         {
-            WriteItems(list.Items, parent, "- ");
-            WriteLine();
+            WriteItems(list.Items, context, "- ");
+            context.WriteLine();
         }
 
-        protected override void Write(OrderedList list, object parent)
+        protected override void Write(OrderedList list, TextWriter context)
         {
-            WriteItems(list.Items, parent, "# ");
-            WriteLine();
+            WriteItems(list.Items, context, "# ");
+            context.WriteLine();
         }
 
-        protected override void Write(Table table, object parent)
+        protected override void Write(Table table, TextWriter context)
         {
             foreach (var r in table.Rows)
             {
                 foreach (var c in r.Cells)
                 {
-                    Write(c is TableHeaderCell ? "||" : "|");
-                    WriteBlocks(c.Blocks, parent);
+                    context.Write(c is TableHeaderCell ? "||" : "|");
+                    WriteBlocks(c.Blocks, context);
                 }
-                WriteLine("|");
+                context.WriteLine("|");
             }
-            WriteLine();
+            context.WriteLine();
         }
 
-        protected override void Write(CodeBlock codeBlock, object parent)
+        protected override void Write(CodeBlock codeBlock, TextWriter context)
         {
-            WriteLine("{{{");
-            WriteLines(codeBlock.Text);
-            WriteLine("}}}");
-            WriteLine();
+            context.WriteLine("{{{");
+            WriteLines(context, codeBlock.Text);
+            context.WriteLine("}}}");
+            context.WriteLine();
         }
 
-        protected override void Write(HorizontalRuler ruler, object parent)
+        protected override void Write(HorizontalRuler ruler, TextWriter context)
         {
-            WriteLine("----");
-            WriteLine();
+            context.WriteLine("----");
+            context.WriteLine();
         }
 
-        protected override void Write(NonBreakingSpace nbsp, object parent)
+        protected override void Write(NonBreakingSpace nbsp, TextWriter context)
         {
-            Write(" ");
+            context.Write(" ");
         }
 
-        protected override void Write(Run run, object parent)
+        protected override void Write(Run run, TextWriter context)
         {
             var text = Encode(run.Text);
-            Write(text);
+            context.Write(text);
         }
 
-        protected override void Write(Symbol symbol, object parent)
+        protected override void Write(Symbol symbol, TextWriter context)
         {
-            Write(symbol.Name);
+            context.Write(symbol.Name);
         }
 
-        protected override void Write(Span span, object parent)
+        protected override void Write(Span span, TextWriter context)
         {
-            WriteInlines(span.Content, parent);
+            WriteInlines(span.Content, context);
         }
 
-        protected override void Write(Strong strong, object parent)
+        protected override void Write(Strong strong, TextWriter context)
         {
-            Write("**");
-            WriteInlines(strong.Content, parent);
-            Write("**");
+            context.Write("**");
+            WriteInlines(strong.Content, context);
+            context.Write("**");
         }
 
-        protected override void Write(Emphasized em, object parent)
+        protected override void Write(Emphasized em, TextWriter context)
         {
-            Write("//");
-            WriteInlines(em.Content, parent);
-            Write("//");
+            context.Write("//");
+            WriteInlines(em.Content, context);
+            context.Write("//");
         }
 
-        protected override void Write(LineBreak linebreak, object parent)
+        protected override void Write(LineBreak linebreak, TextWriter context)
         {
-            WriteLine(@"\\");
+            context.WriteLine(@"\\");
         }
 
-        protected override void Write(InlineCode inlineCode, object parent)
+        protected override void Write(InlineCode inlineCode, TextWriter context)
         {
-            Write("{{", inlineCode.Code, "}}");
+            context.Write("{{" + inlineCode.Code + "}}");
         }
 
-        protected override void Write(Equation equation, object parent)
+        protected override void Write(Equation equation, TextWriter context)
         {
         }
     }

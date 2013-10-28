@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DocumentParser.cs" company="Lynx Toolkit">
+// <copyright file="DocumentFormatterExtensions.cs" company="Lynx Toolkit">
 //   The MIT License (MIT)
 //   
 //   Copyright (c) 2012 Oystein Bjorke
@@ -24,43 +24,34 @@
 //   SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // </copyright>
 // <summary>
-//   Creates a regular expression.
+//   Provides extension methods for the <see cref="IDocumentFormatter" />s.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
+
 namespace LynxToolkit.Documents
 {
-    using System.Text.RegularExpressions;
+    using System.IO;
 
-    public abstract class DocumentParser
+    /// <summary>
+    /// Provides extension methods for the <see cref="IDocumentFormatter"/>s.
+    /// </summary>
+    public static class DocumentFormatterExtensions
     {
-        protected DocumentParser()
-        {
-            this.Document = new Document();
-        }
-
-        public Document Document { get; private set; }
-
         /// <summary>
-        /// Creates a regular expression.
+        /// Formats the document to a string.
         /// </summary>
-        /// <param name="s">The expression.</param>
-        /// <param name="multiline">Multiline mode. Changes the meaning of ^ and$ so they match at the beginning and end, respectively, of any line, and not just the beginning and end of the entire string.</param>
-        /// <param name="singleline">Specifies single-line mode. Changes the meaning of the dot (.) so it matches every character (instead of every character except \n).</param>
-        /// <returns>The compiled regular expression.</returns>
-        public static Regex CreateRegex(string s, bool multiline = true, bool singleline = true)
+        /// <param name="formatter">The formatter.</param>
+        /// <param name="doc">The <see cref="Document"/> to format.</param>
+        /// <returns>A string.</returns>
+        public static string Format(this IDocumentFormatter formatter, Document doc)
         {
-            var o = RegexOptions.IgnorePatternWhitespace | RegexOptions.CultureInvariant;
-            if (multiline)
+            using (var s = new MemoryStream())
             {
-                o |= RegexOptions.Multiline;
+                formatter.Format(doc, s);
+                s.Position = 0;
+                var r = new StreamReader(s);
+                return r.ReadToEnd();
             }
-            
-            if (singleline)
-            {
-                o |= RegexOptions.Singleline;
-            }
-
-            return new Regex(s, o);
         }
     }
 }

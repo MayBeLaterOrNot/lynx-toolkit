@@ -1,5 +1,7 @@
 ﻿namespace LynxToolkit.Documents.Tests
 {
+    using System.IO;
+
     using NUnit.Framework;
 
     [TestFixture]
@@ -8,7 +10,7 @@
         [Test]
         public void ParseFile()
         {
-            var o2 = new WikiParser();
+            var o2 = new WikiParser(File.OpenRead);
             var model = o2.ParseFile(@"Input/Example.wiki");
         }
 
@@ -131,9 +133,9 @@
         }
 
         [Test]
-        public void Code2()
+        public void Code_Included()
         {
-            var o2 = new WikiParser();
+            var o2 = new WikiParser(File.OpenRead);
             var model = o2.Parse("```xml\r\n@include Input/Example.xml\r\n```");
 
             Assert.AreEqual(1, model.Blocks.Count);
@@ -413,7 +415,7 @@
         public static void AssertImage(string expectedSource, string expectedAlt, Inline image)
         {
             var img = (Image)image;
-            Assert.IsTrue(img.Source.Contains(expectedSource), "Image source: Expected {0} in {1}", expectedSource, img.Source);
+            Assert.IsTrue(img.Source.Contains(expectedSource), "Image Source: Expected {0} in {1}", expectedSource, img.Source);
             Assert.AreEqual(expectedAlt, img.AlternateText, "Image alternate text");
         }
 
@@ -651,7 +653,7 @@
         [Test]
         public void Include()
         {
-            var o2 = new WikiParser();
+            var o2 = new WikiParser(File.OpenRead);
             o2.IncludeDefaultExtension = ".wiki";
             var model = o2.Parse("@include Input/Example");
         }

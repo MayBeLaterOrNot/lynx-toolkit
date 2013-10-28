@@ -28,21 +28,24 @@ namespace LynxToolkit.Documents
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
+    using System.IO;
 
-    public abstract class DocumentFormatter
+    [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Reviewed. Suppression is OK here.")]
+    public abstract class DocumentFormatter<T> : IDocumentFormatter
     {
-        protected Document source;
-
-        public DocumentFormatter()
+        protected DocumentFormatter()
         {
             this.StyleSheet = new StyleSheet();
         }
 
-        protected StyleSheet StyleSheet { get; set; }
-
         public string SymbolDirectory { get; set; }
 
-        public abstract bool Format(Document doc, string outputFile);
+        protected Document Source { get; set; }
+
+        protected StyleSheet StyleSheet { get; set; }
+
+        public abstract void Format(Document doc, Stream stream);
 
         protected Style GetStyle(Header header)
         {
@@ -99,221 +102,221 @@ namespace LynxToolkit.Documents
             return this.StyleSheet.ImageStyle;
         }
 
-        protected abstract void Write(Header header, object parent);
+        protected abstract void Write(Header header, T context);
 
-        protected abstract void Write(TableOfContents toc, object parent);
+        protected abstract void Write(TableOfContents toc, T context);
 
-        protected abstract void Write(Paragraph paragraph, object parent);
+        protected abstract void Write(Paragraph paragraph, T context);
 
-        protected abstract void Write(UnorderedList list, object parent);
+        protected abstract void Write(UnorderedList list, T context);
 
-        protected abstract void Write(OrderedList list, object parent);
+        protected abstract void Write(OrderedList list, T context);
 
-        protected abstract void Write(Quote quote, object parent);
+        protected abstract void Write(Quote quote, T context);
 
-        protected abstract void Write(Section section, object parent);
+        protected abstract void Write(Section section, T context);
 
-        protected abstract void Write(CodeBlock codeBlock, object parent);
+        protected abstract void Write(CodeBlock codeBlock, T context);
 
-        protected abstract void Write(HorizontalRuler ruler, object parent);
+        protected abstract void Write(HorizontalRuler ruler, T context);
 
-        protected abstract void Write(NonBreakingSpace nbsp, object parent);
+        protected abstract void Write(NonBreakingSpace nbsp, T context);
 
-        protected abstract void Write(Run run, object parent);
+        protected abstract void Write(Run run, T context);
 
-        protected abstract void Write(Span span, object parent);
+        protected abstract void Write(Span span, T context);
 
-        protected abstract void Write(Strong strong, object parent);
+        protected abstract void Write(Strong strong, T context);
 
-        protected abstract void Write(Emphasized em, object parent);
+        protected abstract void Write(Emphasized em, T context);
 
-        protected abstract void Write(LineBreak linebreak, object parent);
+        protected abstract void Write(LineBreak linebreak, T context);
 
-        protected abstract void Write(InlineCode inlineCode, object parent);
+        protected abstract void Write(InlineCode inlineCode, T context);
 
-        protected abstract void Write(Hyperlink hyperlink, object parent);
+        protected abstract void Write(Hyperlink hyperlink, T context);
 
-        protected abstract void Write(Image image, object parent);
+        protected abstract void Write(Image image, T context);
 
-        protected abstract void Write(Equation equation, object parent);
+        protected abstract void Write(Equation equation, T context);
 
-        protected abstract void Write(Symbol symbol, object parent);
+        protected abstract void Write(Symbol symbol, T context);
 
-        protected abstract void Write(Anchor anchor, object parent);
+        protected abstract void Write(Anchor anchor, T context);
 
-        protected virtual void Write(Table table, object parent)
+        protected virtual void Write(Table table, T context)
         {
             foreach (var row in table.Rows)
             {
-                this.Write(row, parent);
+                this.Write(row, context);
             }
         }
 
-        protected virtual void Write(TableRow row, object parent)
+        protected virtual void Write(TableRow row, T context)
         {
             foreach (var cell in row.Cells)
             {
-                this.Write(cell, parent);
+                this.Write(cell, context);
             }
         }
 
-        protected virtual void Write(TableCell cell, object parent)
+        protected virtual void Write(TableCell cell, T context)
         {
-            this.WriteBlocks(cell.Blocks, parent);
+            this.WriteBlocks(cell.Blocks, context);
         }
 
-        protected virtual void Write(ListItem item, object parent)
+        protected virtual void Write(ListItem item, T context)
         {
-            this.WriteInlines(item.Content, parent);
+            this.WriteInlines(item.Content, context);
         }
 
-        protected virtual void WriteBlock(Block block, object parent)
+        protected virtual void WriteBlock(Block block, T context)
         {
-            if (this.WriteBlock<Header>(block, parent, this.Write))
+            if (this.WriteBlock<Header>(block, context, this.Write))
             {
                 return;
             }
 
-            if (this.WriteBlock<TableOfContents>(block, parent, this.Write))
+            if (this.WriteBlock<TableOfContents>(block, context, this.Write))
             {
                 return;
             }
 
-            if (this.WriteBlock<Quote>(block, parent, this.Write))
+            if (this.WriteBlock<Quote>(block, context, this.Write))
             {
                 return;
             }
 
-            if (this.WriteBlock<Paragraph>(block, parent, this.Write))
+            if (this.WriteBlock<Paragraph>(block, context, this.Write))
             {
                 return;
             }
 
-            if (this.WriteBlock<Section>(block, parent, this.Write))
+            if (this.WriteBlock<Section>(block, context, this.Write))
             {
                 return;
             }
 
-            if (this.WriteBlock<HorizontalRuler>(block, parent, this.Write))
+            if (this.WriteBlock<HorizontalRuler>(block, context, this.Write))
             {
                 return;
             }
 
-            if (this.WriteBlock<OrderedList>(block, parent, this.Write))
+            if (this.WriteBlock<OrderedList>(block, context, this.Write))
             {
                 return;
             }
 
-            if (this.WriteBlock<UnorderedList>(block, parent, this.Write))
+            if (this.WriteBlock<UnorderedList>(block, context, this.Write))
             {
                 return;
             }
 
-            if (this.WriteBlock<Table>(block, parent, this.Write))
+            if (this.WriteBlock<Table>(block, context, this.Write))
             {
                 return;
             }
 
-            this.WriteBlock<CodeBlock>(block, parent, this.Write);
+            this.WriteBlock<CodeBlock>(block, context, this.Write);
         }
 
-        protected bool WriteBlock<T>(Block block, object parent, Action<T, object> writer) where T : Block
+        protected bool WriteBlock<TBlock>(Block block, T context, Action<TBlock, T> writer) where TBlock : Block
         {
-            var i = block as T;
+            var i = block as TBlock;
             if (i == null)
             {
                 return false;
             }
 
-            writer(i, parent);
+            writer(i, context);
             return true;
         }
 
-        protected virtual void WriteBlocks(IList<Block> blocks, object parent)
+        protected virtual void WriteBlocks(IList<Block> blocks, T context)
         {
             foreach (var block in blocks)
             {
-                this.WriteBlock(block, parent);
+                this.WriteBlock(block, context);
             }
         }
 
-        protected virtual void WriteInline(Inline inline, object parent)
+        protected virtual void WriteInline(Inline inline, T context)
         {
-            if (this.WriteInline<Span>(inline, parent, this.Write))
+            if (this.WriteInline<Span>(inline, context, this.Write))
             {
                 return;
             }
 
-            if (this.WriteInline<Strong>(inline, parent, this.Write))
+            if (this.WriteInline<Strong>(inline, context, this.Write))
             {
                 return;
             }
 
-            if (this.WriteInline<Emphasized>(inline, parent, this.Write))
+            if (this.WriteInline<Emphasized>(inline, context, this.Write))
             {
                 return;
             }
 
-            if (this.WriteInline<Symbol>(inline, parent, this.Write))
+            if (this.WriteInline<Symbol>(inline, context, this.Write))
             {
                 return;
             }
 
-            if (this.WriteInline<Run>(inline, parent, this.Write))
+            if (this.WriteInline<Run>(inline, context, this.Write))
             {
                 return;
             }
 
-            if (this.WriteInline<NonBreakingSpace>(inline, parent, this.Write))
+            if (this.WriteInline<NonBreakingSpace>(inline, context, this.Write))
             {
                 return;
             }
 
-            if (this.WriteInline<LineBreak>(inline, parent, this.Write))
+            if (this.WriteInline<LineBreak>(inline, context, this.Write))
             {
                 return;
             }
 
-            if (this.WriteInline<InlineCode>(inline, parent, this.Write))
+            if (this.WriteInline<InlineCode>(inline, context, this.Write))
             {
                 return;
             }
 
-            if (this.WriteInline<Hyperlink>(inline, parent, this.Write))
+            if (this.WriteInline<Hyperlink>(inline, context, this.Write))
             {
                 return;
             }
 
-            if (this.WriteInline<Anchor>(inline, parent, this.Write))
+            if (this.WriteInline<Anchor>(inline, context, this.Write))
             {
                 return;
             }
 
-            if (this.WriteInline<Equation>(inline, parent, this.Write))
+            if (this.WriteInline<Equation>(inline, context, this.Write))
             {
                 return;
             }
 
-            this.WriteInline<Image>(inline, parent, this.Write);
+            this.WriteInline<Image>(inline, context, this.Write);
         }
 
-        protected bool WriteInline<Ti>(Inline inline, object parent, Action<Ti, object> writer) where Ti : Inline
+        protected bool WriteInline<TInline>(Inline inline, T context, Action<TInline, T> writer) where TInline : Inline
         {
-            var i = inline as Ti;
+            var i = inline as TInline;
             if (i == null)
             {
                 return false;
             }
 
-            writer(i, parent);
+            writer(i, context);
             return true;
         }
 
-        protected virtual void WriteInlines(IList<Inline> inlines, object parent)
+        protected virtual void WriteInlines(IList<Inline> inlines, T context)
         {
             foreach (var inline in inlines)
             {
-                this.WriteInline(inline, parent);
+                this.WriteInline(inline, context);
             }
         }
 
@@ -325,6 +328,7 @@ namespace LynxToolkit.Documents
             {
                 dir += "/";
             }
+
             var path = dir + file;
             return path;
         }

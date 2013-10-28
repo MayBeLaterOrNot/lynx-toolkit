@@ -39,6 +39,7 @@ namespace WikiT
 
     using LynxToolkit;
     using LynxToolkit.Documents;
+    using LynxToolkit.Documents.Html;
     using LynxToolkit.Documents.OpenXml;
 
     /// <summary>
@@ -96,7 +97,7 @@ namespace WikiT
         /// <remarks>
         /// The defines can be used in "@if DEFINE" ... "@endif" blocks
         /// </remarks>
-        public static HashSet<string> Defines { get; set; }
+        public static List<string> Defines { get; set; }
 
         /// <summary>
         /// Gets or sets the variables.
@@ -129,7 +130,7 @@ namespace WikiT
             Format = "html";
             Extension = null;
             Output = "output";
-            Defines = new HashSet<string>();
+            Defines = new List<string>();
             Variables = new Dictionary<string, string>();
 
             foreach (var arg in args)
@@ -198,15 +199,15 @@ namespace WikiT
                 Console.WriteLine("The output extension should start with '.'");
                 return 2;
             }
-            
+
             Utilities.CreateDirectoryIfMissing(Output);
 
-            var inputDirectory = Path.GetFullPath(Path.GetDirectoryName(Input));
-            var searchPattern = Path.GetFileName(Input);
+            var inputDirectory = System.IO.Path.GetFullPath(System.IO.Path.GetDirectoryName(Input));
+            var searchPattern = System.IO.Path.GetFileName(Input);
 
-            Console.WriteLine("Input directory:  '{0}'", Path.GetFullPath(inputDirectory));
+            Console.WriteLine("Input directory:  '{0}'", System.IO.Path.GetFullPath(inputDirectory));
             Console.WriteLine("Search pattern:   '{0}'", searchPattern);
-            Console.WriteLine("Output directory: '{0}'", Path.GetFullPath(Output));
+            Console.WriteLine("Output directory: '{0}'", System.IO.Path.GetFullPath(Output));
             Console.WriteLine("Output extension: '{0}'", Extension);
 
             var files = Utilities.FindFiles(inputDirectory, searchPattern).ToList();
@@ -264,14 +265,14 @@ namespace WikiT
                 throw new ArgumentNullException("relativeFilePath");
             }
 
-            var filePath = Path.Combine(inputFolder, relativeFilePath);
-            var parser = new WikiParser(Defines, Variables) { IncludeDefaultExtension = Path.GetExtension(Input) };
+            var filePath = System.IO.Path.Combine(inputFolder, relativeFilePath);
+            var parser = new WikiParser(Defines, Variables, File.OpenRead) { IncludeDefaultExtension = System.IO.Path.GetExtension(Input) };
             var doc = parser.ParseFile(filePath);
 
-            var outputPath = Output != null ? Path.Combine(Output, relativeFilePath) : relativeFilePath;
-            outputPath = Path.ChangeExtension(outputPath, Extension);
+            var outputPath = Output != null ? System.IO.Path.Combine(Output, relativeFilePath) : relativeFilePath;
+            outputPath = System.IO.Path.ChangeExtension(outputPath, Extension);
 
-            DocumentFormatter formatter = null;
+            IDocumentFormatter formatter = null;
             switch (Format)
             {
                 case "word":
@@ -310,10 +311,11 @@ namespace WikiT
                 throw new FormatException(string.Format("The output format '{0}' is not supported.", Format));
             }
 
-            var outputDirectory = Path.GetDirectoryName(outputPath);
+            var outputDirectory = System.IO.Path.GetDirectoryName(outputPath);
             Utilities.CreateDirectoryIfMissing(outputDirectory);
-
-            return formatter.Format(doc, outputPath);
+            using (var stream = File.OpenWrite(outputPath))
+                formatter.Format(doc, stream);
+            return true;
         }
     }
 }

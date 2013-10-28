@@ -1,6 +1,7 @@
 ﻿namespace LynxToolkit.Documents.Wpf.Tests
 {
-    using LynxToolkit.Documents.OpenXml;
+    using System.IO;
+
     using LynxToolkit.Documents.Wpf;
 
     using NUnit.Framework;
@@ -11,11 +12,13 @@
         [Test]
         public void Format()
         {
-            var parser = new WikiParser();
+            var parser = new WikiParser(File.OpenRead);
             var doc = parser.ParseFile(@"Input/Example.wiki");
-            var formatter = new FlowDocumentFormatter();
-            formatter.SymbolDirectory = @"Input\Images";
-            formatter.Format(doc, @"Example.xps");
+            var formatter = new FlowDocumentFormatter { SymbolDirectory = @"Input\Images" };
+            using (var stream = File.OpenWrite("Example.xps"))
+            {
+                formatter.Format(doc, stream);
+            }
         }
     }
 }

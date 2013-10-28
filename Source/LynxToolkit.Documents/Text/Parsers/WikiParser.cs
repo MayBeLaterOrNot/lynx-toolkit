@@ -34,32 +34,36 @@ namespace LynxToolkit.Documents
     using System.Text;
 
     /// <summary>
-    /// Provides a simple wiki parser.  
+    /// Implements a simple wiki parser.  
     /// </summary>
     public class WikiParser
     {
+        Func<string, Stream> OpenRead { get; set; }
+
         private Document document;
 
-        private char escapeCharacter = '~';
+        private const char EscapeCharacter = '~';
 
         private int i;
 
         private int n;
 
-        private char newLineCharacter = '\n';
+        private const char NewLineCharacter = '\n';
 
         private string text;
 
-        public WikiParser()
+        public WikiParser(Func<string, Stream> openRead = null)
         {
-            this.Defines = new HashSet<string>();
+            this.OpenRead = openRead;
+            this.Defines = new List<string>();
             this.Variables = new Dictionary<string, string>();
             this.CurrentDirectory = string.Empty;
         }
 
-        public WikiParser(HashSet<string> defines, Dictionary<string, string> variables)
+        public WikiParser(IEnumerable<string> defines, Dictionary<string, string> variables, Func<string, Stream> openRead)
         {
-            this.Defines = new HashSet<string>(defines);
+            this.OpenRead = openRead;
+            this.Defines = new List<string>(defines);
             this.Variables = new Dictionary<string, string>(variables);
             this.CurrentDirectory = string.Empty;
         }
@@ -70,7 +74,7 @@ namespace LynxToolkit.Documents
 
         public string IncludeDefaultExtension { get; set; }
 
-        public HashSet<string> Defines { get; private set; }
+        public List<string> Defines { get; private set; }
 
         public Dictionary<string, string> Variables { get; private set; }
 
@@ -84,24 +88,33 @@ namespace LynxToolkit.Documents
             return this.document;
         }
 
+        private string ReadAllText(string fileName)
+        {
+            using (var r = new StreamReader(this.OpenRead(fileName)))
+            {
+                return r.ReadToEnd();
+            }
+        }
+
+
         public Document ParseFile(string fileName)
         {
-            this.CurrentDirectory = Path.GetDirectoryName(Path.GetFullPath(fileName));
-            var content = File.ReadAllText(fileName);
+            this.CurrentDirectory = Path.GetDirectoryName(fileName);
+            var content = this.ReadAllText(fileName);
             return this.Parse(content);
         }
 
         private void ParseCodeBlock(BlockCollection blocks)
         {
-            string language = this.ReadTo(this.newLineCharacter);
+            string language = this.ReadTo(NewLineCharacter);
             this.i++;
             var b = new StringBuilder();
 
             if (this.Match("@include"))
             {
                 var include = this.ReadArg();
-                var path = Path.GetFullPath(Path.Combine(this.CurrentDirectory, include));
-                var content = File.ReadAllText(path);
+                var path = Path.Combine(this.CurrentDirectory, include);
+                var content = this.ReadAllText(path);
                 b.Append(content);
             }
 
@@ -113,7 +126,7 @@ namespace LynxToolkit.Documents
                 }
 
                 var c = text[i++];
-                if (c == this.newLineCharacter)
+                if (c == NewLineCharacter)
                 {
                     b.AppendLine();
                 }
@@ -314,7 +327,7 @@ namespace LynxToolkit.Documents
 
         private string ResolveIncludeFile(string filename)
         {
-            var include = Path.GetFullPath(Path.Combine(this.CurrentDirectory, filename));
+            var include = Path.Combine(this.CurrentDirectory, filename);
             if (this.IncludeDefaultExtension != null && string.IsNullOrEmpty(Path.GetExtension(include)))
             {
                 include = Path.ChangeExtension(include, this.IncludeDefaultExtension);
@@ -330,7 +343,7 @@ namespace LynxToolkit.Documents
             {
                 var s = this.ReadArg();
 
-                var content = File.ReadAllText(this.ResolveIncludeFile(s));
+                var content = this.ReadAllText(this.ResolveIncludeFile(s));
                 this.text = this.text.Insert(this.i, content);
                 this.n = this.text.Length;
                 return;
@@ -339,7 +352,7 @@ namespace LynxToolkit.Documents
             if (this.Match("import"))
             {
                 var s = this.ReadArg();
-                var parser = new WikiParser(this.Defines, this.Variables);
+                var parser = new WikiParser(this.Defines, this.Variables, this.OpenRead);
                 parser.IncludeDefaultExtension = this.IncludeDefaultExtension;
                 var importedDocument = parser.ParseFile(this.ResolveIncludeFile(s));
                 foreach (var block in importedDocument.Blocks)
@@ -445,7 +458,7 @@ namespace LynxToolkit.Documents
                     if (runContent.Length > 0)
                     {
                         c.Add(new Run(runContent.ToString()));
-                        runContent.Clear();
+                        runContent = new StringBuilder();
                     }
                 };
 
@@ -454,7 +467,7 @@ namespace LynxToolkit.Documents
 
             while (this.i < this.n)
             {
-                if (this.text[this.i] == this.escapeCharacter)
+                if (this.text[this.i] == EscapeCharacter)
                 {
                     this.i++;
                     var ch = this.text[i++];
@@ -597,7 +610,7 @@ namespace LynxToolkit.Documents
                         var source = this.ReadToAny('|', '}');
                         if (!source.StartsWith("http") && !Path.IsPathRooted(source))
                         {
-                            source = Path.GetFullPath(Path.Combine(this.CurrentDirectory, source));
+                            source = Path.Combine(this.CurrentDirectory, source);
                         }
 
                         var img = new Image { Source = source };
@@ -846,7 +859,7 @@ namespace LynxToolkit.Documents
                 }
 
                 var c = this.text[this.i];
-                if (handleEscapeCharacters && c == this.escapeCharacter)
+                if (handleEscapeCharacters && c == EscapeCharacter)
                 {
                     this.i++;
                     b.Append(this.text[this.i++]);
@@ -877,7 +890,7 @@ namespace LynxToolkit.Documents
             {
                 var c = this.text[this.i];
 
-                if (c == this.escapeCharacter)
+                if (c == EscapeCharacter)
                 {
                     this.i++;
                     b.Append(this.text[this.i++]);
@@ -924,7 +937,7 @@ namespace LynxToolkit.Documents
             while (this.i < this.n)
             {
                 var ch = this.text[this.i];
-                if (ch != ' ' && ch != this.newLineCharacter)
+                if (ch != ' ' && ch != NewLineCharacter)
                 {
                     break;
                 }

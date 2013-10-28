@@ -296,6 +296,24 @@ namespace LynxToolkit.Documents.Spreadsheet
         }
 
         /// <summary>
+        /// Resizes the columns automatically.
+        /// </summary>
+        public void AutoSizeColumns()
+        {
+            var maxColumn = this.Cells.Max(c => c.Column);
+            while (this.Columns.Count <= maxColumn)
+            {
+                this.AddColumn();
+            }
+
+            for (int i = 0; i < this.Columns.Count; i++)
+            {
+                var maxLength = this.Cells.Where(c => c.Column == i).Max(c => c.ToString().Length);
+                this.Columns[i].Width = maxLength;
+            }
+        }
+
+        /// <summary>
         /// Gets the cells in the specified range.
         /// </summary>
         /// <param name="rangeReference">
@@ -313,21 +331,6 @@ namespace LynxToolkit.Documents.Spreadsheet
                 {
                     yield return this.GetCell(i, j);
                 }
-            }
-        }
-
-        public void AutoSizeColumns()
-        {
-            var maxColumn = this.Cells.Max(c => c.Column);
-            while (this.Columns.Count <= maxColumn)
-            {
-                this.AddColumn();
-            }
-
-            for (int i = 0; i < this.Columns.Count; i++)
-            {
-                var maxLength = this.Cells.Where(c => c.Column == i).Max(c => c.ToString().Length);
-                this.Columns[i].Width = maxLength;
             }
         }
     }

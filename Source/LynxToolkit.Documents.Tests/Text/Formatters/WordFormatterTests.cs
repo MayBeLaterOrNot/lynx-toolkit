@@ -1,5 +1,7 @@
 ﻿namespace LynxToolkit.Documents.OpenXml.Tests
 {
+    using System.IO;
+
     using LynxToolkit.Documents.OpenXml;
 
     using NUnit.Framework;
@@ -10,12 +12,13 @@
         [Test]
         public void Format()
         {
-            var parser = new WikiParser();
+            var parser = new WikiParser(File.OpenRead);
             var doc = parser.ParseFile(@"Input/Example.wiki");
             var formatter = new WordFormatter();
             formatter.SymbolDirectory = @"Input\Images";
             // options.Template=
-            formatter.Format(doc, "Example.docx");
+            using (var stream = File.OpenWrite("Example.docx"))
+                formatter.Format(doc, stream);
         }
     }
 }

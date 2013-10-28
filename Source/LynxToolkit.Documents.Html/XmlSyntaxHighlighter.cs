@@ -28,7 +28,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace LynxToolkit.Documents
+namespace LynxToolkit.Documents.Html
 {
     using System.Text;
     using System.Text.RegularExpressions;

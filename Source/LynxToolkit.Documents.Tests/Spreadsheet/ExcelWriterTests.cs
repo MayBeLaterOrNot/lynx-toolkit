@@ -24,10 +24,10 @@
 //   SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
-namespace LynxToolkit.Documents.OpenXml.Tests
+namespace LynxToolkit.Documents.Tests
 {
+    using LynxToolkit.Documents.OpenXml;
     using LynxToolkit.Documents.Spreadsheet;
-    using LynxToolkit.Documents.Tests;
 
     using NUnit.Framework;
 
@@ -35,7 +35,7 @@ namespace LynxToolkit.Documents.OpenXml.Tests
     public class ExcelWriterTests
     {
         [Test]
-        public void HelloExcel()
+        public void Export_HelloExcel()
         {
             var workbook = new Workbook();
             var sheet = workbook.AddSheet();

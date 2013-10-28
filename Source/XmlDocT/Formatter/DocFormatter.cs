@@ -39,6 +39,7 @@ namespace XmlDocT
 
     using LynxToolkit;
     using LynxToolkit.Documents;
+    using LynxToolkit.Documents.Html;
     using LynxToolkit.Documents.OpenXml;
 
     public class DocFormatter
@@ -757,7 +758,7 @@ namespace XmlDocT
                 return this.Output;
             }
 
-            return Path.Combine(this.Output, fileName + this.OutputExtension);
+            return System.IO.Path.Combine(this.Output, fileName + this.OutputExtension);
         }
 
         private void WritePage(string fileName, string title, string description)
@@ -771,7 +772,7 @@ namespace XmlDocT
             this.doc.Title = title;
             this.doc.Description = description;
 
-            DocumentFormatter formatter=null;
+            IDocumentFormatter formatter=null;
             switch (this.Format)
             {
                 case "html":
@@ -814,7 +815,7 @@ namespace XmlDocT
             }
 
             var path = this.GetOutputFile(fileName);
-            formatter.Format(this.doc, path);
+            formatter.Format(this.doc, File.OpenWrite(path));
             
             this.doc = null;
         }

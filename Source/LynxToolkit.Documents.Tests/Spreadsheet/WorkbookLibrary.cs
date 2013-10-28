@@ -28,7 +28,6 @@ namespace LynxToolkit.Documents.Tests
 {
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel;
     using System.Reflection;
 
     using LynxToolkit.Documents.Spreadsheet;

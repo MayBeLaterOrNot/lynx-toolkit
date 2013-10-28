@@ -46,6 +46,7 @@ namespace LynxToolkit.Documents
         [XmlArrayItem("Quote", typeof(Quote))]
         [XmlArrayItem("CodeBlock", typeof(CodeBlock))]
         [XmlArrayItem("HorizontalRuler", typeof(HorizontalRuler))]
+        [XmlArrayItem("Section", typeof(Section))]
         public BlockCollection Blocks { get; private set; }
 
         public string Category { get; set; }
@@ -172,6 +173,8 @@ namespace LynxToolkit.Documents
         [XmlArrayItem("Image", typeof(Image))]
         [XmlArrayItem("Anchor", typeof(Anchor))]
         [XmlArrayItem("Symbol", typeof(Symbol))]
+        [XmlArrayItem("Span", typeof(Span))]
+        [XmlArrayItem("Equation", typeof(Equation))]
         [XmlArrayItem("NonBreakingSpace", typeof(NonBreakingSpace))]
         public InlineCollection Content { get; private set; }
     }
@@ -258,12 +261,7 @@ namespace LynxToolkit.Documents
 
         public CodeBlock(string language, string code)
         {
-            Language l;
-            if (Enum.TryParse(language, true, out l))
-            {
-                this.Language = l;
-            }
-
+            this.Language = (Language)Enum.Parse(typeof(Language), language, true);
             this.Text = code;
         }
 
