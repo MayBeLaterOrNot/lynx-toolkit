@@ -285,6 +285,11 @@ namespace XmlDocT
                 sb.Append("public ");
             }
 
+            if (this.Type.IsAbstract)
+            {
+                sb.Append("abstract ");
+            }
+
             if (this.Type.IsClass)
             {
                 sb.Append("class ");
