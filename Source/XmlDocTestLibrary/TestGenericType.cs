@@ -61,8 +61,11 @@ namespace XmlDocTestLibrary
         /// <typeparam name="T1">The type of the numbers.</typeparam>
         /// <param name="numbers">The numbers.</param>
         /// <returns>
-        /// The numbers.
+        /// A <see cref="List{T}"/> of <typeparamref name="T1"/> numbers.
         /// </returns>
-        public List<T1> Method8<T1>(List<T1> numbers) { return null; }
+        public List<T1> Method8<T1>(List<T1> numbers)
+        {
+            return null;
+        }
     }
 }
