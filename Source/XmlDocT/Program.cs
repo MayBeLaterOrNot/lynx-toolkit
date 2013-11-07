@@ -78,7 +78,7 @@ namespace XmlDocT
                             doc.IndexPage = kv[1];
                             break;
                         case "/indextitle":
-                            doc.IndexTitle= kv[1];
+                            doc.IndexTitle = kv[1];
                             break;
                         case "/helpcontents":
                             doc.HtmlHelpContents = kv[1];

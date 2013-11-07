@@ -57,6 +57,8 @@ namespace XmlDocT
 (?:\<c\>(?<c>.*?)\</c\>)
 )", RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
+        private Document doc;
+
         public DocFormatter()
         {
             this.Model = new LibraryModel();
@@ -111,8 +113,6 @@ namespace XmlDocT
         /// </remarks>
         public Dictionary<string, string> Replacements { get; set; }
 
-        private Document doc { get; set; }
-
         public void WritePages()
         {
             if (this.OutputExtension == null)
@@ -125,11 +125,9 @@ namespace XmlDocT
                     case "owiki":
                         this.OutputExtension = ".wiki";
                         break;
-
                     case "xml":
                         this.OutputExtension = ".xml";
                         break;
-
                     case "word":
                         this.OutputExtension = ".docx";
                         break;
@@ -360,7 +358,7 @@ namespace XmlDocT
 
                 var td1 = new TableCell();
                 var p1 = new Paragraph();
-                td1.Blocks.Add(p1);                
+                td1.Blocks.Add(p1);
                 p1.Content.Add(this.CreateLink(t.Type));
 
                 var td2 = new TableCell();
@@ -772,7 +770,7 @@ namespace XmlDocT
             this.doc.Title = title;
             this.doc.Description = description;
 
-            IDocumentFormatter formatter=null;
+            IDocumentFormatter formatter = null;
             switch (this.Format)
             {
                 case "html":
@@ -804,7 +802,7 @@ namespace XmlDocT
 
                 case "word":
                     {
-                        formatter = new WordFormatter { Template = this.Template };                    
+                        formatter = new WordFormatter { Template = this.Template };
                         break;
                     }
             }
@@ -815,8 +813,11 @@ namespace XmlDocT
             }
 
             var path = this.GetOutputFile(fileName);
-            formatter.Format(this.doc, File.OpenWrite(path));
-            
+            using (var outputStream = File.Create(path))
+            {
+                formatter.Format(this.doc, outputStream);
+            }
+
             this.doc = null;
         }
     }

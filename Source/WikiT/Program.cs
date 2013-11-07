@@ -313,8 +313,10 @@ namespace WikiT
 
             var outputDirectory = System.IO.Path.GetDirectoryName(outputPath);
             Utilities.CreateDirectoryIfMissing(outputDirectory);
-            using (var stream = File.OpenWrite(outputPath))
+            using (var stream = File.Create(outputPath))
+            {
                 formatter.Format(doc, stream);
+            }
             return true;
         }
     }

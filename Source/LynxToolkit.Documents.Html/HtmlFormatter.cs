@@ -149,7 +149,7 @@ namespace LynxToolkit.Documents.Html
         /// Formats the specified document as HTML.
         /// </summary>
         /// <param name="doc">The document.</param>
-        /// <returns><c>true</c> if the output file was modified, <c>false</c> otherwise</returns>
+        /// <param name="stream">The stream.</param>
         public override void Format(Document doc, Stream stream)
         {
             var w = new StringWriter();
@@ -161,8 +161,10 @@ namespace LynxToolkit.Documents.Html
 
             var html = w.ToString();
             html = this.ApplyTemplate(doc, html);
-            var tw = new StreamWriter(stream, Encoding.UTF8);
-            tw.Write(html);
+            using (var tw = new StreamWriter(stream, Encoding.UTF8))
+            {
+                tw.Write(html);
+            }
         }
 
         /// <summary>

@@ -15,7 +15,7 @@
             var parser = new WikiParser(File.OpenRead);
             var doc = parser.ParseFile(@"Input/Example.wiki");
             var formatter = new HtmlFormatter { SymbolDirectory = @"Input\Images" };
-            using (var stream = File.OpenWrite("Example.html"))
+            using (var stream = File.Create("Example.html"))
             {
                 formatter.Format(doc, stream);
             }

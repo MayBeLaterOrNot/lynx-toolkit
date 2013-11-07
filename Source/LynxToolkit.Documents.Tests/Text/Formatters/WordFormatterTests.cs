@@ -17,8 +17,10 @@
             var formatter = new WordFormatter();
             formatter.SymbolDirectory = @"Input\Images";
             // options.Template=
-            using (var stream = File.OpenWrite("Example.docx"))
+            using (var stream = File.Create("Example.docx"))
+            {
                 formatter.Format(doc, stream);
+            }
         }
     }
 }

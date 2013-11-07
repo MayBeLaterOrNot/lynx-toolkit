@@ -186,7 +186,7 @@ namespace IcoMaker
         public void Save(string path)
         {
             // http://en.wikipedia.org/wiki/ICO_(file_format)
-            using (var s = File.OpenWrite(path))
+            using (var s = File.Create(path))
             {
                 using (var w = new BinaryWriter(s))
                 {

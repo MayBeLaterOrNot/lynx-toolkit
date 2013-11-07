@@ -15,7 +15,7 @@
             var parser = new WikiParser(File.OpenRead);
             var doc = parser.ParseFile(@"Input/Example.wiki");
             var formatter = new FlowDocumentFormatter { SymbolDirectory = @"Input\Images" };
-            using (var stream = File.OpenWrite("Example.xps"))
+            using (var stream = File.Create("Example.xps"))
             {
                 formatter.Format(doc, stream);
             }

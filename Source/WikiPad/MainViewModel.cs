@@ -325,8 +325,10 @@ namespace WikiPad
                 // this.WikiConfluence = ConfluenceFormatter.Format(doc);
                 // this.WikiCodeplex = CodeplexFormatter.Format(doc);
                 Utilities.CreateDirectoryIfMissing(System.IO.Path.GetDirectoryName(outputPath));
-                using (var stream = File.OpenWrite(outputPath))
+                using (var stream = File.Create(outputPath))
+                {
                     formatter.Format(doc, stream);
+                }
 
                 this.OutputSource = null;
                 this.OutputSource = new Uri(outputPath, UriKind.Absolute);
