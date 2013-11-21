@@ -43,6 +43,28 @@ namespace PropertyCG
     /// </summary>
     public class PropertyClassModel
     {
+        private static Regex fileHeaderExpression = new Regex(@"^// (.*)", RegexOptions.Compiled);
+        private static Regex fileNameExpression = new Regex(@"(?<file>file=""(.*?)"")", RegexOptions.Compiled);
+        private static Regex usingExpression = new Regex(@"^using\s+([\w.]+);", RegexOptions.Compiled);
+        private static Regex namespaceExpression = new Regex(@"^namespace\s+([\w.]*)", RegexOptions.Compiled);
+        private static Regex classExpression = new Regex(@"^(\w+)\s+(abstract\s)?(partial\s)\s*class\s+([\w\<\>]+?)[\s:]", RegexOptions.Compiled);
+        private static Regex commentExpression = new Regex(@"^//", RegexOptions.Compiled);
+        private static Regex usingExpression2 = new Regex(@"^using\s+([\w.]+)", RegexOptions.Compiled);
+        private static Regex propertyExpression = new Regex(
+@"^
+(?<Ref>\&)?
+(?<Type>[\.<>\w\?]+)
+:?(?<Name>\w*)
+(?<Enum>\{.+\})?
+\s*
+(?<Flags>[\|\=\!\#\+\*$rpi]*)?
+\s*
+(?<Desc>'.*')?
+$",
+           RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace);
+        private static Regex dependencyExpression = new Regex(@"^(\w+)\s*->\s*(\w+)", RegexOptions.Compiled);
+        private static Regex attributeExpression = new Regex(@"^(\[.+\])", RegexOptions.Compiled);
+
         /// <summary>
         /// Gets or sets the file header format string.
         /// </summary>
@@ -80,13 +102,10 @@ namespace PropertyCG
         /// <param name="classFileName">Name of the class file.</param>
         public void ParseClass(string classFileName)
         {
-            var fileHeaderExpression = new Regex(@"^// (.*)$", RegexOptions.Compiled);
-            var fileNameExpression = new Regex(@"(?<file>file=""(.*?)"")", RegexOptions.Compiled);
-            var usingExpression = new Regex(@"using\s+([\w.]+);", RegexOptions.Compiled);
-            var namespaceExpression = new Regex(@"namespace\s+([\w.]*)", RegexOptions.Compiled);
-            var classExpression = new Regex(@"(\w+)\s+(abstract\s)?(partial\s)\s*class\s+([\w\<\>]+?)[\s:]", RegexOptions.Compiled);
             foreach (var line in File.ReadAllLines(classFileName))
             {
+                var trimmedLine = line.Trim();
+
                 var fileHeaderMatch = fileHeaderExpression.Match(line);
                 if (fileHeaderMatch.Success)
                 {
@@ -94,19 +113,19 @@ namespace PropertyCG
                     this.FileHeader.AppendLine(line2);
                 }
 
-                var usingMatch = usingExpression.Match(line);
+                var usingMatch = usingExpression.Match(trimmedLine);
                 if (usingMatch.Success)
                 {
                     this.UsedNamespaces.Add(usingMatch.Groups[1].Value);
                 }
 
-                var namespaceMatch = namespaceExpression.Match(line);
+                var namespaceMatch = namespaceExpression.Match(trimmedLine);
                 if (namespaceMatch.Success)
                 {
                     this.Namespace = namespaceMatch.Groups[1].Value;
                 }
 
-                var classMatch = classExpression.Match(line);
+                var classMatch = classExpression.Match(trimmedLine);
                 if (classMatch.Success && this.Name == null)
                 {
                     this.AccessModifier = classMatch.Groups[1].Value;
@@ -159,22 +178,6 @@ namespace PropertyCG
         /// <exception cref="System.InvalidOperationException">Invalid dependency relation. The target property </exception>
         public void Parse(string fileName, IPropertyCodeGeneratorOptions options)
         {
-            var commentExpression = new Regex(@"^\s//", RegexOptions.Compiled);
-            var usingExpression = new Regex(@"using\s+([\w.]+)", RegexOptions.Compiled);
-            var propertyExpression = new Regex(
-@"^
-(?<Ref>\&)?
-(?<Type>[\.<>\w\?]+)
-:?(?<Name>\w*)
-(?<Enum>\{.+\})?
-\s*
-(?<Flags>[\|\=\!\#\+\*$rpi]*)?
-\s*
-(?<Desc>'.*')?
-$",
-                RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace);
-            var dependencyExpression = new Regex(@"(\w+)\s*->\s*(\w+)", RegexOptions.Compiled);
-            var attributeExpression = new Regex(@"^\s*(\[.+\])\s*$", RegexOptions.Compiled);
             var attributes = new List<string>();
             var dependencies = new List<Dependency>();
             foreach (var line in File.ReadAllLines(fileName))
@@ -184,33 +187,49 @@ $",
                     continue;
                 }
 
-                if (commentExpression.Match(line).Success)
+                var trimmedLine = line.Trim();
+
+                if (trimmedLine.StartsWith("//"))
                 {
                     continue;
                 }
 
-                var usingMatch = usingExpression.Match(line);
-                if (usingMatch.Success)
+                if (trimmedLine.StartsWith("using"))
                 {
-                    this.UsedNamespaces.Add(usingMatch.Groups[1].Value);
-                    continue;
+                    var usingMatch = usingExpression2.Match(trimmedLine);
+                    if (usingMatch.Success)
+                    {
+                        this.UsedNamespaces.Add(usingMatch.Groups[1].Value);
+                        continue;
+                    }
                 }
 
-                var dependencyMatch = dependencyExpression.Match(line);
-                if (dependencyMatch.Success)
+                if (trimmedLine.Contains("->"))
                 {
-                    dependencies.Add(new Dependency { Source = dependencyMatch.Groups[1].Value, Target = dependencyMatch.Groups[2].Value });
-                    continue;
+                    var dependencyMatch = dependencyExpression.Match(trimmedLine);
+                    if (dependencyMatch.Success)
+                    {
+                        dependencies.Add(
+                            new Dependency
+                                {
+                                    Source = dependencyMatch.Groups[1].Value,
+                                    Target = dependencyMatch.Groups[2].Value
+                                });
+                        continue;
+                    }
                 }
 
-                var attributeMatch = attributeExpression.Match(line);
-                if (attributeMatch.Success)
+                if (trimmedLine.StartsWith("["))
                 {
-                    attributes.Add(attributeMatch.Groups[1].Value);
-                    continue;
+                    var attributeMatch = attributeExpression.Match(trimmedLine);
+                    if (attributeMatch.Success)
+                    {
+                        attributes.Add(attributeMatch.Groups[1].Value);
+                        continue;
+                    }
                 }
 
-                var propertyMatch = propertyExpression.Match(line);
+                var propertyMatch = propertyExpression.Match(trimmedLine);
                 if (propertyMatch.Success)
                 {
                     var flags = propertyMatch.Groups["Flags"].Value;
