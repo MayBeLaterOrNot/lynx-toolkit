@@ -62,7 +62,7 @@
     <Compile Include="Text\Utilities\XmlSyntaxHighligherTests.cs" />
     <Compile Include="Text\Utilities\CsSyntaxHighligherTests.cs" />
     <Compile Include="Utilities\JsonSerializerTests.cs" />
-    <Compile Include="Utilities\PathTests.cs" />
+    <Compile Include="Utilities\PathUtilitiesTests.cs" />
     <Content Include="Input\Subfolder\Test.wiki">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
