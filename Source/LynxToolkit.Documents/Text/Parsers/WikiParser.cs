@@ -99,7 +99,7 @@ namespace LynxToolkit.Documents
 
         public Document ParseFile(string fileName)
         {
-            this.CurrentDirectory = Path.GetDirectoryName(fileName);
+            this.CurrentDirectory = PathUtilities.GetDirectoryName(fileName);
             var content = this.ReadAllText(fileName);
             return this.Parse(content);
         }
@@ -113,7 +113,7 @@ namespace LynxToolkit.Documents
             if (this.Match("@include"))
             {
                 var include = this.ReadArg();
-                var path = Path.Combine(this.CurrentDirectory, include);
+                var path = PathUtilities.Combine(this.CurrentDirectory, include);
                 var content = this.ReadAllText(path);
                 b.Append(content);
             }
@@ -327,10 +327,10 @@ namespace LynxToolkit.Documents
 
         private string ResolveIncludeFile(string filename)
         {
-            var include = Path.Combine(this.CurrentDirectory, filename);
-            if (this.IncludeDefaultExtension != null && string.IsNullOrEmpty(Path.GetExtension(include)))
+            var include = PathUtilities.Combine(this.CurrentDirectory, filename);
+            if (this.IncludeDefaultExtension != null && string.IsNullOrEmpty(PathUtilities.GetExtension(include)))
             {
-                include = Path.ChangeExtension(include, this.IncludeDefaultExtension);
+                include = PathUtilities.ChangeExtension(include, this.IncludeDefaultExtension);
             }
 
             return include;
@@ -608,9 +608,9 @@ namespace LynxToolkit.Documents
 
                         // Image
                         var source = this.ReadToAny('|', '}');
-                        if (!source.StartsWith("http") && !Path.IsPathRooted(source))
+                        if (!source.StartsWith("http") && !PathUtilities.IsPathRooted(source))
                         {
-                            source = Path.Combine(this.CurrentDirectory, source);
+                            source = PathUtilities.Combine(this.CurrentDirectory, source);
                         }
 
                         var img = new Image { Source = source };

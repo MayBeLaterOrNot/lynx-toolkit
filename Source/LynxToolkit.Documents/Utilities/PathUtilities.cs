@@ -1,6 +1,6 @@
 ﻿namespace LynxToolkit.Documents
 {
-    public static class Path
+    public static class PathUtilities
     {
         public static string GetDirectoryName(string path)
         {

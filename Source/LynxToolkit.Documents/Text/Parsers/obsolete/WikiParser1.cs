@@ -208,7 +208,7 @@ namespace LynxToolkit.Documents
                     doc.Append(
                         Parse(
                             includeText,
-                            Path.GetDirectoryName(includeFilePath),
+                            PathUtilities.GetDirectoryName(includeFilePath),
                             includeDefaultExtension,
                             defaultSyntax,
                             replacements,
@@ -258,7 +258,7 @@ namespace LynxToolkit.Documents
         public static Document ParseFile(string filePath, string defaultSyntax = null, Dictionary<string, string> replacements = null, HashSet<string> defines = null)
         {
             var text = File.ReadAllText(filePath);
-            return Parse(text, Path.GetDirectoryName(filePath), Path.GetExtension(filePath), defaultSyntax, replacements, defines);
+            return Parse(text, PathUtilities.GetDirectoryName(filePath), PathUtilities.GetExtension(filePath), defaultSyntax, replacements, defines);
         }
 
         private static Document ParseCore(string text, string syntax, string documentFolder)
@@ -299,10 +299,10 @@ namespace LynxToolkit.Documents
         {
             foreach (var p in includepaths)
             {
-                var f = Path.Combine(Path.Combine(documentPath, p), include);
-                if (ext != null && string.IsNullOrEmpty(Path.GetExtension(f)))
+                var f = PathUtilities.Combine(PathUtilities.Combine(documentPath, p), include);
+                if (ext != null && string.IsNullOrEmpty(PathUtilities.GetExtension(f)))
                 {
-                    f = Path.ChangeExtension(f, ext);
+                    f = PathUtilities.ChangeExtension(f, ext);
                 }
 
                 if (File.Exists(f))
