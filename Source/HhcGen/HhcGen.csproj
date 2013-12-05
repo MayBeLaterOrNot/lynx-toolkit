@@ -31,6 +31,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>..\Lynx.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -47,6 +50,9 @@
     <Compile Include="..\Utilities.cs">
       <Link>Utilities.cs</Link>
     </Compile>
+    <CodeAnalysisDictionary Include="..\Lynx.ico">
+      <Link>Lynx.ico</Link>
+    </CodeAnalysisDictionary>
     <Content Include="ReadMe.txt" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
