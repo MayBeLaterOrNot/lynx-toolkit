@@ -96,10 +96,10 @@ namespace FtpUpload
                     localFile,
                     1024,
                     (x, y) =>
-                        {
-                            Console.Write("#");
-                            return true;
-                        });
+                    {
+                        Console.Write("#");
+                        return true;
+                    });
                 Console.WriteLine("\n{0} bytes uploaded.", length);
             }
 
@@ -167,30 +167,38 @@ namespace FtpUpload
                             : Directory.GetFiles(localDir, searchPattern);
             var q = new ConcurrentQueue<string>(files);
             var tasks = new List<Task>();
-            for (int i = 0; i < UploadThreads; i++)
+            if (UploadThreads == 1)
             {
-                tasks.Add(
-                    Task.Factory.StartNew(
-                        () =>
-                            {
-                                while (q.Count > 0)
-                                {
-                                    string f;
-                                    if (!q.TryDequeue(out f))
-                                    {
-                                        continue;
-                                    }
-
-                                    var remoteFile = f.Replace(localDir, remoteDirectory).Replace('\\', '/');
-                                    Console.WriteLine(f);
-                                    UploadFile(remoteFile, f);
-                                }
-                            }));
+                ProcessQueue(remoteDirectory, q, localDir);
             }
-
-            while (!tasks.All(t => t.IsCompleted))
+            else
             {
-                Thread.Sleep(1000);
+                for (int i = 0; i < UploadThreads; i++)
+                {
+                    tasks.Add(Task.Factory.StartNew(() => ProcessQueue(remoteDirectory, q, localDir)));
+                }
+
+                while (!tasks.All(t => t.IsCompleted))
+                {
+                    Thread.Sleep(1000);
+                }
+            }
+        }
+
+        private static void ProcessQueue(string remoteDirectory, ConcurrentQueue<string> q, string localDir)
+        {
+            while (q.Count > 0)
+            {
+                string f;
+                Console.WriteLine("TryDequeue");
+                if (!q.TryDequeue(out f))
+                {
+                    continue;
+                }
+
+                var remoteFile = f.Replace(localDir, remoteDirectory).Replace('\\', '/');
+                Console.WriteLine(f);
+                UploadFile(remoteFile, f);
             }
         }
     }
