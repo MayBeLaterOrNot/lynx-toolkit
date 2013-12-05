@@ -38,17 +38,47 @@ namespace LynxToolkit.Documents
     /// </summary>
     public class WikiParser
     {
-        Func<string, Stream> OpenRead { get; set; }
+        private Func<string, Stream> OpenRead { get; set; }
 
         private Document document;
 
         private const char EscapeCharacter = '~';
 
+        private const char DirectivePrefix = '@';
+
+        private const char HeaderPrefix = '=';
+
+        private const char OrderedListPrefix = '#';
+
+        private const char UnorderedListPrefix = '-';
+
+        private const char NewLineCharacter = '\n';
+
+        private const string IncludeKeyword = "@include";
+
+        private const string CodeBlockPrefix = "```";
+
+        private const string HorizontalRulerSymbol = "---";
+
+        private const string VariablePrefix = "$";
+
+        private const string SectionPrefix = "[[";
+
+        private const char QuotePrefix = '>';
+
+        private const char TablePrefix = '|';
+
+        private const string UrlPrefix = "http://";
+
+        private const string SecureUrlPrefix = "https://";
+
+        private const string NewLine = "\n";
+
+        private const string ParagraphSuffix = "\n\n";
+
         private int i;
 
         private int n;
-
-        private const char NewLineCharacter = '\n';
 
         private string text;
 
@@ -60,7 +90,10 @@ namespace LynxToolkit.Documents
             this.CurrentDirectory = string.Empty;
         }
 
-        public WikiParser(IEnumerable<string> defines, Dictionary<string, string> variables, Func<string, Stream> openRead)
+        public WikiParser(
+            IEnumerable<string> defines,
+            Dictionary<string, string> variables,
+            Func<string, Stream> openRead)
         {
             this.OpenRead = openRead;
             this.Defines = new List<string>(defines);
@@ -110,7 +143,7 @@ namespace LynxToolkit.Documents
             this.i++;
             var b = new StringBuilder();
 
-            if (this.Match("@include"))
+            if (this.Match(IncludeKeyword))
             {
                 var include = this.ReadArg();
                 var path = PathUtilities.Combine(this.CurrentDirectory, include);
@@ -120,12 +153,12 @@ namespace LynxToolkit.Documents
 
             while (this.i < this.n)
             {
-                if (this.Match("```"))
+                if (this.Match(CodeBlockPrefix))
                 {
                     break;
                 }
 
-                var c = text[i++];
+                var c = this.text[i++];
                 if (c == NewLineCharacter)
                 {
                     b.AppendLine();
@@ -243,7 +276,7 @@ namespace LynxToolkit.Documents
         {
             foreach (var kvp in this.Variables)
             {
-                if (this.Match("$" + kvp.Key))
+                if (this.Match(VariablePrefix + kvp.Key))
                 {
                     value = kvp.Value;
                     return true;
@@ -269,56 +302,63 @@ namespace LynxToolkit.Documents
                     break;
                 }
 
-                switch (this.text[this.i])
+                if (this.text[this.i] == DirectivePrefix)
                 {
-                    case '@':
-                        this.ParseDirective(b);
+                    this.ParseDirective(b);
+                    continue;
+                }
+
+                if (this.text[this.i] == HeaderPrefix)
+                {
+                    b.Add(this.ParseHeader());
+                    continue;
+                }
+
+                if (this.text[this.i] == CodeBlockPrefix[0])
+                {
+                    if (this.Match(CodeBlockPrefix))
+                    {
+                        this.ParseCodeBlock(b);
                         continue;
-                    case '=':
-                        b.Add(this.ParseHeader());
+                    }
+                }
+
+                if (this.text[this.i] == HorizontalRulerSymbol[0])
+                {
+                    if (this.Match(HorizontalRulerSymbol))
+                    {
+                        this.Skip('-');
+                        b.Add(new HorizontalRuler());
                         continue;
+                    }
+                }
 
-                    case '`':
-                        if (this.Match("```"))
-                        {
-                            this.ParseCodeBlock(b);
-                            continue;
-                        }
+                if (this.text[this.i] == OrderedListPrefix || this.text[this.i] == UnorderedListPrefix)
+                {
+                    b.Add(this.ParseList(terminator));
+                    continue;
+                }
 
-                        break;
-
-                    case '-':
-                        if (this.Match("---"))
-                        {
-                            this.Skip('-');
-                            b.Add(new HorizontalRuler());
-                            continue;
-                        }
-
-                        break;
-
-                    case '*':
-                    case '#':
-                        b.Add(this.ParseList(terminator));
+                if (this.text[this.i] == SectionPrefix[0])
+                {
+                    if (this.text[this.i + 1] == SectionPrefix[1])
+                    {
+                        this.i += 2;
+                        b.Add(this.ParseSection());
                         continue;
+                    }
+                }
 
-                    case '[':
-                        if (this.text[this.i + 1] == '[')
-                        {
-                            this.i += 2;
-                            b.Add(this.ParseSection());
-                            continue;
-                        }
+                if (this.text[this.i] == QuotePrefix)
+                {
+                    b.Add(this.ParseQuote(terminator));
+                    continue;
+                }
 
-                        break;
-
-                    case '>':
-                        b.Add(this.ParseQuote(terminator));
-                        continue;
-
-                    case '|':
-                        b.Add(this.ParseTable());
-                        continue;
+                if (this.text[this.i] == TablePrefix)
+                {
+                    b.Add(this.ParseTable());
+                    continue;
                 }
 
                 b.Add(this.ParseParagraph(terminator));
@@ -373,6 +413,12 @@ namespace LynxToolkit.Documents
             if (this.Match("title"))
             {
                 this.document.Title = this.ReadArg();
+                return;
+            }
+
+            if (this.Match("subtitle"))
+            {
+                this.document.Subtitle = this.ReadArg();
                 return;
             }
 
@@ -433,6 +479,7 @@ namespace LynxToolkit.Documents
             if (this.Match("if"))
             {
                 var condition = this.ReadArg();
+                // Note: boolean expressions are not supported
                 if (!this.Defines.Contains(condition))
                 {
                     this.ReadTo("@endif");
@@ -447,7 +494,8 @@ namespace LynxToolkit.Documents
                 return;
             }
 
-            throw new Exception("Unknown directive.");
+            var directive = this.ReadTo(' ');
+            throw new FormatException("Unknown directive: " + directive);
         }
 
         private int ParseInlines(InlineCollection c, params string[] terminators)
@@ -492,160 +540,173 @@ namespace LynxToolkit.Documents
                     break;
                 }
 
-                switch (this.text[this.i])
+                var ci = this.text[this.i];
+                var ci2 = this.i + 1 < this.n ? this.text[this.i + 1] : '\0';
+
+                if (ci == '$')
                 {
-                    case '$':
-                        if (this.i + 1 < this.n && this.text[this.i + 1] == '$')
-                        {
-                            this.i += 2;
-                            addRun();
-                            var eq = new Equation { Content = this.ReadTo("$$", false) };
-                            this.i += 2;
-                            c.Add(eq);
-                            continue;
-                        }
-
-                        string variableValue;
-                        if (this.MatchVariable(out variableValue))
-                        {
-                            runContent.Append(variableValue);
-                            continue;
-                        }
-
-                        break;
-
-                    case '\n':
-                        this.i++;
+                    if (ci2 == '$')
+                    {
+                        this.i += 2;
                         addRun();
+                        var eq = new Equation { Content = this.ReadTo("$$", false) };
+                        this.i += 2;
+                        c.Add(eq);
                         continue;
+                    }
 
-                    case '\\':
-                        if (this.i + 1 < this.n && this.text[this.i + 1] == '\\')
-                        {
-                            this.i += 2;
-                            addRun();
-                            c.Add(new LineBreak());
-                            continue;
-                        }
-
-                        break;
-
-                    case '*':
-                        if (this.i + 1 < this.n && this.text[this.i + 1] == '*')
-                        {
-                            addRun();
-                            this.i += 2;
-                            var strong = new Strong();
-                            this.ParseInlines(strong.Content, "**");
-                            this.i += 2;
-                            c.Add(strong);
-                            continue;
-                        }
-
-                        this.i++;
-                        addRun();
-
-                        var em = new Emphasized();
-                        this.ParseInlines(em.Content, "*");
-                        this.i++;
-                        c.Add(em);
+                    string variableValue;
+                    if (this.MatchVariable(out variableValue))
+                    {
+                        runContent.Append(variableValue);
                         continue;
-
-                    case '`':
-                        addRun();
-                        this.i++;
-                        var code = new InlineCode { Code = this.ReadTo("`", false) };
-                        this.i++;
-                        c.Add(code);
-                        continue;
-
-                    case '[':
-                        addRun();
-                        this.i++;
-                        var link = new Hyperlink { Url = this.ReadToAny('|', ']') };
-                        if (this.text[this.i] == '|')
-                        {
-                            this.i++;
-                            this.ParseInlines(link.Content, "]");
-                        }
-                        else
-                        {
-                            link.Content.Add(new Run(SimplifyUrl(link.Url)));
-                        }
-
-                        this.i++;
-
-                        c.Add(link);
-                        continue;
-
-                    case '{':
-                        this.i++;
-                        addRun();
-
-                        // Span
-                        if (this.text[this.i] == '{')
-                        {
-                            this.i++;
-                            var className = this.ReadTo(':');
-                            this.i++;
-                            var span = new Span { Class = className };
-                            this.ParseInlines(span.Content, "}}");
-                            this.i += 2;
-                            c.Add(span);
-                            continue;
-                        }
-
-                        // Anchor
-                        if (this.text[this.i] == '#')
-                        {
-                            this.i++;
-                            var anchorName = this.ReadTo('}');
-                            this.i++;
-                            var anchor = new Anchor { Name = anchorName };
-                            c.Add(anchor);
-                            continue;
-                        }
-
-                        // Image
-                        var source = this.ReadToAny('|', '}');
-                        if (!source.StartsWith("http") && !PathUtilities.IsPathRooted(source))
-                        {
-                            source = PathUtilities.Combine(this.CurrentDirectory, source);
-                        }
-
-                        var img = new Image { Source = source };
-
-                        if (this.text[this.i] == '|')
-                        {
-                            this.i++;
-                            img.AlternateText = this.ReadToAny('|', '}');
-                        }
-
-                        if (this.text[this.i] == '|')
-                        {
-                            this.i++;
-                            img.Link = this.ReadTo('}');
-                        }
-
-                        this.i++;
-                        c.Add(img);
-                        continue;
-
-                    case '(':
-                    case ':':
-                    case ';':
-                        string symbolName;
-                        if (this.MatchSymbol(out symbolName))
-                        {
-                            var s = new Symbol { Name = symbolName };
-                            c.Add(s);
-                            continue;
-                        }
-
-                        break;
+                    }
                 }
 
-                runContent.Append(this.text[this.i++]);
+                if (ci == NewLineCharacter)
+                {
+                    this.i++;
+                    addRun();
+                    continue;
+                }
+
+                if (ci == ' ' && this.Match("  \n"))
+                {
+                    addRun();
+                    c.Add(new LineBreak());
+                    continue;
+                }
+
+                if (ci == '\\' && ci2 == '\\')
+                {
+                    this.i += 2;
+                    addRun();
+                    c.Add(new LineBreak());
+                    continue;
+                }
+
+                if (ci == '*' && ci2 == '*')
+                {
+                    addRun();
+                    this.i += 2;
+                    var strong = new Strong();
+                    this.ParseInlines(strong.Content, "**");
+                    this.i += 2;
+                    c.Add(strong);
+                    continue;
+                }
+
+                if (ci == '/' && ci2 == '/')
+                {
+                    addRun();
+                    this.i += 2;
+
+                    var em = new Emphasized();
+                    this.ParseInlines(em.Content, "//");
+                    this.i += 2;
+                    c.Add(em);
+                    continue;
+                }
+
+                if (ci == '`')
+                {
+                    addRun();
+                    this.i++;
+                    var code = new InlineCode { Code = this.ReadTo("`", false) };
+                    this.i++;
+                    c.Add(code);
+                    continue;
+                }
+
+                if (ci == '[')
+                {
+                    addRun();
+                    this.i++;
+                    var link = new Hyperlink { Url = this.ReadToAny('|', ']') };
+                    if (i < n && this.text[this.i] == '|')
+                    {
+                        this.i++;
+                        this.ParseInlines(link.Content, "]");
+                    }
+                    else
+                    {
+                        link.Content.Add(new Run(this.SimplifyUrl(link.Url)));
+                    }
+
+                    this.i++;
+
+                    c.Add(link);
+                    continue;
+                }
+
+                if (ci == '{')
+                {
+                    addRun();
+                    this.i++;
+
+                    // Span
+                    if (this.text[this.i] == '{')
+                    {
+                        this.i++;
+                        var className = this.ReadTo(':');
+                        this.i++;
+                        var span = new Span { Class = className };
+                        this.ParseInlines(span.Content, "}}");
+                        this.i += 2;
+                        c.Add(span);
+                        continue;
+                    }
+
+                    // Anchor
+                    if (this.text[this.i] == '#')
+                    {
+                        this.i++;
+                        var anchorName = this.ReadTo('}');
+                        this.i++;
+                        var anchor = new Anchor { Name = anchorName };
+                        c.Add(anchor);
+                        continue;
+                    }
+
+                    // Image
+                    var source = this.ReadToAny('|', '}');
+                    if (!source.StartsWith("http") && !PathUtilities.IsPathRooted(source))
+                    {
+                        source = PathUtilities.Combine(this.CurrentDirectory, source);
+                    }
+
+                    var img = new Image { Source = source };
+
+                    if (this.text[this.i] == '|')
+                    {
+                        this.i++;
+                        img.AlternateText = this.ReadToAny('|', '}');
+                    }
+
+                    if (this.text[this.i] == '|')
+                    {
+                        this.i++;
+                        img.Link = this.ReadTo('}');
+                    }
+
+                    this.i++;
+                    c.Add(img);
+                    continue;
+                }
+
+                if (ci == '(' || ci == ':' || ci == ';')
+                {
+                    string symbolName;
+                    if (this.MatchSymbol(out symbolName))
+                    {
+                        var s = new Symbol { Name = symbolName };
+                        c.Add(s);
+                        continue;
+                    }
+                }
+
+                runContent.Append(ci);
+                this.i++;
             }
 
             addRun();
@@ -659,7 +720,7 @@ namespace LynxToolkit.Documents
                 return null;
             }
 
-            return url.Replace("http://", string.Empty).Replace("https://", string.Empty);
+            return url.Replace(UrlPrefix, string.Empty).Replace(SecureUrlPrefix, string.Empty);
         }
 
         private List ParseList(string terminator)
@@ -671,7 +732,7 @@ namespace LynxToolkit.Documents
                 this.i++;
                 if (list == null)
                 {
-                    if (prefix[0] == '#')
+                    if (prefix[0] == OrderedListPrefix)
                     {
                         list = new OrderedList();
                     }
@@ -684,16 +745,16 @@ namespace LynxToolkit.Documents
                 var li = new ListItem();
                 if (terminator == null)
                 {
-                    this.ParseInlines(li.Content, "\n");
+                    this.ParseInlines(li.Content, NewLine);
                 }
                 else
                 {
-                    this.ParseInlines(li.Content, "\n", terminator);
+                    this.ParseInlines(li.Content, NewLine, terminator);
                 }
 
                 this.i++;
                 list.Items.Add(li);
-                if (this.i < this.n && this.text[this.i] != '*' && this.text[this.i] != '#')
+                if (this.i < this.n && this.text[this.i] != UnorderedListPrefix && this.text[this.i] != OrderedListPrefix)
                 {
                     break;
                 }
@@ -707,11 +768,11 @@ namespace LynxToolkit.Documents
             var p = new Paragraph();
             if (terminator == null)
             {
-                this.ParseInlines(p.Content, "\n\n");
+                this.ParseInlines(p.Content, ParagraphSuffix);
             }
             else
             {
-                this.ParseInlines(p.Content, "\n\n", terminator);
+                this.ParseInlines(p.Content, ParagraphSuffix, terminator);
             }
 
             return p;
@@ -726,15 +787,15 @@ namespace LynxToolkit.Documents
                 this.Skip(' ');
                 if (terminator == null)
                 {
-                    this.ParseInlines(quote.Content, "\n");
+                    this.ParseInlines(quote.Content, NewLine);
                 }
                 else
                 {
-                    this.ParseInlines(quote.Content, "\n", terminator);
+                    this.ParseInlines(quote.Content, NewLine, terminator);
                 }
 
                 this.i++;
-                if (this.i < this.n && this.text[this.i] != '>')
+                if (this.i < this.n && this.text[this.i] != QuotePrefix)
                 {
                     break;
                 }
@@ -743,12 +804,15 @@ namespace LynxToolkit.Documents
             return quote;
         }
 
+        private const char SectionDelimiter = ':';
+        private const string SectionSuffix = "]]";
+
         private Section ParseSection()
         {
-            var className = this.ReadTo(':');
+            var className = this.ReadTo(SectionDelimiter);
             this.i++;
             var section = new Section { Class = className };
-            this.ParseBlocks(section.Blocks, "]]");
+            this.ParseBlocks(section.Blocks, SectionSuffix);
             this.i += 2;
             return section;
         }
@@ -819,7 +883,7 @@ namespace LynxToolkit.Documents
             {
                 var c = this.text[this.i];
 
-                if (c == '\\')
+                if (c == EscapeCharacter)
                 {
                     this.i++;
                     b.Append(this.text[this.i++]);

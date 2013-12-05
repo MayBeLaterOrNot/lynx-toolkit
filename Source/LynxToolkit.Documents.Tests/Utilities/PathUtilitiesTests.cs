@@ -58,5 +58,15 @@
             var result2 = System.IO.Path.IsPathRooted(input);
             Assert.AreEqual(expectedOutput, result2);
         }
+
+        [Test]
+        [TestCase(@"a\..", @"")]
+        [TestCase(@"a\..\b", @"b")]
+        [TestCase(@"\a\..\b", @"\b")]
+        public void Simplify(string input, string expectedOutput)
+        {
+            var result = PathUtilities.Simplify(input);
+            Assert.AreEqual(expectedOutput, result);
+        }
     }
 }

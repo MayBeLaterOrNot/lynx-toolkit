@@ -39,35 +39,18 @@ namespace LynxToolkit.Documents.Html
 
     public class HtmlFormatter : DocumentFormatter<XmlWriter>
     {
-
-        public string OutputDirectory { get; private set; }
-
-        public string EquationFilePrefix { get; set; }
-
-        /// <summary>
-        /// The encodings
-        /// </summary>
-        private static readonly Dictionary<string, string> Encodings;
-
-        /// <summary>
-        /// Initializes static members of the <see cref="HtmlFormatter"/> class.
-        /// </summary>
-        static HtmlFormatter()
-        {
-            Encodings = new Dictionary<string, string> { { "&", "&amp;" }, { ">", "&gt;" }, { "<", "&lt;" } };
-        }
-
         /// <summary>
         /// Initializes a new instance of the <see cref="HtmlFormatter"/> class.
         /// </summary>
         public HtmlFormatter()
         {
             this.OutputDirectory = ".";
+            this.ImageBaseDirectory = ".";
             this.EquationFilePrefix = "Equations";
             this.LocalLinkFormatString = "{0}.html";
             this.SpaceLinkFormatString = "{0}/{1}.html";
-            this.EquationFormatString = "{0}/Equation{1}.png";
-            this.CacheEquations = true;
+            this.EquationFileNameFormatString = "{0}/Equation{1}.png";
+            this.ForceEquationUpdates = false;
 
             this.InternalLinkSpaces = new Dictionary<string, string>
                                           {
@@ -81,36 +64,64 @@ namespace LynxToolkit.Documents.Html
         }
 
         /// <summary>
-        ///     Gets or sets the cascading style sheet.
+        /// Gets or sets the output directory.
+        /// </summary>
+        /// <value>The output directory.</value>
+        public string OutputDirectory { get; set; }
+
+        /// <summary>
+        /// Gets or sets the image base directory.
+        /// </summary>
+        /// <value>The image base directory.</value>
+        /// <remarks>
+        /// The relative image paths will be related to the ImageBaseDirectory.
+        /// Image paths will be combined from the OutputDirectory and the relative image path.
+        /// Example
+        /// OutputDirectory: <code>C:\Output</code>
+        /// ImageBaseDirectory: <code>C:\Source\Documentation</code>
+        /// Full image path: <code>C:\Source\Documentation\Images\Image1.png</code>
+        /// Relative image path: <code>Images\Image1.png</code>
+        /// Output image path: <code>C:\Output\Images\Image1.png</code>
+        /// </remarks>
+        public string ImageBaseDirectory { get; set; }
+
+        /// <summary>
+        /// Gets or sets the equation file prefix.
+        /// </summary>
+        /// <value>The equation file prefix.</value>
+        public string EquationFilePrefix { get; set; }
+
+        /// <summary>
+        /// Gets or sets the filename of the cascading style sheet.
         /// </summary>
         public string Css { get; set; }
 
         /// <summary>
-        ///     Gets or sets the footer.
+        /// Gets or sets the footer.
         /// </summary>
         public string Footer { get; set; }
 
         /// <summary>
-        ///     Gets the internal link space dictionary.
+        /// Gets the internal link space dictionary.
         /// </summary>
         public Dictionary<string, string> InternalLinkSpaces { get; private set; }
 
         /// <summary>
-        ///     Gets or sets the format string for local links (without space or http prefix).
+        /// Gets or sets the format string for local links (without space or http prefix).
         /// </summary>
         /// <remarks>{0} will be replaced by the local link reference.</remarks>
         public string LocalLinkFormatString { get; set; }
 
         /// <summary>
-        ///     Gets or sets the format string for local links containing a space (e.g. "space:id").
+        /// Gets or sets the format string for local links containing a space (e.g. "space:id").
         /// </summary>
         /// <remarks>{0} will be replaced by the space, and {1} will be replaced by the id.</remarks>
         public string SpaceLinkFormatString { get; set; }
 
         /// <summary>
-        /// Gets or sets the equation format string. {0} will be replaced by the page name. {1} will be replaced by the equation number within the page.
+        /// Gets or sets the equation filename format string. {0} will be replaced by the page name. {1} will be replaced by the equation number within the page.
         /// </summary>
-        public string EquationFormatString { get; set; }
+        public string EquationFileNameFormatString { get; set; }
 
         /// <summary>
         /// Gets or sets the image wrapper class. If this property is not defined, a wrapper will not be generated.
@@ -141,9 +152,13 @@ namespace LynxToolkit.Documents.Html
         public string Template { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether to cache equation images.
+        /// Gets or sets a value indicating whether to force the equation images to be updated.
         /// </summary>
-        public bool CacheEquations { get; set; }
+        /// <remarks>
+        /// A .tex file will be generated with the same filename as the equation image file.
+        /// If the content of the <c>.tex</c> file is not changed, the equation image will not be regenerated unless this property is set to <c>true</c>.
+        /// </remarks>
+        public bool ForceEquationUpdates { get; set; }
 
         /// <summary>
         /// Formats the specified document as HTML.
@@ -578,7 +593,7 @@ namespace LynxToolkit.Documents.Html
         protected override void Write(Equation e, XmlWriter context)
         {
             var alt = string.Format("Equation {0}", equationCounter);
-            var fileName = string.Format(this.EquationFormatString, this.EquationFilePrefix, this.equationCounter);
+            var fileName = string.Format(this.EquationFileNameFormatString, this.EquationFilePrefix, this.equationCounter);
             this.equationCounter++;
 
             // Generate png
@@ -587,7 +602,7 @@ namespace LynxToolkit.Documents.Html
 
             var tex = "$" + e.Content + "$";
             bool exists = false;
-            if (this.CacheEquations)
+            if (!this.ForceEquationUpdates)
             {
                 var texFilePath = Path.ChangeExtension(filePath, ".tex");
                 if (File.Exists(filePath))
@@ -604,6 +619,7 @@ namespace LynxToolkit.Documents.Html
 
                 File.WriteAllText(texFilePath, tex);
             }
+
             if (!exists)
             {
                 var tc = new TexConverter();
@@ -666,12 +682,28 @@ namespace LynxToolkit.Documents.Html
 
             var src = image.Source;
 
-            // TODO: copy image??
-            // src = MakeRelativePath(src, this.OutputDirectory);
+            var relativeImagePath = MakeRelativePath(Path.Combine(this.ImageBaseDirectory, "."), src);
+            var outputImagePath = Path.Combine(this.OutputDirectory, relativeImagePath);
+
+            try
+            {
+                if (File.Exists(src))
+                {
+                    // Copy image file
+                    CreateDirectoryIfMissing(Path.GetDirectoryName(outputImagePath));
+                    File.Copy(src, outputImagePath, true);
+                }
+                else
+                {
+                }
+            }
+            catch
+            {
+            }
 
             context.WriteStartElement("img");
             this.WriteAttributes(image, context);
-            context.WriteAttributeString("src", src);
+            context.WriteAttributeString("src", relativeImagePath.Replace('\\', '/'));
             context.WriteAttributeString("alt", image.AlternateText);
             context.WriteEndElement();
             if (!string.IsNullOrWhiteSpace(image.Link))
@@ -695,10 +727,9 @@ namespace LynxToolkit.Documents.Html
 
         private static string Encode(string text)
         {
-            foreach (var e in Encodings)
-            {
-                text = text.Replace(e.Key, e.Value);
-            }
+            text = text.Replace("&", "&amp;");
+            text = text.Replace(">", "&gt;");
+            text = text.Replace("<", "&lt;");
 
             return text;
         }

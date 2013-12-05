@@ -27,6 +27,7 @@
 namespace WikiPad
 {
     using System;
+    using System.Diagnostics;
     using System.IO;
     using System.Linq;
     using System.Text;
@@ -69,6 +70,10 @@ namespace WikiPad
             this.SaveAllCommand = new DelegateCommand(
                 this.SaveAll, () => this.Project != null && this.Project.Documents.Any(d => d.IsModified));
             this.ExitCommand = new DelegateCommand(this.Exit);
+
+            this.OpenExternalEditorCommand = new DelegateCommand(this.OpenExternalEditor, () => this.SelectedDocument != null);
+            this.ExploreCommand = new DelegateCommand(this.Explore, () => this.SelectedDocument != null);
+
             var args = Environment.GetCommandLineArgs();
             foreach (var arg in args)
             {
@@ -140,6 +145,8 @@ namespace WikiPad
         }
 
         public ICommand OpenProjectCommand { get; private set; }
+        public ICommand OpenExternalEditorCommand { get; private set; }
+        public ICommand ExploreCommand { get; private set; }
 
         public WikiProject Project
         {
@@ -259,6 +266,22 @@ namespace WikiPad
             }
         }
 
+        private void OpenExternalEditor()
+        {
+            if (this.SelectedDocument != null)
+            {
+                Process.Start(this.SelectedDocument.FullPath);
+            }
+        }
+
+        private void Explore()
+        {
+            if (this.SelectedDocument != null)
+            {
+                Process.Start("Explorer.exe", "/select," + this.SelectedDocument.FullPath);
+            }
+        }
+
         private void Revert()
         {
             this.SelectedDocument.Revert();
@@ -303,7 +326,8 @@ namespace WikiPad
                               {
                                   Template = template,
                                   LocalLinkFormatString = this.Project.LocalLinks,
-                                  Variables = this.Project.GetVariables()
+                                  Variables = this.Project.GetVariables(),
+                                  ImageBaseDirectory = documentFolder
                               };
             try
             {

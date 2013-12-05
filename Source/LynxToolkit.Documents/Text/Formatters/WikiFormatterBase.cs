@@ -24,24 +24,64 @@
 //   SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
-using System.Text;
 
 namespace LynxToolkit.Documents
 {
     using System.IO;
+    using System.Text;
 
     public abstract class WikiFormatterBase : DocumentFormatter<TextWriter>
     {
         protected WikiFormatterBase()
         {
+            this.EscapeCharacter = '\\';
             this.LineLength = 72;
+            this.UnorderedListItemPrefix = "- ";
+            this.OrderedListItemPrefix = "# ";
+
+            this.HorizontalRulerText = "----";
+            this.LineBreakText = @"\\";
+            this.HeaderPrefix = "=";
+
+            this.StrongWrapper = "**";
+            this.EmphasizedWrapper = "//";
+            this.InlineCodePrefix = "{{";
+            this.InlineCodeSuffix = "}}";
+
+            this.TableHeaderPrefix = "|=";
+            this.TableCellSeparator = "|";
         }
 
-        protected static char[] NewlineChars = new[] { '\r', '\n' };
+        public int LineLength { get; set; }
 
-        public string ToString(TextWriter context)
+        public char EscapeCharacter { get; protected set; }
+
+        public string UnorderedListItemPrefix { get; set; }
+
+        public string OrderedListItemPrefix { get; set; }
+
+        public string HorizontalRulerText { get; set; }
+
+        public string LineBreakText { get; set; }
+
+        public string HeaderPrefix { get; set; }
+
+        public string StrongWrapper { get; set; }
+
+        public string EmphasizedWrapper { get; set; }
+
+        public string InlineCodePrefix { get; set; }
+
+        public string InlineCodeSuffix { get; set; }
+
+        public string TableCellSeparator { get; set; }
+
+        public string TableHeaderPrefix { get; set; }
+
+        public override void Format(Document doc, Stream stream)
         {
-            return context.ToString().Trim(NewlineChars);
+            var w = new StreamWriter(stream);
+            this.WriteBlocks(doc.Blocks, w);
         }
 
         protected void WriteItems(ListItemCollection items, TextWriter context, string prefix)
@@ -49,12 +89,13 @@ namespace LynxToolkit.Documents
             int i = 1;
             foreach (var item in items)
             {
-                context.Write(prefix, i++);
+                var actualPrefix = prefix.Replace("i", i.ToString());
+                context.Write(actualPrefix, i++);
                 var innerWriter = new StringWriter();
                 this.WriteInlines(item.Content, innerWriter);
                 var text = innerWriter.ToString();
                 text = Wrap(text, this.LineLength);
-                this.WriteLines(context, text, Repeat(" ", prefix.Length), string.Empty);
+                this.WriteLines(context, text, Repeat(" ", actualPrefix.Length), string.Empty);
             }
         }
 
@@ -130,20 +171,29 @@ namespace LynxToolkit.Documents
             }
         }
 
-        public int LineLength { get; set; }
-
         protected override void Write(TableOfContents toc, TextWriter context)
         {
             context.WriteLine("@toc");
         }
 
+        protected override void Write(Header header, TextWriter context)
+        {
+            context.Write(Repeat(this.HeaderPrefix, header.Level));
+            context.Write(" ");
+            this.WriteInlines(header.Content, context);
+            context.WriteLine();
+
+            // Empty line
+            context.WriteLine();
+        }
+
+
         protected override void Write(Paragraph paragraph, TextWriter context)
         {
             var sb = new StringWriter();
-            WriteInlines(paragraph.Content, sb);
-            var text = Wrap(sb.ToString(), LineLength);
-            context.Write(text);
-            context.WriteLine();
+            this.WriteInlines(paragraph.Content, sb);
+            var text = Wrap(sb.ToString(), this.LineLength);
+            context.WriteLine(text);
             context.WriteLine();
         }
 
@@ -155,24 +205,24 @@ namespace LynxToolkit.Documents
         protected override void Write(Quote quote, TextWriter context)
         {
             var sb = new StringWriter();
-            WriteInlines(quote.Content, sb);
-            var text = Wrap(sb.ToString(), LineLength);
+            this.WriteInlines(quote.Content, sb);
+            var text = Wrap(sb.ToString(), this.LineLength);
             context.WriteLine("///");
-            WriteInlines(quote.Content, context);
-            WriteLines(context, text);
+            this.WriteInlines(quote.Content, context);
+            this.WriteLines(context, text);
             context.WriteLine("///");
             context.WriteLine();
         }
 
         protected override void Write(UnorderedList list, TextWriter context)
         {
-            WriteItems(list.Items, context, "- ");
+            this.WriteItems(list.Items, context, this.UnorderedListItemPrefix);
             context.WriteLine();
         }
 
         protected override void Write(OrderedList list, TextWriter context)
         {
-            WriteItems(list.Items, context, "# ");
+            this.WriteItems(list.Items, context, this.OrderedListItemPrefix);
             context.WriteLine();
         }
 
@@ -182,25 +232,28 @@ namespace LynxToolkit.Documents
             {
                 foreach (var c in r.Cells)
                 {
-                    context.Write(c is TableHeaderCell ? "||" : "|");
-                    WriteBlocks(c.Blocks, context);
+                    context.Write(c is TableHeaderCell ? this.TableHeaderPrefix : this.TableCellSeparator);
+                    this.WriteBlocks(c.Blocks, context);
                 }
-                context.WriteLine("|");
+
+                context.WriteLine(this.TableCellSeparator);
             }
+
             context.WriteLine();
         }
 
         protected override void Write(CodeBlock codeBlock, TextWriter context)
         {
             context.WriteLine("{{{");
-            WriteLines(context, codeBlock.Text);
+            this.WriteLines(context, codeBlock.Text);
             context.WriteLine("}}}");
             context.WriteLine();
         }
 
         protected override void Write(HorizontalRuler ruler, TextWriter context)
         {
-            context.WriteLine("----");
+            context.WriteLine();
+            context.WriteLine(HorizontalRulerText);
             context.WriteLine();
         }
 
@@ -227,30 +280,39 @@ namespace LynxToolkit.Documents
 
         protected override void Write(Strong strong, TextWriter context)
         {
-            context.Write("**");
+            context.Write(this.StrongWrapper);
             WriteInlines(strong.Content, context);
-            context.Write("**");
+            context.Write(this.StrongWrapper);
         }
 
         protected override void Write(Emphasized em, TextWriter context)
         {
-            context.Write("//");
+            context.Write(this.EmphasizedWrapper);
             WriteInlines(em.Content, context);
-            context.Write("//");
+            context.Write(this.EmphasizedWrapper);
         }
 
         protected override void Write(LineBreak linebreak, TextWriter context)
         {
-            context.WriteLine(@"\\");
+            context.WriteLine(this.LineBreakText);
         }
 
         protected override void Write(InlineCode inlineCode, TextWriter context)
         {
-            context.Write("{{" + inlineCode.Code + "}}");
+            context.Write(this.InlineCodePrefix);
+            context.Write(inlineCode.Code);
+            context.Write(this.InlineCodeSuffix);
         }
+
 
         protected override void Write(Equation equation, TextWriter context)
         {
+            context.Write(equation.Content);
+        }
+
+        protected override void Write(Anchor anchor, TextWriter context)
+        {
+            context.Write(anchor.Name);
         }
     }
 }

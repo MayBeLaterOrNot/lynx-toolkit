@@ -31,6 +31,7 @@ namespace LynxToolkit.Documents
     using System.Diagnostics.CodeAnalysis;
     using System.IO;
 
+    // ReSharper disable CanBeReplacedWithTryCastAndCheckForNull
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Reviewed. Suppression is OK here.")]
     public abstract class DocumentFormatter<T> : IDocumentFormatter
     {
@@ -172,64 +173,67 @@ namespace LynxToolkit.Documents
 
         protected virtual void WriteBlock(Block block, T context)
         {
-            if (this.WriteBlock<Header>(block, context, this.Write))
+            if (block is Header)
             {
+                this.Write((Header)block, context);
                 return;
             }
 
-            if (this.WriteBlock<TableOfContents>(block, context, this.Write))
+            if (block is TableOfContents)
             {
+                this.Write((TableOfContents)block, context);
                 return;
             }
 
-            if (this.WriteBlock<Quote>(block, context, this.Write))
+            if (block is Quote)
             {
+                this.Write((Quote)block, context);
                 return;
             }
 
-            if (this.WriteBlock<Paragraph>(block, context, this.Write))
+            if (block is Paragraph)
             {
+                this.Write((Paragraph)block, context);
                 return;
             }
 
-            if (this.WriteBlock<Section>(block, context, this.Write))
+            if (block is Section)
             {
+                this.Write((Section)block, context);
                 return;
             }
 
-            if (this.WriteBlock<HorizontalRuler>(block, context, this.Write))
+            if (block is HorizontalRuler)
             {
+                this.Write((HorizontalRuler)block, context);
                 return;
             }
 
-            if (this.WriteBlock<OrderedList>(block, context, this.Write))
+            if (block is OrderedList)
             {
+                this.Write((OrderedList)block, context);
                 return;
             }
 
-            if (this.WriteBlock<UnorderedList>(block, context, this.Write))
+            if (block is UnorderedList)
             {
+                this.Write((UnorderedList)block, context);
                 return;
             }
 
-            if (this.WriteBlock<Table>(block, context, this.Write))
+            if (block is Table)
             {
+                this.Write((Table)block, context);
                 return;
             }
 
-            this.WriteBlock<CodeBlock>(block, context, this.Write);
-        }
-
-        protected bool WriteBlock<TBlock>(Block block, T context, Action<TBlock, T> writer) where TBlock : Block
-        {
-            var i = block as TBlock;
-            if (i == null)
+            if (block is CodeBlock)
             {
-                return false;
+                this.Write((CodeBlock)block, context);
+                return;
             }
 
-            writer(i, context);
-            return true;
+            throw new InvalidOperationException();
         }
 
         protected virtual void WriteBlocks(IList<Block> blocks, T context)
@@ -242,74 +246,91 @@ namespace LynxToolkit.Documents
 
         protected virtual void WriteInline(Inline inline, T context)
         {
-            if (this.WriteInline<Span>(inline, context, this.Write))
+            var span = inline as Span;
+            if (span != null)
             {
+                this.Write(span, context);
                 return;
             }
 
-            if (this.WriteInline<Strong>(inline, context, this.Write))
+            var strong = inline as Strong;
+            if (strong != null)
             {
+                this.Write(strong, context);
                 return;
             }
 
-            if (this.WriteInline<Emphasized>(inline, context, this.Write))
+            var emphasized = inline as Emphasized;
+            if (emphasized != null)
             {
+                this.Write(emphasized, context);
                 return;
             }
 
-            if (this.WriteInline<Symbol>(inline, context, this.Write))
+            var symbol = inline as Symbol;
+            if (symbol != null)
             {
+                this.Write(symbol, context);
                 return;
             }
 
-            if (this.WriteInline<Run>(inline, context, this.Write))
+            var run = inline as Run;
+            if (run != null)
             {
+                this.Write(run, context);
                 return;
             }
 
-            if (this.WriteInline<NonBreakingSpace>(inline, context, this.Write))
+            var nonBreakingSpace = inline as NonBreakingSpace;
+            if (nonBreakingSpace != null)
             {
+                this.Write(nonBreakingSpace, context);
                 return;
             }
 
-            if (this.WriteInline<LineBreak>(inline, context, this.Write))
+            var lineBreak = inline as LineBreak;
+            if (lineBreak != null)
             {
+                this.Write(lineBreak, context);
                 return;
             }
 
-            if (this.WriteInline<InlineCode>(inline, context, this.Write))
+            var inlineCode = inline as InlineCode;
+            if (inlineCode != null)
             {
+                this.Write(inlineCode, context);
                 return;
             }
 
-            if (this.WriteInline<Hyperlink>(inline, context, this.Write))
+            var hyperLink = inline as Hyperlink;
+            if (hyperLink != null)
             {
+                this.Write(hyperLink, context);
                 return;
             }
 
-            if (this.WriteInline<Anchor>(inline, context, this.Write))
+            var anchor = inline as Anchor;
+            if (anchor != null)
             {
+                this.Write(anchor, context);
                 return;
             }
 
-            if (this.WriteInline<Equation>(inline, context, this.Write))
+            var equation = inline as Equation;
+            if (equation != null)
             {
+                this.Write(equation, context);
                 return;
             }
 
-            this.WriteInline<Image>(inline, context, this.Write);
-        }
-
-        protected bool WriteInline<TInline>(Inline inline, T context, Action<TInline, T> writer) where TInline : Inline
-        {
-            var i = inline as TInline;
-            if (i == null)
+            var image = inline as Image;
+            if (image != null)
             {
-                return false;
+                this.Write(image, context);
+                return;
             }
 
-            writer(i, context);
-            return true;
+            throw new InvalidOperationException("Inline type not supported.");
         }
 
         protected virtual void WriteInlines(IList<Inline> inlines, T context)

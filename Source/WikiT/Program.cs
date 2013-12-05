@@ -35,7 +35,7 @@ namespace WikiT
     using System.Globalization;
     using System.IO;
     using System.Linq;
-    using System.Text;
+    using System.Xml.Linq;
 
     using LynxToolkit;
     using LynxToolkit.Documents;
@@ -156,6 +156,9 @@ namespace WikiT
                         case "/extension":
                             Extension = kv[1];
                             continue;
+                        case "/project":
+                            ParseProject(kv[1]);
+                            continue;
                         case "/template":
                             Template = kv[1];
                             continue;
@@ -166,7 +169,8 @@ namespace WikiT
                             Defines.Add(kv[1]);
                             continue;
                         default:
-                            Variables.Add(kv[0].Trim('/'), kv[1]);
+                            var key = kv[0].Trim('/');
+                            Variables[key] = kv[1];
                             continue;
                     }
                 }
@@ -202,12 +206,12 @@ namespace WikiT
 
             Utilities.CreateDirectoryIfMissing(Output);
 
-            var inputDirectory = System.IO.Path.GetFullPath(System.IO.Path.GetDirectoryName(Input));
-            var searchPattern = System.IO.Path.GetFileName(Input);
+            var inputDirectory = Path.GetFullPath(Path.GetDirectoryName(Input));
+            var searchPattern = Path.GetFileName(Input);
 
-            Console.WriteLine("Input directory:  '{0}'", System.IO.Path.GetFullPath(inputDirectory));
+            Console.WriteLine("Input directory:  '{0}'", Path.GetFullPath(inputDirectory));
             Console.WriteLine("Search pattern:   '{0}'", searchPattern);
-            Console.WriteLine("Output directory: '{0}'", System.IO.Path.GetFullPath(Output));
+            Console.WriteLine("Output directory: '{0}'", Path.GetFullPath(Output));
             Console.WriteLine("Output extension: '{0}'", Extension);
 
             var files = Utilities.FindFiles(inputDirectory, searchPattern).ToList();
@@ -224,7 +228,7 @@ namespace WikiT
 #endif
                 foreach (var f in files)
                 {
-                    var relativePath = Utilities.MakeRelativePath(f, inputDirectory);
+                    var relativePath = Utilities.MakeRelativePath(inputDirectory + "\\", f);
                     Console.Write(relativePath);
                     if (!Transform(inputDirectory, relativePath))
                     {
@@ -248,6 +252,59 @@ namespace WikiT
         }
 
         /// <summary>
+        /// Parses project settings from a <c>.wikiproj</c> file.
+        /// </summary>
+        /// <param name="fileName">Project filename.</param>
+        private static void ParseProject(string fileName)
+        {
+            XDocument doc;
+            using (var stream = File.OpenRead(fileName))
+            {
+                doc = XDocument.Load(stream);
+            }
+
+            var dir = Path.GetDirectoryName(fileName) ?? ".";
+
+            foreach (var d in doc.Descendants())
+            {
+                if (d.Name == "Format")
+                {
+                    Format = d.Value;
+                }
+
+                if (d.Name == "Template")
+                {
+                    Template = PathUtilities.Simplify(Path.Combine(dir, d.Value));
+                }
+
+                if (d.Name == "StyleSheet")
+                {
+                    Stylesheet = PathUtilities.Simplify(Path.Combine(dir, d.Value));
+                }
+
+                if (d.Name == "LocalLinks")
+                {
+                }
+
+                if (d.Name == "Input")
+                {
+                    Input = PathUtilities.Simplify(Path.Combine(dir, d.Value));
+                }
+
+                if (d.Name == "Output")
+                {
+                    Output = PathUtilities.Simplify(Path.Combine(dir, d.Value));
+                }
+
+                if (d.Name == "Variable")
+                {
+                    var key = d.Attribute("Key").Value;
+                    Variables[key] = d.Value;
+                }
+            }
+        }
+
+        /// <summary>
         /// Transforms the specified file.
         /// </summary>
         /// <param name="inputFolder">The input folder.</param>
@@ -265,12 +322,14 @@ namespace WikiT
                 throw new ArgumentNullException("relativeFilePath");
             }
 
-            var filePath = System.IO.Path.Combine(inputFolder, relativeFilePath);
-            var parser = new WikiParser(Defines, Variables, File.OpenRead) { IncludeDefaultExtension = System.IO.Path.GetExtension(Input) };
+            var filePath = Path.Combine(inputFolder, relativeFilePath);
+            var parser = new WikiParser(Defines, Variables, File.OpenRead) { IncludeDefaultExtension = Path.GetExtension(Input) };
             var doc = parser.ParseFile(filePath);
 
-            var outputPath = Output != null ? System.IO.Path.Combine(Output, relativeFilePath) : relativeFilePath;
-            outputPath = System.IO.Path.ChangeExtension(outputPath, Extension);
+            var outputPath = Output != null ? Path.Combine(Output, relativeFilePath) : relativeFilePath;
+            outputPath = Path.ChangeExtension(outputPath, Extension);
+                        
+            var outputDirectory = Path.GetDirectoryName(outputPath);
 
             IDocumentFormatter formatter = null;
             switch (Format)
@@ -280,18 +339,23 @@ namespace WikiT
                     break;
 
                 case "wiki":
-                    //formatter = new WikiFormatter();
+                    formatter = new OWikiFormatter();
                     break;
 
                 case "creole":
-                    // formatter = new CreoleFormatter();
+                    formatter = new CreoleFormatter();
                     break;
 
                 case "markdown":
-                    // formatter = new MarkdownFormatter();
+                    formatter = new MarkdownFormatter();
                     break;
+
                 case "xml":
                     //outputText = XmlFormatter.Format(doc);
+                    break;
+
+                case "tex":
+                    formatter = new TexFormatter();
                     break;
 
                 case "html":
@@ -299,9 +363,11 @@ namespace WikiT
                                       {
                                           Css = Stylesheet,
                                           Template = Template,
-                                          LocalLinkFormatString = "{0}." + Extension,
-                                          SpaceLinkFormatString = "{0}/{1}." + Extension,
+                                          LocalLinkFormatString = "{0}" + Extension,
+                                          SpaceLinkFormatString = "{0}/{1}" + Extension,
                                           Variables = Variables,
+                                          OutputDirectory = outputDirectory,
+                                          ImageBaseDirectory = inputFolder
                                       };
                     break;
             }
@@ -311,12 +377,12 @@ namespace WikiT
                 throw new FormatException(string.Format("The output format '{0}' is not supported.", Format));
             }
 
-            var outputDirectory = System.IO.Path.GetDirectoryName(outputPath);
             Utilities.CreateDirectoryIfMissing(outputDirectory);
             using (var stream = File.Create(outputPath))
             {
                 formatter.Format(doc, stream);
             }
+
             return true;
         }
     }

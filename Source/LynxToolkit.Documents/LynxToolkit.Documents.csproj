@@ -11,7 +11,7 @@
     <RootNamespace>LynxToolkit.Documents</RootNamespace>
     <AssemblyName>LynxToolkit.Documents</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Profile2</TargetFrameworkProfile>
+    <TargetFrameworkProfile>Profile136</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
   </PropertyGroup>
@@ -36,20 +36,21 @@
     <Compile Include="..\GlobalAssemblyInfo.cs">
       <Link>Properties\GlobalAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Text\Formatters\MarkdownFormatter.cs" />
+    <Compile Include="Text\Formatters\TexFormatter.cs" />
     <Compile Include="Text\Parsers\DocumentParserExtensions.cs" />
     <Compile Include="Text\Formatters\DocumentFormatterExtensions.cs" />
     <Compile Include="Text\Formatters\IDocumentFormatter.cs" />
     <Compile Include="Text\Parsers\IDocumentParser.cs" />
     <Compile Include="Utilities\JsonSerializer.cs" />
-    <Compile Include="Text\Formatters\XmlFormatter.cs" />
+    <None Include="Text\Formatters\XmlFormatter.cs" />
     <Compile Include="Utilities\PathUtilities.cs" />
-    <None Include="Text\Formatters\obsolete\CodeplexFormatter.cs" />
-    <None Include="Text\Formatters\obsolete\ConfluenceFormatter.cs" />
+    <Compile Include="Text\Formatters\CodeplexFormatter.cs" />
+    <Compile Include="Text\Formatters\ConfluenceFormatter.cs" />
     <Compile Include="Text\Parsers\JsonParser.cs" />
     <Compile Include="Text\Formatters\JsonFormatter.cs" />
     <Compile Include="Text\Parsers\WikiParser.cs" />
-    <None Include="Text\Formatters\obsolete\MarkdownFormatter.cs" />
-    <None Include="Text\Formatters\obsolete\CreoleFormatter.cs" />
+    <Compile Include="Text\Formatters\CreoleFormatter.cs" />
     <Compile Include="Text\Formatters\DocumentFormatter.cs" />
     <Compile Include="Text\Parsers\XmlParser.cs" />
     <Compile Include="Spreadsheet\BorderStyle.cs" />

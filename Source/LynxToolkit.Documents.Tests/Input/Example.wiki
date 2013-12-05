@@ -70,7 +70,7 @@ Use three or more hyphens to add a horizontal ruler:
 -----------------------------------------
 
 === Emphasized (italic) text
-Lorem *ipsum* dolor sit amet
+Lorem //ipsum// dolor sit amet
 
 === Strong (bold) text
 Lorem **ipsum** dolor sit amet

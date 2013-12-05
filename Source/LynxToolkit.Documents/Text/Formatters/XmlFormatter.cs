@@ -1,7 +1,6 @@
 ﻿namespace LynxToolkit.Documents
 {
     using System.IO;
-    using System.Xml.Serialization;
 
     public class XmlFormatter : IDocumentFormatter
     {

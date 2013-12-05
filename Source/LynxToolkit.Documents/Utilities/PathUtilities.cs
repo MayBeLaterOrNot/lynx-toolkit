@@ -1,7 +1,11 @@
 ﻿namespace LynxToolkit.Documents
 {
+    using System.Linq;
+
     public static class PathUtilities
     {
+        private static char[] SeparatorCharArray = "\\/".ToCharArray();
+
         public static string GetDirectoryName(string path)
         {
             var i = path.LastIndexOfAny("\\/".ToCharArray());
@@ -49,6 +53,22 @@
             }
 
             return path1 + path2;
+        }
+
+        public static string Simplify(string path, char separator = '\\')
+        {
+            var names = path.Split(SeparatorCharArray).ToList();
+            for (int i = 1; i < names.Count; i++)
+            {
+                if (names[i] == ".." && i > 0)
+                {
+                    names.RemoveAt(i);
+                    names.RemoveAt(i - 1);
+                    i -= 2;
+                }
+            }
+
+            return string.Join(separator.ToString(), names);
         }
     }
 }

@@ -12,6 +12,8 @@
     <Window.InputBindings>
         <KeyBinding Key="S" Modifiers="Control" Command="{Binding SaveCommand}"/>
         <KeyBinding Key="S" Modifiers="Control+Shift" Command="{Binding SaveAllCommand}"/>
+        <KeyBinding Key="E" Modifiers="Control" Command="{Binding ExploreCommand}"/>
+        <KeyBinding Key="Enter" Command="{Binding OpenExternalEditorCommand}"/>
     </Window.InputBindings>
     <DockPanel>
         <Menu DockPanel.Dock="Top">
@@ -22,6 +24,9 @@
                 <MenuItem Header="Save" Command="{Binding SaveCommand}" InputGestureText="Ctrl+S"/>
                 <Separator/>
                 <MenuItem Header="Save all" Command="{Binding SaveAllCommand}" InputGestureText="Ctrl+Shift+S"/>
+                <Separator/>
+                <MenuItem Header="Open in external program..." Command="{Binding OpenExternalEditorCommand}" InputGestureText="Enter"/>
+                <MenuItem Header="Explore..." Command="{Binding ExploreCommand}" InputGestureText="Ctrl+E"/>
                 <Separator/>
                 <MenuItem Header="Exit" Command="{Binding ExitCommand}" InputGestureText="Alt+F4"/>
             </MenuItem>

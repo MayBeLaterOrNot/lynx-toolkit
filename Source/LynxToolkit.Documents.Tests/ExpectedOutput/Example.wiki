@@ -1,55 +1,52 @@
-﻿EasyWiki
-========
+﻿= EasyWiki
 
-Introduction
-------------
+== Introduction
 
-### Objective
+=== Objective
 1. Easy to parse
 2. Easy source code
 
-Examples
---------
+== Examples
 
-### Paragraphs
+=== Paragraphs
 Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy
 nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.
 
 Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper
 suscipit lobortis nisl ut aliquip ex ea commodo consequat.
 
-### Line breaks
+=== Line breaks
 Lorem ipsum dolor sit amet,  
 consectetuer adipiscing elit,  
 sed diam nonummy
 
-### Horizontal ruler
+=== Horizontal ruler
 
 ----
 
-### Emphasized
+=== Emphasized
 Lorem *ipsum* dolor sit amet
 
-### Strong
+=== Strong
 Lorem **ipsum** dolor sit amet
 
-### Links
+=== Links
 The syntax is `[url|text|title]`  
 [http://www.google.com]  
 [http://www.google.com|google]  
 [http://www.google.com|google|search with google]
 
-### #name1 Anchor
+=== #name1 Anchor
 #name2 Anchors are defined as `#name1`  
 [#name1|Go to anchor]
 
-### Image
+=== Image
 The syntax is `{source|alt|link}`  
 {image.png}  
 {image.png|alternative text}  
 {image.png|alternative text|http://www.google.com}
 
-### Unordered List
+=== Unordered List
 - lorem ipsum
   dolor sit amet
 - consectetuer adipiscing elit
@@ -57,23 +54,23 @@ The syntax is `{source|alt|link}`
   - nibh euismod tincidunt
 - ut laoreet dolore magna aliquam erat volutpat
 
-### Ordered list
+=== Ordered list
 1. First
 2. Second
 3. Third
    1. Fourth
    2. Fifth
 
-### Table
+=== Table
 || header1 ||  header2  ||  header 3 |
 | cell 1a  |   cell 2a  |    cell 3a |
 | cell 1b  |   cell 2b  |    cell 3b |
 
-### Quote
+=== Quote
 > Line 1
 > Line 2
 
-### Code
+=== Code
 ```cs
 code line 1
 code line 2
@@ -81,7 +78,7 @@ code line 2
 
 Lorem `ipsum` dolor sit amet
 
-### Special characters
+=== Special characters
 (C) Copyright  
 (R) Registered trademark  
 (TM) Trademark  
@@ -94,28 +91,28 @@ AT&T Ampersand
 1024x768 or 1024 x 768  
 Long dashes: -- ---
 
-### Smileys
+=== Smileys
 :) :(  
 
-### Symbols
+=== Symbols
 (*) (i) (\) (x) (!) (+) (-) (?) (_) (y) (n) (on) (off) (h)
 
-### Escaped
+=== Escaped
 \*Not emphasized\*  
 \*\*Not bold\*\*  
 \[Not link](not link)  
 \----  
-\### Not header  
+\=== Not header  
 \- not list  
 \1. not ordered list  
 \||Not a table|  
 \|Not a cell|  
 
-### Other
+=== Other
 
-#### *Emphasized* title
+#=== *Emphasized* title
 
-### Syntax links
+=== Syntax links
 - [http://en.wikipedia.org/wiki/Lightweight_markup_language]
 - [http://daringfireball.net/projects/markdown]
 - [http://github.github.com/github-flavored-markdown]

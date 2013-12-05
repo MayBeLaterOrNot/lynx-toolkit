@@ -36,6 +36,7 @@ syntax: glob
 Output/
 ClientBin/
 lib/
+Backup/
 
 Tools/    # Add manually
 

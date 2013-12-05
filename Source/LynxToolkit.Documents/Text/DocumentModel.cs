@@ -65,6 +65,8 @@ namespace LynxToolkit.Documents
 
         public string Title { get; set; }
 
+        public string Subtitle { get; set; }
+
         public string Version { get; set; }
 
         public void Append(Document doc)
@@ -261,7 +263,15 @@ namespace LynxToolkit.Documents
 
         public CodeBlock(string language, string code)
         {
-            this.Language = (Language)Enum.Parse(typeof(Language), language, true);
+            if (!string.IsNullOrEmpty(language))
+            {
+                Language l;
+                if (Enum.TryParse(language, true, out l))
+                {
+                    this.Language = l;
+                }
+            }
+
             this.Text = code;
         }
 
@@ -520,7 +530,7 @@ namespace LynxToolkit.Documents
 
         public VerticalAlignment VerticalAlignment { get; set; }
 
-        public bool PageBreakBefore { get; set; }
+        public bool? PageBreakBefore { get; set; }
     }
 
     public abstract class Inline : Element

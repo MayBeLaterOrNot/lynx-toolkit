@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CreoleFormatter.cs" company="Lynx Toolkit">
+// <copyright file="CodeplexFormatter.cs" company="Lynx Toolkit">
 //   The MIT License (MIT)
 //   
 //   Copyright (c) 2012 Oystein Bjorke
@@ -24,59 +24,51 @@
 //   SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
-using System.Text;
-
 namespace LynxToolkit.Documents
 {
-    public class CreoleFormatter : WikiFormatterBase
+    using System.IO;
+
+    public class CodeplexFormatter : WikiFormatterBase
     {
-        protected CreoleFormatter(Document doc)
-            : base(doc)
+        public CodeplexFormatter()
         {
+            // https://codeplex.codeplex.com/wikipage?title=CodePlex%20Wiki%20Markup%20Guide
+            this.EscapeCharacter = '\\';
+            this.UnorderedListItemPrefix = "- ";
+            this.OrderedListItemPrefix = "i. ";
+            this.HorizontalRulerText = "- - -";
+            this.LineBreakText = "//";
+            this.StrongWrapper = "*";
+            this.EmphasizedWrapper = "_";
+            this.HeaderPrefix = "!";
+            this.InlineCodePrefix = "{{";
+            this.InlineCodeSuffix = "}}";
         }
 
-        public static string Format(Document doc)
+        protected override void Write(Hyperlink hyperlink, TextWriter context)
         {
-            var wf = new CreoleFormatter(doc);
-            wf.Format();
-            return wf.ToString();
-        }
-
-        protected override void Write(Header header, object parent)
-        {
-            Write(Repeat("=", header.Level), " ");
-            WriteInlines(header.Content, parent);
-            WriteLine(" ", Repeat("=", header.Level));
-            if (header.Level < 3)
-            {
-                WriteLine();
-            }
-        }
-
-        protected override void Write(Anchor anchor, object parent)
-        {
-            Write("�", anchor.Name, "�");
-        }
-
-        protected override void Write(Hyperlink hyperlink, object parent)
-        {
-            Write("[[", hyperlink.Url);
+            context.Write("[url:");
+            context.Write(hyperlink.Url);
             if (hyperlink.Content.Count > 0)
             {
-                Write("|");
-                WriteInlines(hyperlink.Content, parent);
+                context.Write("|");
+                this.WriteInlines(hyperlink.Content, context);
             }
-            Write("]]");
+
+            context.Write("]");
         }
 
-        protected override void Write(Image image, object parent)
+        protected override void Write(Image image, TextWriter context)
         {
-            Write("{{", image.Source);
+            context.Write("[image:");
+            context.Write(image.Source);
             if (!string.IsNullOrEmpty(image.AlternateText))
             {
-                Write("|", image.AlternateText);
+                context.Write("|");
+                context.Write(image.AlternateText);
             }
-            Write("}}");
+
+            context.Write("]");
         }
     }
 }

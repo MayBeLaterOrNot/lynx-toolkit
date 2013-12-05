@@ -727,12 +727,13 @@ namespace LynxToolkit.Documents.OpenXml
                 indentation.Right = string.Format(
                     CultureInfo.InvariantCulture, "{0}", documentStyle.Margin.Value.Right * 20);
             }
+
             spacingBetweenLines2.LineRule = LineSpacingRuleValues.Auto;
 
             // pPr.Append(new KeepNext());
             // pPr.Append(new KeepLines());
 
-            if (documentStyle.PageBreakBefore)
+            if (documentStyle.PageBreakBefore.Value)
             {
                 pPr.Append(new PageBreakBefore());
             }

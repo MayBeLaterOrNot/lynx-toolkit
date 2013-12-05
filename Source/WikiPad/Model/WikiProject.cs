@@ -20,6 +20,7 @@
 
         public static WikiProject Load(string filePath)
         {
+            filePath = Path.GetFullPath(filePath);
             var s = new XmlSerializer(typeof(WikiProject));
             using (var r = XmlReader.Create(filePath))
             {
@@ -35,6 +36,11 @@
             var dir = Path.GetDirectoryName(this.FilePath);
             var input = Path.Combine(dir, this.Input);
             var inputdir = Path.GetDirectoryName(input);
+            if (string.IsNullOrEmpty(inputdir))
+            {
+                inputdir = ".";
+            }
+
             var inputpattern = Path.GetFileName(input);
             foreach (var filePath in System.IO.Directory.GetFiles(inputdir, inputpattern))
             {

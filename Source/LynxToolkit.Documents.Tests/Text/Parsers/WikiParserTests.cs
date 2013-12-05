@@ -1,5 +1,6 @@
 ﻿namespace LynxToolkit.Documents.Tests
 {
+    using System;
     using System.IO;
 
     using NUnit.Framework;
@@ -90,12 +91,12 @@
         public void Paragraph4()
         {
             var o2 = new WikiParser();
-            var model = o2.Parse("Line 1\r\nLine 2");
+            var model = o2.Parse("Line 1 \r\nLine 2");
             Assert.AreEqual(1, model.Blocks.Count);
             var p1 = model.Blocks[0] as Paragraph;
             Assert.AreEqual(2, p1.Content.Count);
             var r1 = p1.Content[0] as Run;
-            Assert.AreEqual("Line 1", r1.Text);
+            Assert.AreEqual("Line 1 ", r1.Text);
             var r2 = p1.Content[1] as Run;
             Assert.AreEqual("Line 2", r2.Text);
         }
@@ -118,6 +119,21 @@
             Assert.AreEqual(1, p2.Content.Count);
             var r2 = p2.Content[0] as Run;
             Assert.AreEqual("Paragraph 2", r2.Text);
+        }
+
+        [Test]
+        public void ParagraphFollowedByCode()
+        {
+            var o2 = new WikiParser();
+            var model = o2.Parse("Line 1 \r\n```\r\ncode\r\n```");
+            Assert.AreEqual(2, model.Blocks.Count);
+            var p1 = (Paragraph)model.Blocks[0];
+            Assert.AreEqual(2, p1.Content.Count);
+            var r1 = (Run)p1.Content[0];
+            Assert.AreEqual("Line 1 ", r1.Text);
+
+            var b2 = (CodeBlock)model.Blocks[1];
+            Assert.AreEqual("code", b2.Text);
         }
 
         [Test]
@@ -148,7 +164,7 @@
         public void InlineCode1()
         {
             var o2 = new WikiParser();
-            var model = o2.Parse("Inline `co\\de`!");
+            var model = o2.Parse("Inline `co\\de` !");
 
             Assert.AreEqual(1, model.Blocks.Count);
             var p1 = model.Blocks[0] as Paragraph;
@@ -157,7 +173,7 @@
             var r3 = p1.Content[2] as Run;
             Assert.AreEqual("Inline ", r1.Text);
             Assert.AreEqual("co\\de", r2.Code);
-            Assert.AreEqual("!", r3.Text);
+            Assert.AreEqual(" !", r3.Text);
         }
 
         [Test]
@@ -200,7 +216,7 @@
         public void Emphasized1()
         {
             var o2 = new WikiParser();
-            var model = o2.Parse("This is *emphasized* text");
+            var model = o2.Parse("This is //emphasized// text");
 
             Assert.AreEqual(1, model.Blocks.Count);
             var p1 = model.Blocks[0] as Paragraph;
@@ -230,12 +246,12 @@
         public void Hyperlink2()
         {
             var o2 = new WikiParser();
-            var model = o2.Parse("[link1|alt1] text");
+            var model = o2.Parse("[link1|text] following text");
 
             Assert.AreEqual(1, model.Blocks.Count);
             var p1 = model.Blocks[0] as Paragraph;
-            AssertLink("link1", "alt1", p1.Content[0]);
-            AssertInline(" text", p1.Content[1]);
+            AssertLink("link1", "text", p1.Content[0]);
+            AssertInline(" following text", p1.Content[1]);
         }
 
         [Test]
@@ -340,6 +356,16 @@
         }
 
         [Test]
+        public void LineBreak()
+        {
+            var o2 = new WikiParser();
+            var model = o2.Parse("Line1  \r\nLine2");
+            var p = (Paragraph)model.Blocks[0];
+            Assert.AreEqual(3, p.Content.Count);
+            Assert.IsTrue(p.Content[1] is LineBreak);
+        }
+
+        [Test]
         public void OrderedList()
         {
             var o2 = new WikiParser();
@@ -357,7 +383,7 @@
         public void UnorderedList()
         {
             var o2 = new WikiParser();
-            var model = o2.Parse("* Item 1\r\n* Item 2");
+            var model = o2.Parse("- Item 1\r\n- Item 2");
 
             Assert.AreEqual(1, model.Blocks.Count);
             var list = model.Blocks[0] as UnorderedList;

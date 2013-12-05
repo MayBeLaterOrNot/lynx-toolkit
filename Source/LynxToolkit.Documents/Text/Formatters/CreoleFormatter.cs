@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="OWikiFormatter.cs" company="Lynx Toolkit">
+// <copyright file="CreoleFormatter.cs" company="Lynx Toolkit">
 //   The MIT License (MIT)
 //   
 //   Copyright (c) 2012 Oystein Bjorke
@@ -24,53 +24,62 @@
 //   SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
+
 namespace LynxToolkit.Documents
 {
     using System.IO;
 
-    public class OWikiFormatter : WikiFormatterBase
+    public class CreoleFormatter : WikiFormatterBase
     {
+        public CreoleFormatter()
+        {
+            // http://www.wikicreole.org/wiki/Creole1.0
+            this.EscapeCharacter = '~';
+            this.UnorderedListItemPrefix = "* ";
+            this.OrderedListItemPrefix = "# ";
+            this.HorizontalRulerText = "----";
+            this.LineBreakText = @"\\";
+            this.StrongWrapper = "**";
+            this.EmphasizedWrapper = "//";
+            this.HeaderPrefix = "=";
+            this.InlineCodePrefix = "{{";
+            this.InlineCodeSuffix = "}}";
+            this.TableHeaderPrefix = "|=";
+            this.TableCellSeparator = "|";
+        }
+
+        protected override void Write(CodeBlock codeBlock, TextWriter context)
+        {
+            context.WriteLine("{{{");
+            this.WriteLines(context, codeBlock.Text);
+            context.WriteLine("}}}");
+            context.WriteLine();
+        }
+
         protected override void Write(Hyperlink hyperlink, TextWriter context)
         {
-            context.Write("[");
+            context.Write("[[");
             context.Write(hyperlink.Url);
-            bool isDefaultTitle = false;
-            if (hyperlink.Content.Count == 1)
-            {
-                var defaultTitle = hyperlink.Url != null ? hyperlink.Url.Replace("http://", "") : null;
-                var run1 = hyperlink.Content[0] as Run;
-                isDefaultTitle = run1 != null && string.Equals(run1.Text, defaultTitle);
-            }
-
-            if (hyperlink.Content.Count > 0 && !isDefaultTitle)
+            if (hyperlink.Content.Count > 0)
             {
                 context.Write("|");
                 this.WriteInlines(hyperlink.Content, context);
             }
 
-            if (!string.IsNullOrEmpty(hyperlink.Title))
-            {
-                context.Write("|");
-                context.Write(hyperlink.Title);
-            }
-
-            context.Write("]");
+            context.Write("]]");
         }
 
         protected override void Write(Image image, TextWriter context)
         {
-            context.Write("{" + image.Source);
+            context.Write("{{");
+            context.Write(image.Source);
             if (!string.IsNullOrEmpty(image.AlternateText))
             {
-                context.Write("|" + image.AlternateText);
+                context.Write("|");
+                context.Write(image.AlternateText);
             }
 
-            if (!string.IsNullOrEmpty(image.Link))
-            {
-                context.Write("|" + image.Link);
-            }
-
-            context.Write("}");
+            context.Write("}}");
         }
     }
 }
