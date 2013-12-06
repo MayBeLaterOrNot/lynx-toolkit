@@ -82,6 +82,7 @@ namespace FtpUpload
             }
 
             Console.WriteLine("{0} => {1}/{2}", localFile, Host, remoteFile);
+            Console.WriteLine();
 
             var w = Stopwatch.StartNew();
 
@@ -103,11 +104,11 @@ namespace FtpUpload
                 Console.WriteLine("\n{0} bytes uploaded.", length);
             }
 
+            Console.WriteLine();
             Console.WriteLine("Upload time: {0}:{1:00}", w.Elapsed.Minutes, w.Elapsed.Seconds);
         }
 
-        private static long UploadFile(
-            string remoteFile, string localFile, int bufferSize = 2048, Func<long, long, bool> callback = null)
+        private static long UploadFile(string remoteFile, string localFile, int bufferSize = 2048, Func<long, long, bool> callback = null)
         {
             try
             {
@@ -116,39 +117,48 @@ namespace FtpUpload
                 request.UseBinary = true;
                 request.UsePassive = true;
                 request.KeepAlive = true;
+                var fi = new FileInfo(localFile);
+                request.ContentLength = fi.Length;
                 request.Method = WebRequestMethods.Ftp.UploadFile;
 
-                using (var requestStream = request.GetRequestStream())
+                long total = 0;
+                var requestStream = request.GetRequestStream();
+                using (var localFileStream = new FileStream(localFile, FileMode.Open))
                 {
-                    using (var localFileStream = new FileStream(localFile, FileMode.Open))
+                    var byteBuffer = new byte[bufferSize];
+                    while (true)
                     {
-                        var byteBuffer = new byte[bufferSize];
-                        long total = 0;
-                        while (true)
+                        // Read from local stream
+                        var bytes = localFileStream.Read(byteBuffer, 0, bufferSize);
+                        if (bytes == 0)
                         {
-                            // Read from local stream
-                            var bytes = localFileStream.Read(byteBuffer, 0, bufferSize);
-                            if (bytes == 0)
+                            break;
+                        }
+
+                        // Write to request stream
+                        requestStream.Write(byteBuffer, 0, bytes);
+                        total += bytes;
+                        if (callback != null)
+                        {
+                            var cont = callback(localFileStream.Length, total);
+                            if (!cont)
                             {
                                 break;
                             }
-
-                            // Write to request stream
-                            requestStream.Write(byteBuffer, 0, bytes);
-                            total += bytes;
-                            if (callback != null)
-                            {
-                                var cont = callback(localFileStream.Length, total);
-                                if (!cont)
-                                {
-                                    break;
-                                }
-                            }
                         }
-
-                        return total;
                     }
                 }
+
+                requestStream.Flush();
+                
+                // don't know why, but this seems to help...
+                Thread.Sleep(150); 
+                requestStream.Close();
+                
+                var response = (FtpWebResponse)request.GetResponse();
+                response.Close();
+                
+                return total;
             }
             catch (Exception e)
             {
@@ -190,7 +200,6 @@ namespace FtpUpload
             while (q.Count > 0)
             {
                 string f;
-                Console.WriteLine("TryDequeue");
                 if (!q.TryDequeue(out f))
                 {
                     continue;
