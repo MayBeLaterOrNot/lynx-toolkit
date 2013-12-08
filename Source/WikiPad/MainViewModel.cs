@@ -117,6 +117,21 @@ namespace WikiPad
             }
         }
 
+        private string errorMessage;
+
+        public string ErrorMessage
+        {
+            get
+            {
+                return this.errorMessage;
+            }
+
+            set
+            {
+                this.SetValue(ref this.errorMessage, value, "ErrorMessage");
+            }
+        }
+
         public string Html
         {
             get
@@ -313,6 +328,7 @@ namespace WikiPad
 
         private void UpdateCore(CancellationToken cancellationToken)
         {
+            this.ErrorMessage = null;
             if (this.SelectedDocument == null || this.Project == null)
             {
                 this.Html = null;
@@ -359,7 +375,8 @@ namespace WikiPad
             }
             catch (Exception e)
             {
-                MessageBox.Show(e.Message);
+                this.OutputSource = null;
+                this.ErrorMessage = e.Message;
             }
 
             //// File.WriteAllText("temp.txt", Html, Encoding.UTF8);

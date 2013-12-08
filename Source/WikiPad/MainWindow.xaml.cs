@@ -35,5 +35,13 @@ namespace WikiPad
         {
             ((MainViewModel)this.DataContext).Closed();
         }
+
+        private void WebBrowser_OnLoadCompleted(object sender, NavigationEventArgs e)
+        {
+            // ((MainViewModel)this.DataContext).OnLoadCompleted();
+            var webBrowser = sender as WebBrowser;
+            var dom = webBrowser.Document;
+            var body = dom.GetType().GetProperty("body").GetValue(dom, null);
+        }
     }
 }

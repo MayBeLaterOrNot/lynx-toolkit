@@ -63,6 +63,7 @@
     <Compile Include="..\Utilities.cs">
       <Link>Utilities.cs</Link>
     </Compile>
+    <Compile Include="VisibilityConverter.cs" />
     <Compile Include="WebBrowserBehavior.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
