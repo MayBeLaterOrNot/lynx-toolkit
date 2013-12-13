@@ -172,7 +172,7 @@ namespace PropertyCG
         public string ReferencePropertyType { get; set; }
 
         /// <summary>
-        /// Gets the format string for the reference resolve statement.
+        /// Gets or sets the format string for the reference resolve statement.
         /// </summary>
         public string ReferenceResolve { get; set; }
 
