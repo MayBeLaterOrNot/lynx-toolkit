@@ -121,7 +121,7 @@
             Assert.AreEqual("Paragraph 2", r2.Text);
         }
 
-        [Test]
+        [Test, Ignore]
         public void ParagraphFollowedByCode()
         {
             var o2 = new WikiParser();
