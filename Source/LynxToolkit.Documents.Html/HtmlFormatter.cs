@@ -176,10 +176,8 @@ namespace LynxToolkit.Documents.Html
 
             var html = w.ToString();
             html = this.ApplyTemplate(doc, html);
-            using (var tw = new StreamWriter(stream, Encoding.UTF8))
-            {
-                tw.Write(html);
-            }
+            var tw = new StreamWriter(stream, Encoding.UTF8);
+            tw.Write(html);
         }
 
         /// <summary>
@@ -682,7 +680,7 @@ namespace LynxToolkit.Documents.Html
 
             var src = image.Source;
 
-            var relativeImagePath = MakeRelativePath(Path.Combine(this.ImageBaseDirectory, "."), src);
+            var relativeImagePath = MakeRelativePath(Path.GetFullPath(Path.Combine(this.ImageBaseDirectory, ".")), Path.GetFullPath(src));
             var outputImagePath = Path.Combine(this.OutputDirectory, relativeImagePath);
 
             try
