@@ -733,7 +733,7 @@ namespace LynxToolkit.Documents.OpenXml
             // pPr.Append(new KeepNext());
             // pPr.Append(new KeepLines());
 
-            if (documentStyle.PageBreakBefore.Value)
+            if (documentStyle.PageBreakBefore.HasValue && documentStyle.PageBreakBefore.Value)
             {
                 pPr.Append(new PageBreakBefore());
             }
