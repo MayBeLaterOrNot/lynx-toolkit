@@ -178,6 +178,7 @@ namespace LynxToolkit.Documents.Html
             html = this.ApplyTemplate(doc, html);
             var tw = new StreamWriter(stream, Encoding.UTF8);
             tw.Write(html);
+            tw.Flush();
         }
 
         /// <summary>
@@ -190,9 +191,7 @@ namespace LynxToolkit.Documents.Html
         {
             if (this.Template != null)
             {
-                var body =
-                    Regex.Match(html, "<body>(.*)</body>", RegexOptions.Singleline).Groups[1]
-                        .Value.TrimEnd();
+                var body = Regex.Match(html, "<body>(.*)</body>", RegexOptions.Singleline).Groups[1].Value.TrimEnd();
 
                 // Read the contents of the template
                 html = File.ReadAllText(this.Template);
