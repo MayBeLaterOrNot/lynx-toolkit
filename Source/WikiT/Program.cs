@@ -68,6 +68,12 @@ namespace WikiT
         public static bool ForceOutput { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether to flatten the output file hierarchy.
+        /// </summary>
+        /// <value><c>true</c> if output should be flattened; otherwise, <c>false</c>.</value>
+        public static bool FlattenOutput { get; set; }
+
+        /// <summary>
         /// Gets or sets the output folder.
         /// </summary>
         /// <value>The output folder.</value>
@@ -149,8 +155,10 @@ namespace WikiT
                         case "/format":
                             Format = kv[1].ToLower();
                             continue;
-                        case "/f":
-                        case "/forceoutput":
+                        case "/flatten":
+                            FlattenOutput = true;
+                            continue;
+                        case "/force":
                             ForceOutput = true;
                             continue;
                         case "/extension":
@@ -325,6 +333,11 @@ namespace WikiT
             var filePath = Path.Combine(inputFolder, relativeFilePath);
             var parser = new WikiParser(Defines, Variables, File.OpenRead) { IncludeDefaultExtension = Path.GetExtension(Input) };
             var doc = parser.ParseFile(filePath);
+
+            if (FlattenOutput)
+            {
+                relativeFilePath = Path.GetFileName(relativeFilePath);
+            }
 
             var outputPath = Output != null ? Path.Combine(Output, relativeFilePath) : relativeFilePath;
             outputPath = Path.ChangeExtension(outputPath, Extension);
