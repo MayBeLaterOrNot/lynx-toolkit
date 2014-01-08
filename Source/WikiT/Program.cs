@@ -124,7 +124,7 @@ namespace WikiT
         public static int Main(string[] args)
         {
             Console.WriteLine(Utilities.ApplicationHeader);
-            if (args.Length == 0)
+            if (args.Length == 0 || args[0] == "/?")
             {
                 Console.WriteLine("Arguments: [/input=folder/search-pattern] [/format=html] [/output=output-folder] [/forceoutput] [/extension=.html] [/template=template.html] [/stylesheet=style.css] [/define=XYZ]");
                 Console.WriteLine(@"Example: /input=..\docs\*.wiki /output=..\output");
@@ -177,8 +177,12 @@ namespace WikiT
                             Defines.Add(kv[1]);
                             continue;
                         default:
-                            var key = kv[0].Trim('/');
-                            Variables[key] = kv[1];
+                            if (kv.Length > 1)
+                            {
+                                var key = kv[0].Trim('/');
+                                Variables[key] = kv[1];
+                            }
+
                             continue;
                     }
                 }
@@ -341,7 +345,7 @@ namespace WikiT
 
             var outputPath = Output != null ? Path.Combine(Output, relativeFilePath) : relativeFilePath;
             outputPath = Path.ChangeExtension(outputPath, Extension);
-                        
+
             var outputDirectory = Path.GetDirectoryName(outputPath);
 
             IDocumentFormatter formatter = null;

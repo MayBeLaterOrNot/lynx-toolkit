@@ -111,9 +111,14 @@ namespace LynxToolkit.Documents
 
         public Dictionary<string, string> Variables { get; private set; }
 
-        public Document Parse(string text)
+        /// <summary>
+        /// Parses the specified text.
+        /// </summary>
+        /// <param name="input">The text to parse.</param>
+        /// <returns>the parsed <see cref="Document"/>.</returns>
+        public Document Parse(string input)
         {
-            this.text = text.Replace("\r", string.Empty);
+            this.text = input.Replace("\r", string.Empty);
             this.n = this.text.Length;
             this.i = 0;
             this.document = new Document();
@@ -128,7 +133,6 @@ namespace LynxToolkit.Documents
                 return r.ReadToEnd();
             }
         }
-
 
         public Document ParseFile(string fileName)
         {
@@ -670,12 +674,13 @@ namespace LynxToolkit.Documents
 
                     // Image
                     var source = this.ReadToAny('|', '}');
+                    var fullPath = source;
                     if (!source.StartsWith("http") && !PathUtilities.IsPathRooted(source))
                     {
-                        source = PathUtilities.Combine(this.CurrentDirectory, source);
+                        fullPath = PathUtilities.Simplify(PathUtilities.Combine(this.CurrentDirectory, source));
                     }
 
-                    var img = new Image { Source = source };
+                    var img = new Image { Source = fullPath, OriginalSource = source };
 
                     if (this.text[this.i] == '|')
                     {
