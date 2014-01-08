@@ -784,21 +784,23 @@ namespace XmlDocT
                         break;
                     }
 
-                //case "owiki":
-                //    {
-                //        var path = this.GetOutputFile(fileName);
-                //        var src = OWikiFormatter.Format(this.doc);
-                //        File.WriteAllText(path, src);
-                //        break;
-                //    }
+                case "owiki":
+                    {
+                        formatter = new OWikiFormatter();
+                        break;
+                    }
 
-                //case "xml":
-                //    {
-                //        var path = this.GetOutputFile(fileName);
-                //        var src = XmlFormatter.Format(this.doc);
-                //        File.WriteAllText(path, src);
-                //        break;
-                //    }
+                case "xml":
+                    {
+                        formatter = new XmlFormatter();
+                        break;
+                    }
+
+                case "json":
+                    {
+                        formatter = new JsonFormatter();
+                        break;
+                    }
 
                 case "word":
                     {

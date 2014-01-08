@@ -4,7 +4,7 @@
 
     public class TexFormatter : IDocumentFormatter
     {
-        public void Format(Document doc, Stream s)
+        public void Format(Document doc, Stream stream)
         {
         }
     }

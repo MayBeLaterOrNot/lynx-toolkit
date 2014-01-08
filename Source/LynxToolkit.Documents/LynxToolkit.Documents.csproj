@@ -45,7 +45,7 @@
     <Compile Include="Text\Formatters\IDocumentFormatter.cs" />
     <Compile Include="Text\Parsers\IDocumentParser.cs" />
     <Compile Include="Utilities\JsonSerializer.cs" />
-    <None Include="Text\Formatters\XmlFormatter.cs" />
+    <Compile Include="Text\Formatters\XmlFormatter.cs" />
     <Compile Include="Utilities\PathUtilities.cs" />
     <Compile Include="Text\Formatters\CodeplexFormatter.cs" />
     <Compile Include="Text\Formatters\ConfluenceFormatter.cs" />

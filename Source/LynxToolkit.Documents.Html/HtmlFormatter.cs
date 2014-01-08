@@ -678,9 +678,9 @@ namespace LynxToolkit.Documents.Html
             }
 
             var src = image.Source;
-
+            
             var relativeImagePath = MakeRelativePath(Path.GetFullPath(Path.Combine(this.ImageBaseDirectory, ".")), Path.GetFullPath(src));
-            var outputImagePath = Path.Combine(this.OutputDirectory, relativeImagePath);
+            var outputImagePath = PathUtilities.Simplify(Path.Combine(this.OutputDirectory, image.OriginalSource));
 
             try
             {
@@ -689,18 +689,23 @@ namespace LynxToolkit.Documents.Html
                     // Copy image file
                     CreateDirectoryIfMissing(Path.GetDirectoryName(outputImagePath));
                     File.Copy(src, outputImagePath, true);
+
+                    // Remove possible readonly attribute
+                    File.SetAttributes(src,File.GetAttributes(src) & ~FileAttributes.ReadOnly);
                 }
                 else
                 {
+                    System.Diagnostics.Trace.WriteLine("{0} not found.", src);
                 }
             }
-            catch
+            catch (Exception e)
             {
+                System.Diagnostics.Trace.WriteLine(string.Format("{0} when copying {1}: {2}", e.GetType().Name, src, e.Message));
             }
 
             context.WriteStartElement("img");
             this.WriteAttributes(image, context);
-            context.WriteAttributeString("src", relativeImagePath.Replace('\\', '/'));
+            context.WriteAttributeString("src", image.OriginalSource.Replace('\\', '/'));
             context.WriteAttributeString("alt", image.AlternateText);
             context.WriteEndElement();
             if (!string.IsNullOrWhiteSpace(image.Link))

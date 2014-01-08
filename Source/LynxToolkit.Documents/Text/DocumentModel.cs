@@ -324,7 +324,7 @@ namespace LynxToolkit.Documents
 
     public abstract class Item
     {
-        public Item()
+        protected Item()
         {
             this.Content = new InlineCollection();
         }
@@ -415,6 +415,7 @@ namespace LynxToolkit.Documents
         public HorizontalAlignment HorizontalAlignment { get; set; }
 
         public int ColumnSpan { get; set; }
+
         public int RowSpan { get; set; }
     }
 
@@ -565,7 +566,7 @@ namespace LynxToolkit.Documents
 
         public override string ToString()
         {
-            return Text;
+            return this.Text;
         }
     }
 
@@ -616,8 +617,8 @@ namespace LynxToolkit.Documents
         }
 
         public Emphasized(string text)
+            : base(new Run(text))
         {
-            this.Content.Add(new Run(text));
         }
     }
 
@@ -632,8 +633,8 @@ namespace LynxToolkit.Documents
         }
 
         public Strong(string text)
+            : base(new Run(text))
         {
-            this.Content.Add(new Run(text));
         }
     }
 
@@ -671,6 +672,11 @@ namespace LynxToolkit.Documents
             this.Url = url;
         }
 
+        public Hyperlink(string url, string text)
+            : this(url, new Run(text))
+        {
+        }
+
         public string Url { get; set; }
     }
 
@@ -692,5 +698,7 @@ namespace LynxToolkit.Documents
         public string Link { get; set; }
 
         public string Source { get; set; }
+
+        public string OriginalSource { get; set; }
     }
 }
