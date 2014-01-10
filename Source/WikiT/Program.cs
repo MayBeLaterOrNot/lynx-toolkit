@@ -48,6 +48,52 @@ namespace WikiT
     public class Program
     {
         /// <summary>
+        /// Specifies the output formats
+        /// </summary>
+        public enum OutputFormats
+        {
+            /// <summary>
+            /// Output to HTML
+            /// </summary>
+            Html,
+
+            /// <summary>
+            /// Output to Word
+            /// </summary>
+            Word,
+
+            /// <summary>
+            /// Output to latex
+            /// </summary>
+            Tex,
+
+            /// <summary>
+            /// Output to owiki
+            /// </summary>
+            Owiki,
+
+            /// <summary>
+            /// Output to Markdown
+            /// </summary>
+            Markdown,
+
+            /// <summary>
+            /// Output to Creole
+            /// </summary>
+            Creole,
+
+            /// <summary>
+            /// Output to XML
+            /// </summary>
+            Xml,
+
+            /// <summary>
+            /// Output to JSON
+            /// </summary>
+            Json
+        }
+
+        /// <summary>
         /// Gets or sets the input folder and search pattern.
         /// </summary>
         /// <value>The input.</value>
@@ -56,8 +102,8 @@ namespace WikiT
         /// <summary>
         /// Gets or sets the output format.
         /// </summary>
-        /// <value>The output format (html, docx, owiki, md, creole, xml).</value>
-        public static string Format { get; set; }
+        /// <value>The output format (html, word, tex, wiki, markdown, creole, xml).</value>
+        public static OutputFormats Format { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether to force output to be written.
@@ -126,14 +172,83 @@ namespace WikiT
             Console.WriteLine(Utilities.ApplicationHeader);
             if (args.Length == 0 || args[0] == "/?")
             {
-                Console.WriteLine("Arguments: [/input=folder/search-pattern] [/format=html] [/output=output-folder] [/forceoutput] [/extension=.html] [/template=template.html] [/stylesheet=style.css] [/define=XYZ]");
-                Console.WriteLine(@"Example: /input=..\docs\*.wiki /output=..\output");
+                Console.WriteLine("Arguments: [/project=path] [/define=XYZ] [/key=value]");
+                Console.WriteLine(@"Example: WikiT /project=..\docs\MyApplication.wikiproj /Version=1.0");
+                Console.WriteLine("The wiki project file format is defined in x.");
+                Console.WriteLine();
+                Console.WriteLine("Arguments: [/input=folder/search-pattern] [/format=html|word|tex|wiki|markdown|creole|xml] [/output=output-folder] [/forceoutput] [/extension=.html] [/template=template.html] [/stylesheet=style.css] [/define=XYZ] [/key=value]");
+                Console.WriteLine(@"Example: WikiT /input=..\docs\*.wiki /output=..\output");
                 return -1;
             }
 
+            ParseArguments(args);
+
+            return ProcessFiles();
+        }
+
+        /// <summary>
+        /// Processes the files.
+        /// </summary>
+        /// <returns>the exit code.</returns>
+        private static int ProcessFiles()
+        {
+            var inputDirectory = Path.GetFullPath(Path.GetDirectoryName(Input) ?? ".");
+            var searchPattern = Path.GetFileName(Input);
+
+            Console.WriteLine("Input directory:  '{0}'", Path.GetFullPath(inputDirectory));
+            Console.WriteLine("Search pattern:   '{0}'", searchPattern);
+            Console.WriteLine("Output directory: '{0}'", Path.GetFullPath(Output));
+            Console.WriteLine("Output extension: '{0}'", Extension);
+
+            var files = Utilities.FindFiles(inputDirectory, searchPattern).ToList();
+
+            Console.WriteLine();
+            Console.WriteLine(files.Count + " input files found.");
+
+            Console.WriteLine();
+
+            var w = Stopwatch.StartNew();
+#if !XDEBUG
+            try
+            {
+#endif
+                Utilities.CreateDirectoryIfMissing(Output);
+
+                foreach (var f in files)
+                {
+                    var relativePath = Utilities.MakeRelativePath(inputDirectory + "\\", f);
+                    Console.Write(Path.GetFileName(relativePath));
+                    if (!Transform(inputDirectory, relativePath))
+                    {
+                        Console.Write(" (no change)");
+                    }
+
+                    Console.WriteLine();
+                }
+#if !XDEBUG
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine();
+                Console.WriteLine("  Exception: " + e.Message);
+                return 1;
+            }
+#endif
+            Console.WriteLine(
+                string.Format(CultureInfo.InvariantCulture, "\nExecution time: {0:0.000} s", w.ElapsedMilliseconds * 0.001));
+
+            return 0;
+        }
+
+        /// <summary>
+        /// Parses the command line arguments.
+        /// </summary>
+        /// <param name="args">The arguments.</param>
+        private static void ParseArguments(IEnumerable<string> args)
+        {
             // set default values
             Input = "*.wiki";
-            Format = "html";
+            Format = OutputFormats.Html;
             Extension = null;
             Output = "output";
             Defines = new List<string>();
@@ -153,7 +268,16 @@ namespace WikiT
                             Output = kv[1];
                             continue;
                         case "/format":
-                            Format = kv[1].ToLower();
+                            OutputFormats format;
+                            if (Enum.TryParse(kv[1].ToLower(), true, out format))
+                            {
+                                Format = format;
+                            }
+                            else
+                            {
+                                Console.WriteLine("Unknown format: " + kv[1]);
+                            }
+
                             continue;
                         case "/flatten":
                             FlattenOutput = true;
@@ -192,20 +316,20 @@ namespace WikiT
             {
                 switch (Format)
                 {
-                    case "html":
+                    case OutputFormats.Html:
                         Extension = ".html";
                         break;
-                    case "owiki":
+                    case OutputFormats.Owiki:
                         Extension = ".wiki";
                         break;
-                    case "markdown":
+                    case OutputFormats.Markdown:
                         Extension = ".md";
                         break;
-                    case "word":
+                    case OutputFormats.Word:
                         Extension = ".docx";
                         break;
                     default:
-                        Extension = "." + Format;
+                        Extension = "." + Format.ToString().ToLower();
                         break;
                 }
             }
@@ -213,58 +337,11 @@ namespace WikiT
             if (!Extension.StartsWith("."))
             {
                 Console.WriteLine("The output extension should start with '.'");
-                return 2;
             }
-
-            Utilities.CreateDirectoryIfMissing(Output);
-
-            var inputDirectory = Path.GetFullPath(Path.GetDirectoryName(Input));
-            var searchPattern = Path.GetFileName(Input);
-
-            Console.WriteLine("Input directory:  '{0}'", Path.GetFullPath(inputDirectory));
-            Console.WriteLine("Search pattern:   '{0}'", searchPattern);
-            Console.WriteLine("Output directory: '{0}'", Path.GetFullPath(Output));
-            Console.WriteLine("Output extension: '{0}'", Extension);
-
-            var files = Utilities.FindFiles(inputDirectory, searchPattern).ToList();
-
-            Console.WriteLine();
-            Console.WriteLine(files.Count + " input files found.");
-
-            Console.WriteLine();
-
-            var w = Stopwatch.StartNew();
-#if !XDEBUG
-            try
-            {
-#endif
-                foreach (var f in files)
-                {
-                    var relativePath = Utilities.MakeRelativePath(inputDirectory + "\\", f);
-                    Console.Write(relativePath);
-                    if (!Transform(inputDirectory, relativePath))
-                    {
-                        Console.Write(" (no change)");
-                    }
-
-                    Console.WriteLine();
-                }
-#if !XDEBUG
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine();
-                Console.WriteLine("  Exception: " + e.Message);
-                return 1;
-            }
-#endif
-            Console.WriteLine(string.Format(CultureInfo.InvariantCulture, "\nExecution time: {0:0.000} s", w.ElapsedMilliseconds * 0.001));
-
-            return 0;
         }
 
         /// <summary>
-        /// Parses project settings from a <c>.wikiproj</c> file.
+        /// Parses project settings from a wiki project file.
         /// </summary>
         /// <param name="fileName">Project filename.</param>
         private static void ParseProject(string fileName)
@@ -281,7 +358,11 @@ namespace WikiT
             {
                 if (d.Name == "Format")
                 {
-                    Format = d.Value;
+                    OutputFormats format;
+                    if (Enum.TryParse(d.Value, true, out format))
+                    {
+                        Format = format;
+                    }
                 }
 
                 if (d.Name == "Template")
@@ -351,31 +432,35 @@ namespace WikiT
             IDocumentFormatter formatter = null;
             switch (Format)
             {
-                case "word":
+                case OutputFormats.Word:
                     formatter = new WordFormatter { Template = Template };
                     break;
 
-                case "wiki":
+                case OutputFormats.Owiki:
                     formatter = new OWikiFormatter();
                     break;
 
-                case "creole":
+                case OutputFormats.Creole:
                     formatter = new CreoleFormatter();
                     break;
 
-                case "markdown":
+                case OutputFormats.Markdown:
                     formatter = new MarkdownFormatter();
                     break;
 
-                case "xml":
-                    //outputText = XmlFormatter.Format(doc);
+                case OutputFormats.Xml:
+                    formatter = new XmlFormatter();
                     break;
 
-                case "tex":
+                case OutputFormats.Json:
+                    formatter = new JsonFormatter();
+                    break;
+
+                case OutputFormats.Tex:
                     formatter = new TexFormatter();
                     break;
 
-                case "html":
+                case OutputFormats.Html:
                     formatter = new HtmlFormatter
                                       {
                                           Css = Stylesheet,
