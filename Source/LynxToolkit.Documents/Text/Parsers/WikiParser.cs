@@ -83,11 +83,8 @@ namespace LynxToolkit.Documents
         private string text;
 
         public WikiParser(Func<string, Stream> openRead = null)
+            : this(new string[] { }, new Dictionary<string, string>(), openRead)
         {
-            this.OpenRead = openRead;
-            this.Defines = new List<string>();
-            this.Variables = new Dictionary<string, string>();
-            this.CurrentDirectory = string.Empty;
         }
 
         public WikiParser(
@@ -96,6 +93,8 @@ namespace LynxToolkit.Documents
             Func<string, Stream> openRead)
         {
             this.OpenRead = openRead;
+            this.ImportPaths = new List<string>();
+            this.IncludePaths = new List<string>();
             this.Defines = new List<string>(defines);
             this.Variables = new Dictionary<string, string>(variables);
             this.CurrentDirectory = string.Empty;
@@ -106,6 +105,10 @@ namespace LynxToolkit.Documents
         public string CurrentDirectory { get; set; }
 
         public string IncludeDefaultExtension { get; set; }
+
+        public List<string> ImportPaths { get; private set; }
+
+        public List<string> IncludePaths { get; private set; }
 
         public List<string> Defines { get; private set; }
 
@@ -369,25 +372,66 @@ namespace LynxToolkit.Documents
             }
         }
 
-        private string ResolveIncludeFile(string filename)
+        private bool Exists(string filename)
         {
-            var include = PathUtilities.Combine(this.CurrentDirectory, filename);
-            if (this.IncludeDefaultExtension != null && string.IsNullOrEmpty(PathUtilities.GetExtension(include)))
+            try
             {
-                include = PathUtilities.ChangeExtension(include, this.IncludeDefaultExtension);
+                using (this.OpenRead(filename)) { }
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private string ResolveIncludeFile(string filename, IEnumerable<string> paths)
+        {
+            if (this.IncludeDefaultExtension != null && string.IsNullOrEmpty(PathUtilities.GetExtension(filename)))
+            {
+                filename = PathUtilities.ChangeExtension(filename, this.IncludeDefaultExtension);
             }
 
-            return include;
+            var resolvedPath = PathUtilities.Combine(this.CurrentDirectory, filename);
+            if (this.Exists(resolvedPath))
+            {
+                return resolvedPath;
+            }
+
+            foreach (var path in paths)
+            {
+
+                resolvedPath = PathUtilities.Simplify(PathUtilities.Combine(PathUtilities.Combine(this.CurrentDirectory, path), filename));
+                if (this.Exists(resolvedPath))
+                {
+                    return resolvedPath;
+                }
+            }
+
+            throw new FileNotFoundException(filename + " not found.");
         }
 
         private void ParseDirective(BlockCollection b)
         {
             this.i++;
+
+            if (this.Match("importpath"))
+            {
+                this.ImportPaths.Add(this.ReadArg());
+                return;
+            }
+
+            if (this.Match("includepath"))
+            {
+                this.IncludePaths.Add(this.ReadArg());
+                return;
+            }
+
             if (this.Match("include"))
             {
                 var s = this.ReadArg();
 
-                var content = this.ReadAllText(this.ResolveIncludeFile(s));
+                var content = this.ReadAllText(this.ResolveIncludeFile(s, this.IncludePaths));
                 this.text = this.text.Insert(this.i, content);
                 this.n = this.text.Length;
                 return;
@@ -396,13 +440,9 @@ namespace LynxToolkit.Documents
             if (this.Match("import"))
             {
                 var s = this.ReadArg();
-                var parser = new WikiParser(this.Defines, this.Variables, this.OpenRead);
-                parser.IncludeDefaultExtension = this.IncludeDefaultExtension;
-                var importedDocument = parser.ParseFile(this.ResolveIncludeFile(s));
-                foreach (var block in importedDocument.Blocks)
-                {
-                    b.Add(block);
-                }
+                var parser = new WikiParser(this.Defines, this.Variables, this.OpenRead) { IncludeDefaultExtension = this.IncludeDefaultExtension };
+                var importedDocument = parser.ParseFile(this.ResolveIncludeFile(s, this.ImportPaths));
+                b.AddRange(importedDocument.Blocks);
 
                 return;
             }
