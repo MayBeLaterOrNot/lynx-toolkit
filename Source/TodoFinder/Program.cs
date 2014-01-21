@@ -47,7 +47,7 @@ namespace TodoFinder
         /// <summary>
         /// The trim chars applied to the comment following the TODO.
         /// </summary>
-        private static readonly char[] TrimChars = "/=: ".ToCharArray();
+        private static readonly char[] TrimChars = "/=:.? ".ToCharArray();
 
         /// <summary>
         /// The regular expression used to search for TODO comments.
@@ -76,7 +76,8 @@ namespace TodoFinder
         /// <returns>the number of TODO comments in the processed files.</returns>
         public static int Main(string[] args)
         {
-            Console.WriteLine(Utilities.ApplicationHeader);
+            Utilities.WriteHeader();
+            //Console.WriteLine(Utilities.ApplicationHeader);
 
             source = Directory.GetCurrentDirectory();
             string output = null;
@@ -123,7 +124,7 @@ namespace TodoFinder
 
             if (output != null)
             {
-               // System.Diagnostics.Process.Start(output);
+                // System.Diagnostics.Process.Start(output);
             }
 
             return todoCount;
@@ -185,7 +186,11 @@ namespace TodoFinder
                         first = false;
                     }
 
-                    Console.WriteLine("  [{0}] {1}", lineNumber, description);
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.Write("  {0}", description);
+                    Console.ForegroundColor = ConsoleColor.Gray;
+                    Console.WriteLine(" (line {0})", lineNumber);
+                    Console.ResetColor();
                     if (outputWriter != null)
                     {
                         outputWriter.WriteLine("<Comment Line=\"{0}\">{1}</Comment>", lineNumber, description);

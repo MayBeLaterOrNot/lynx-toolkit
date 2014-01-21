@@ -84,6 +84,22 @@ namespace LynxToolkit
         }
 
         /// <summary>
+        /// Writes the application header to the <see cref="Console"/>.
+        /// </summary>
+        /// <param name="windowWidth">The width of the console window.</param>
+        public static void WriteHeader(int windowWidth = 120)
+        {
+            var fvi = FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly().Location);
+            Console.Title = fvi.ProductName;
+            Console.WindowWidth = windowWidth;
+            Console.WriteLine(fvi.ProductName);
+            Console.WriteLine("Version {0}.{1} (build {2})", fvi.ProductMajorPart, fvi.ProductMinorPart, fvi.ProductBuildPart);
+            Console.WriteLine();
+            Console.WriteLine(fvi.LegalCopyright);
+            Console.WriteLine();
+        }
+
+        /// <summary>
         /// Finds the files in the specified directory and its subdirectories.
         /// </summary>
         /// <param name="directory">The directory.</param>
@@ -349,7 +365,7 @@ namespace LynxToolkit
         /// <returns>The relative path from the start directory to the end path.</returns>
         /// <exception cref="ArgumentNullException"></exception>
         /// <remarks>See <a href="http://stackoverflow.com/questions/275689/how-to-get-relative-path-from-absolute-path">Stack overflow</a></remarks>
-        public static String MakeRelativePath(String fromPath, String toPath)
+        public static String MakeRelativePath(string fromPath, string toPath)
         {
             if (string.IsNullOrEmpty(fromPath))
             {
