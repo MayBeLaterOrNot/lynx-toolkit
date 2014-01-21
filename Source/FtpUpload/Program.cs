@@ -73,9 +73,11 @@ namespace FtpUpload
                 switch (kv[0].ToLower())
                 {
                     case "/r":
+                    case "/recursive":
                         RecursiveSearch = true;
                         break;
                     case "/t":
+                    case "/threads":
                         UploadThreads = int.Parse(kv[1]);
                         break;
                 }
