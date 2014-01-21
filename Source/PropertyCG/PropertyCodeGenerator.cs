@@ -29,6 +29,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 namespace PropertyCG
 {
+    using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
@@ -208,20 +209,40 @@ namespace PropertyCG
         /// <param name="argumentFormatString">
         /// The argument format string. {0} will be replaced by the file name.
         /// </param>
-        public static void OpenForEdit(string filename, string exe, string argumentFormatString)
+        /// <returns>
+        /// <c>true</c> if the file was opened for edit.
+        /// </returns>
+        public static bool TryOpenForEdit(string filename, string exe, string argumentFormatString)
         {
             if (exe == null)
             {
-                return;
+                return true;
             }
 
-            var psi = new ProcessStartInfo(exe, string.Format(argumentFormatString, filename))
+            try
+            {
+                var psi = new ProcessStartInfo(exe, string.Format(argumentFormatString, filename))
+                              {
+                                  CreateNoWindow =
+                                      true,
+                                  WindowStyle =
+                                      ProcessWindowStyle
+                                      .Hidden
+                              };
+                var p = Process.Start(psi);
+                if (p != null)
                 {
-                    CreateNoWindow = true,
-                    WindowStyle = ProcessWindowStyle.Hidden
-                };
-            var p = Process.Start(psi);
-            p.WaitForExit();
+                    p.WaitForExit();
+                }
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Could not open {0} for edit", filename);
+                Console.WriteLine(e.Message);
+                return false;
+            }
         }
 
         /// <summary>
@@ -266,7 +287,7 @@ namespace PropertyCG
 
                 if (this.OpenForEditExecutable != null)
                 {
-                    OpenForEdit(this.PropertiesFileName, this.OpenForEditExecutable, this.OpenForEditArguments);
+                    TryOpenForEdit(this.PropertiesFileName, this.OpenForEditExecutable, this.OpenForEditArguments);
                 }
             }
 

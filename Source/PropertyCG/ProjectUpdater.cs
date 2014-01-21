@@ -163,7 +163,7 @@ namespace PropertyCG
 
             if (modified)
             {
-                PropertyCodeGenerator.OpenForEdit(this.FileName, this.OpenForEditExecutable, this.OpenForEditArguments);
+                PropertyCodeGenerator.TryOpenForEdit(this.FileName, this.OpenForEditExecutable, this.OpenForEditArguments);
                 doc.Save(this.FileName);
             }
 
