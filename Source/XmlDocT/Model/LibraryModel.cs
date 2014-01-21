@@ -116,11 +116,14 @@ namespace XmlDocT
             string assemblyDirectory = Path.GetDirectoryName(assemblyPath) ?? string.Empty;
             searchDirectories.Add(assemblyDirectory);
 
-            // TODO: how to get silverlight/metro/mono assemblies from .NET 4.5 console application?
+            // TODO: how to get silverlight/win8/mono assemblies from .NET 4.5 console application?
             var silverlightFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Microsoft Silverlight");
-            foreach (var slf in Directory.GetDirectories(silverlightFolder))
+            if (Directory.Exists(silverlightFolder))
             {
-                searchDirectories.Add(slf);
+                foreach (var slf in Directory.GetDirectories(silverlightFolder))
+                {
+                    searchDirectories.Add(slf);
+                }
             }
 
             AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
@@ -178,7 +181,7 @@ namespace XmlDocT
             if (missingAssemblies)
             {
                 Console.WriteLine("  Missing dependencies. Skipping assembly.");
-                return;                
+                return;
             }
 
             var xmldoc = new XmlDocument();
