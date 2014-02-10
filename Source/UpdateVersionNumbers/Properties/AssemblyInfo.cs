@@ -26,6 +26,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 using System.Reflection;
 
-[assembly: AssemblyProduct("VersionUpdater")]
+[assembly: AssemblyProduct("UpdateVersionNumbers")]
 [assembly: AssemblyTitle("Updates version numbers in AssemblyInfo and NuSpec files.")]
-[assembly: AssemblyDescription("Syntax: VersionUpdater.exe /Version=<versionNumber> [/Company=<companyName>] [/Copyright=<copyrightnotice>] /Directory=<path>")]
+[assembly: AssemblyDescription("Syntax: UpdateVersionNumbers.exe /Version=<versionNumber> [/Company=<companyName>] [/Copyright=<copyrightnotice>] /Directory=<path>")]

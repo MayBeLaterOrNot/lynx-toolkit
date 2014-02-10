@@ -27,7 +27,7 @@
 //   Modifies the version numbers to be within 16-bit boundaries.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-namespace VersionUpdater
+namespace UpdateVersionNumbers
 {
     using System;
     using System.Collections.Generic;
@@ -41,7 +41,7 @@ namespace VersionUpdater
     //   The program updates version and company/copyright information.
     //
     // Syntax:
-    //   VersionUpdater.exe [/Directory=..\src] [/VersionFile=..\version.txt] [/Version=x.x.x.x] [/Build=x] [/Revision=x] [/Company=xxx] [/Copyright=xxx]
+    //   UpdateVersionNumbers.exe [/Directory=..\src] [/VersionFile=..\version.txt] [/Version=x.x.x.x] [/Build=x] [/Revision=x] [/Company=xxx] [/Copyright=xxx]
     // Arguments:
     //   /Directory specifies the root directory (all subdirectories will be scanned)
     //   /Version specifies the version number (Major.Minor.Build.Revision)

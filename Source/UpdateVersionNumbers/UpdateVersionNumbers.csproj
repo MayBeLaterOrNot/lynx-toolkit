@@ -8,8 +8,8 @@
     <ProjectGuid>{9FB27C7C-39F4-4F2E-8942-923DE53666CB}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>VersionUpdater</RootNamespace>
-    <AssemblyName>VersionUpdater</AssemblyName>
+    <RootNamespace>UpdateVersionNumbers</RootNamespace>
+    <AssemblyName>UpdateVersionNumbers</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
