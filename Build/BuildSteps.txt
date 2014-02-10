@@ -36,6 +36,7 @@ tools/**/*.* => Output.zip!/tools/
 VCS
 Pull changes from:
 https://hg.codeplex.com/lynx 
+Automatically on agent
 Clean all files before build
 
 Build steps
@@ -51,6 +52,7 @@ VersionUpdater.exe
 Create changeset ID file
 mkdir Output
 echo %build.vcs.number%> Output\changeset.id
+hg log > Output\changesets.log
 
 Build solution
 Source\LynxToolkit.sln
