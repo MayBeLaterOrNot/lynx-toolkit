@@ -31,32 +31,40 @@ namespace PropertyCG
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.IO;
-    using System.Linq;
     using System.Xml;
 
     /// <summary>
     /// Updates C# project files
     /// </summary>
-
+    [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Reviewed. Suppression is OK here.")]
     public class ProjectUpdater
     {
-        public string Extension { get; set; }
-        public string OpenForEditExecutable { get; set; }
-        public string OpenForEditArguments { get; set; }
-        public string FileName { get; private set; }
-
         public ProjectUpdater(string fileName, string extension)
         {
             this.FileName = fileName;
             this.Extension = extension;
         }
 
+        public string Extension { get; set; }
+
+        public string OpenForEditExecutable { get; set; }
+
+        public string OpenForEditArguments { get; set; }
+
+        public string FileName { get; private set; }
+
         public bool Update()
         {
             var doc = new XmlDocument();
             doc.Load(FileName);
             var root = doc.DocumentElement;
+            if (root == null)
+            {
+                throw new Exception("No document.");
+            }
+
             var nsmgr = new XmlNamespaceManager(doc.NameTable);
             const string NamespaceUri = "http://schemas.microsoft.com/developer/msbuild/2003";
             nsmgr.AddNamespace("b", NamespaceUri);
@@ -138,7 +146,7 @@ namespace PropertyCG
                     }
 
                     // the dependent upon (source) file name - note that this should not contain any path, only file name
-                    var dependentUponFileName = Path.GetFileName(omlFile); 
+                    var dependentUponFileName = Path.GetFileName(omlFile);
                     var dependentUponNode = item.SelectSingleNode("b:DependentUpon", nsmgr);
                     if (dependentUponNode == null)
                     {

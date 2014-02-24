@@ -36,8 +36,6 @@ namespace PropertyCG
     using System.Text;
     using System.Text.RegularExpressions;
 
-    using LynxToolkit;
-
     /// <summary>
     /// Provides a model of a class.
     /// </summary>
@@ -237,9 +235,10 @@ $",
                     bool supportsIsVisible = flags.Contains("^");
                     bool includeValidateCallback = flags.Contains("!");
                     bool includePropertyChangeCallback = flags.Contains("#");
+                    bool isNotDataMember = flags.Contains("*");
                     bool isReadOnly = flags.Contains("r");
 
-                    var propertyChangedFlags = options.Flags.Where(f => flags.Contains(f.Key)).Select(f => f.Value).FormatList(" | ");
+                    var propertyChangedFlags = string.Join(" | ", options.Flags.Where(f => flags.Contains(f.Key)).Select(f => f.Value));
 
                     var type = propertyMatch.Groups["Type"].Success ? propertyMatch.Groups["Type"].Value : null;
                     var name = propertyMatch.Groups["Name"].Success ? propertyMatch.Groups["Name"].Value : type;
@@ -261,6 +260,7 @@ $",
                             ValidateCallback = includeValidateCallback,
                             PropertyChangeCallback = includePropertyChangeCallback,
                             ReadOnly = isReadOnly,
+                            DataMember = !isNotDataMember,
                             PropertyChangedFlags = propertyChangedFlags
                         };
 
@@ -383,9 +383,14 @@ $",
                     sb.AppendLine(a);
                 }
 
-                if (options.UseDataMemberAttribute)
+                if (p.DataMember && options.UseDataMemberAttribute)
                 {
                     sb.AppendLine("[DataMember]");
+                }
+
+                if (!p.DataMember && options.UseXmlIgnoreAttribute)
+                {
+                    sb.AppendLine("[XmlIgnore]");
                 }
 
                 sb.AppendLine("public {0} {1}", p.Type, p.Name);

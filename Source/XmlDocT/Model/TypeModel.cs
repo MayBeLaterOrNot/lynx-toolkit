@@ -334,7 +334,7 @@ namespace XmlDocT
 
             if (baseAndInterfaces.Count > 0)
             {
-                sb.Append(" : " + baseAndInterfaces.FormatList(", "));
+                sb.Append(" : " + string.Join(", ", baseAndInterfaces));
             }
 
             return sb.ToString();

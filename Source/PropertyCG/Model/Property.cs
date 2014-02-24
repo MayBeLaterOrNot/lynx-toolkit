@@ -57,6 +57,7 @@ namespace PropertyCG
         {
             this.Type = type;
             this.Name = name;
+            this.DataMember = true;
             this.Description = description;
             this.Dependencies = new List<string>();
             this.Attributes = new List<string>(attributes);
@@ -112,8 +113,17 @@ namespace PropertyCG
         /// <summary>
         /// Gets or sets a value indicating whether the property is read only.
         /// </summary>
-        /// <value><c>true</c> if [read only]; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if the property is read only; otherwise, <c>false</c>.</value>
         public bool ReadOnly { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the property is a data member.
+        /// </summary>
+        /// <value><c>true</c> if the property is a data member; otherwise, <c>false</c>.</value>
+        /// <remarks>
+        /// Properties that are not data members will not be included in serialization.
+        /// </remarks>
+        public bool DataMember { get; set; }
 
         /// <summary>
         /// Gets or sets the property changed flags.

@@ -30,6 +30,8 @@
 namespace PropertyCG
 {
     using System.Collections.Generic;
+    using System.Runtime.Serialization;
+    using System.Xml.Serialization;
 
     /// <summary>
     /// Provides preferences for the property code generation.
@@ -120,9 +122,15 @@ namespace PropertyCG
         bool ValidateDependencies { get; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether to use DataMemberAttribute.
+        /// Gets or sets a value indicating whether to use <see cref="DataMemberAttribute"/>.
         /// </summary>
-        /// <value><c>true</c> if DataMemberAttribute should be used; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if <see cref="DataMemberAttribute"/> should be used; otherwise, <c>false</c>.</value>
         bool UseDataMemberAttribute { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to use <see cref="XmlIgnoreAttribute"/> on properties that are not data members.
+        /// </summary>
+        /// <value><c>true</c> if <see cref="XmlIgnoreAttribute"/> should be used; otherwise, <c>false</c>.</value>
+        bool UseXmlIgnoreAttribute { get; set; }
     }
 }

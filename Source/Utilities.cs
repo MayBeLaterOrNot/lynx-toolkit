@@ -44,7 +44,7 @@ namespace LynxToolkit
     public static class Utilities
     {
         /// <summary>
-        ///     Gets the application comments.
+        /// Gets the application comments.
         /// </summary>
         public static string ApplicationComments
         {
@@ -55,7 +55,7 @@ namespace LynxToolkit
         }
 
         /// <summary>
-        ///     Gets the application description.
+        /// Gets the application description.
         /// </summary>
         public static string ApplicationDescription
         {
@@ -66,7 +66,7 @@ namespace LynxToolkit
         }
 
         /// <summary>
-        ///     Gets the application header (product name, version number and copyright notice).
+        /// Gets the application header (product name, version number and copyright notice).
         /// </summary>
         public static string ApplicationHeader
         {
@@ -119,7 +119,7 @@ namespace LynxToolkit
         }
 
         /// <summary>
-        ///     Creates the directory if missing.
+        /// Creates the directory if missing.
         /// </summary>
         /// <param name="path">The path.</param>
         public static void CreateDirectoryIfMissing(string path)
@@ -142,35 +142,11 @@ namespace LynxToolkit
         }
 
         /// <summary>
-        ///     Formats the list of items to a string with the specified separator.
-        /// </summary>
-        /// <param name="items">The items.</param>
-        /// <param name="separator">The separator.</param>
-        /// <returns>The System.String.</returns>
-        public static string FormatList(this IEnumerable<object> items, string separator)
-        {
-            var sb = new StringBuilder();
-            foreach (var item in items)
-            {
-                if (sb.Length > 0)
-                {
-                    sb.Append(separator);
-                }
-
-                sb.Append(item);
-            }
-
-            return sb.ToString();
-        }
-
-        /// <summary>
         /// Determines whether the specified file is modified.
         /// </summary>
         /// <param name="filePath">The file path.</param>
         /// <param name="newContent">The new content.</param>
-        /// <returns>
-        ///   <c>true</c> if the file is modified; otherwise, <c>false</c>.
-        /// </returns>
+        /// <returns><c>true</c> if the file is modified; otherwise, <c>false</c>.</returns>
         public static bool IsFileModified(string filePath, string newContent)
         {
             if (!File.Exists(filePath))
@@ -183,13 +159,11 @@ namespace LynxToolkit
         }
 
         /// <summary>
-        ///     Determines whether the specified file should be excluded.
+        /// Determines whether the specified file should be excluded.
         /// </summary>
         /// <param name="excludedItems">The excluded items.</param>
         /// <param name="path">The path.</param>
-        /// <returns>
-        ///     <c>true</c> if the specified excluded items is excluded; otherwise, <c>false</c>.
-        /// </returns>
+        /// <returns><c>true</c> if the specified excluded items is excluded; otherwise, <c>false</c>.</returns>
         public static bool IsExcluded(string excludedItems, string path)
         {
             var name = Path.GetFileName(path);
@@ -330,7 +304,10 @@ namespace LynxToolkit
                                   .Hidden
                           };
             var p = Process.Start(psi);
-            p.WaitForExit();
+            if (p != null)
+            {
+                p.WaitForExit();
+            }
         }
 
         /// <summary>
@@ -340,8 +317,7 @@ namespace LynxToolkit
         /// <param name="value">The string to search for.</param>
         /// <param name="comparisonType">Type of the comparison.</param>
         /// <returns>The sub string.</returns>
-        public static string SubstringTo(
-            this string input, string value, StringComparison comparisonType = StringComparison.Ordinal)
+        public static string SubstringTo(this string input, string value, StringComparison comparisonType = StringComparison.Ordinal)
         {
             int i = input.IndexOf(value, comparisonType);
             if (i == 0)
@@ -365,7 +341,7 @@ namespace LynxToolkit
         /// <returns>The relative path from the start directory to the end path.</returns>
         /// <exception cref="ArgumentNullException"></exception>
         /// <remarks>See <a href="http://stackoverflow.com/questions/275689/how-to-get-relative-path-from-absolute-path">Stack overflow</a></remarks>
-        public static String MakeRelativePath(string fromPath, string toPath)
+        public static string MakeRelativePath(string fromPath, string toPath)
         {
             if (string.IsNullOrEmpty(fromPath))
             {

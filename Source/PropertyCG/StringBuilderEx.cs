@@ -26,22 +26,26 @@
 // --------------------------------------------------------------------------------------------------------------------
 namespace PropertyCG
 {
+    using System.Diagnostics.CodeAnalysis;
     using System.Text;
 
+    [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Reviewed. Suppression is OK here.")]
     public class StringBuilderEx
     {
-        private StringBuilder sb;
+        private readonly StringBuilder sb;
+        private string indent;
 
         public StringBuilderEx(int capacity = 1000)
         {
             this.sb = new StringBuilder(capacity);
+            this.indent = string.Empty;
         }
 
-        private string indent = "";
         public void Indent()
         {
             this.indent += "    ";
         }
+
         public void Unindent()
         {
             this.indent = this.indent.Substring(4);
@@ -63,11 +67,18 @@ namespace PropertyCG
             {
                 this.sb.Append(this.indent);
                 if (args.Length > 0)
+                {
                     this.sb.AppendFormat(format, args);
-                else this.sb.Append(format);
+                }
+                else
+                {
+                    this.sb.Append(format);
+                }
             }
+
             this.sb.AppendLine();
         }
+
         public override string ToString()
         {
             return this.sb.ToString();

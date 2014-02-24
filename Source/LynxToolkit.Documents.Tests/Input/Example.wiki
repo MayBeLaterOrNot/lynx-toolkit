@@ -41,6 +41,8 @@ The document model can be formatted to the following formats
 * XHtml
 * FlowDocument
 * OpenXML (Word)
+* OpenDocument (OpenOffice.org)
+* LaTeX
 
 == Examples
 

@@ -31,17 +31,28 @@ namespace PropertyCG
 {
     using System;
     using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
     using System.IO;
 
     /// <summary>
     /// The main program.
     /// </summary>
+    [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Reviewed. Suppression is OK here.")]
     public class Program
     {
+        private static int filesFound;
+        private static int filesChanged;
+        private static int projectsFound;
+        private static int projectsChanged;
+
         public static string OpenForEditExecutable { get; set; }
+        
         public static string OpenForEditArguments { get; set; }
+        
         public static string SearchPattern { get; set; }
+        
         public static string Folder { get; set; }
+        
         public static bool Force { get; set; }
 
         /// <summary>
@@ -113,11 +124,6 @@ namespace PropertyCG
             Console.WriteLine("  Finished in {0} ms", stopwatch.ElapsedMilliseconds);
             Console.WriteLine();
         }
-
-        private static int filesFound;
-        private static int filesChanged;
-        private static int projectsFound;
-        private static int projectsChanged;
 
         private static void Search(string folder, string searchPattern, Action<string> process)
         {
