@@ -62,8 +62,4 @@
   <Target Name="BeforeBuild">
     <Exec Command="$(SolutionDir)\..\Output\PropertyCG.exe . /type=oml" />
   </Target>
-  <UsingTask TaskName="PepitaGet.RestorePackagesTask" AssemblyFile="$(SolutionDir)..\Tools\Pepita\PepitaGet.dll" />
-  <Target Name="BeforeBuild">
-    <PepitaGet.RestorePackagesTask />
-  </Target>
 </Project>
