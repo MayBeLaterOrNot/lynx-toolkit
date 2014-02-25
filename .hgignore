@@ -42,7 +42,11 @@ Tools/    # Add manually
 
 _ReSharper*/
 _TeamCity*/
-[Pp]ackages/
+packages/
+
+Packages/*/License.txt
+Packages/*.png
+
 *.dotCover
 *.ncrunchproject
 *.ncrunchsolution
