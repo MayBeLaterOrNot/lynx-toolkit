@@ -30,80 +30,116 @@ namespace FindObsoleteFiles
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using System.Text.RegularExpressions;
     using System.Xml;
 
-    // Finds all *.cs files that are not included in the solution's projects.
-    class Program
+    /// <summary>
+    /// Finds all *.cs files that are not included in the project(s) of the solutions(s).
+    /// </summary>
+    public class Program
     {
-        static void Main(string[] args)
+        /// <summary>
+        /// Defines the entry point of the application.
+        /// </summary>
+        /// <param name="args">The arguments.</param>
+        public static void Main(string[] args)
         {
             Console.WriteLine(LynxToolkit.Utilities.ApplicationHeader);
 
             foreach (var arg in args)
             {
-                var f = new Finder();
-                f.Find(arg);
+                FindObsoleteFiles(arg);
             }
         }
-    }
 
-    class Finder
-    {
-        public IEnumerable<string> GetProjects(string path)
+        /// <summary>
+        /// Gets the projects in the specified solution.
+        /// </summary>
+        /// <param name="solutionFileName">The file name of the solution.</param>
+        /// <returns>A sequence of project file names.</returns>
+        public static IEnumerable<string> GetProjects(string solutionFileName)
         {
-            var r = new StreamReader(path);
-            var content = r.ReadToEnd();
+            var content = File.ReadAllText(solutionFileName);
             var regex = new Regex("^Project\\(\".*\"\\) = \"(.*?)\", \"(.*?)\"", RegexOptions.Multiline);
-            foreach (Match m in regex.Matches(content))
-            {
-                yield return m.Groups[2].Value;
-            }
+            return regex.Matches(content).Cast<Match>().Select(m => m.Groups[2].Value);
         }
 
-        public void Find(string slnPath)
+        /// <summary>
+        /// Finds the obsolete files in the specified solution.
+        /// </summary>
+        /// <param name="solutionFileName">The file name of the solution.</param>
+        public static void FindObsoleteFiles(string solutionFileName)
         {
             var files = new List<string>();
-            var slnDir = Path.GetDirectoryName(slnPath);
-            foreach (var proj in this.GetProjects(slnPath))
+            var directory = Path.GetDirectoryName(solutionFileName) ?? string.Empty;
+            var searchPattern = Path.GetFileName(solutionFileName);
+            if (string.IsNullOrEmpty(searchPattern))
             {
-                if (!proj.EndsWith(".csproj"))
+                searchPattern = "*.sln";
+            }
+
+            foreach (var solution in Directory.GetFiles(directory, searchPattern))
+            {
+                foreach (var proj in GetProjects(solution))
+                {
+                    if (!proj.EndsWith(".csproj"))
+                    {
+                        continue;
+                    }
+
+                    var projPath = Path.Combine(directory, proj);
+                    files.AddRange(GetFiles(projPath));
+                }
+            }
+
+            foreach (var f in AllFiles(directory).Where(f => !files.Contains(f)))
+            {
+                Console.WriteLine(f);
+            }
+        }
+
+        /// <summary>
+        /// Gets all files under the specified directory.
+        /// </summary>
+        /// <param name="directory">
+        /// The directory.
+        /// </param>
+        /// <returns>
+        /// A sequence of file names.
+        /// </returns>
+        private static IEnumerable<string> AllFiles(string directory)
+        {
+            var q = new Queue<string>();
+            q.Enqueue(directory);
+            while (q.Count > 0)
+            {
+                directory = q.Dequeue();
+                if (IsExcluded(directory))
                 {
                     continue;
                 }
 
-                var projPath = Path.Combine(slnDir, proj);
-                files.AddRange(GetFiles(projPath));
-            }
-
-            Search(slnDir, path =>
+                foreach (var f in Directory.GetFiles(directory, "*.cs"))
                 {
-                    if (!files.Contains(path))
-                        Console.WriteLine(path);
-                });
-        }
+                    yield return f;
+                }
 
-        private void Search(string path, Action<string> action)
-        {
-            if (IsExcluded(path))
-            {
-                return;
-            }
-
-            foreach (var f in Directory.GetFiles(path, "*.cs"))
-            {
-                action(f);
-            }
-
-            foreach (var d in Directory.GetDirectories(path))
-            {
-                Search(d, action);
+                foreach (var d in Directory.GetDirectories(directory))
+                {
+                    q.Enqueue(d);
+                }
             }
         }
 
-        private bool IsExcluded(string path)
+        /// <summary>
+        /// Determines whether the specified file name is excluded.
+        /// </summary>
+        /// <param name="fileName">The file name.</param>
+        /// <returns><c>true</c> if the file is excluded; otherwise <c>false</c>.</returns>
+        private static bool IsExcluded(string fileName)
         {
-            var name = Path.GetFileName(path);
+            var name = Path.GetFileName(fileName) ?? string.Empty;
             if (name.StartsWith("bin"))
             {
                 return true;
@@ -122,19 +158,46 @@ namespace FindObsoleteFiles
             return false;
         }
 
-        private IEnumerable<string> GetFiles(string projPath)
+        /// <summary>
+        /// Gets the files in the specified project.
+        /// </summary>
+        /// <param name="projectFileName">File name of the project.</param>
+        /// <returns>A sequence of file names.</returns>
+        private static IEnumerable<string> GetFiles(string projectFileName)
         {
-            var dir = Path.GetDirectoryName(projPath);
+            var directory = Path.GetDirectoryName(projectFileName) ?? string.Empty;
             var doc = new XmlDocument();
-            doc.Load(projPath);
+            doc.Load(projectFileName);
             var root = doc.DocumentElement;
             var nsmgr = new XmlNamespaceManager(doc.NameTable);
             nsmgr.AddNamespace("b", "http://schemas.microsoft.com/developer/msbuild/2003");
 
-            foreach (XmlNode node in root.SelectNodes("//b:Compile", nsmgr))
+            if (root == null)
             {
-                var include = node.Attributes["Include"].InnerText;
-                yield return Path.Combine(dir, include);
+                yield break;
+            }
+
+            var compileNodes = root.SelectNodes("//b:Compile", nsmgr);
+            var noneNodes = root.SelectNodes("//b:None", nsmgr);
+            if (compileNodes == null || noneNodes == null)
+            {
+                yield break;
+            }
+
+            var nodes = compileNodes.Cast<XmlNode>().Concat(noneNodes.Cast<XmlNode>());
+
+            foreach (var node in nodes)
+            {
+                if (node == null || node.Attributes == null)
+                {
+                    continue;
+                }
+
+                var includeAttribute = node.Attributes["Include"];
+                if (includeAttribute != null)
+                {
+                    yield return Path.GetFullPath(Path.Combine(directory, includeAttribute.InnerText));
+                }
             }
         }
     }

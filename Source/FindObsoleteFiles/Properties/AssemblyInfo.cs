@@ -27,5 +27,5 @@
 using System.Reflection;
 
 [assembly: AssemblyProduct("FindObsoleteFiles")]
-[assembly: AssemblyTitle("Finds files not included in the csproj files found under the specified path.")]
+[assembly: AssemblyTitle("Finds files not included in the projects in the specified solution files.")]
 [assembly: AssemblyDescription("Syntax: FindObsoleteFiles.exe <path>")]
