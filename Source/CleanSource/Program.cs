@@ -30,6 +30,7 @@
 namespace CleanSource
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using System.Text;
@@ -43,16 +44,6 @@ namespace CleanSource
     public static class Program
     {
         /// <summary>
-        /// The constructor summary substring to search for.
-        /// </summary>
-        private const string ConstructorSummarySubString = "/// Initializes a new instance of the";
-
-        /// <summary>
-        /// Expression to search for region/end region lines.
-        /// </summary>
-        private static readonly Regex RegionExpression = new Regex(@"^(\s*#(?:end)?region.*?)$", RegexOptions.Compiled | RegexOptions.Multiline | RegexOptions.Singleline);
-
-        /// <summary>
         /// The number of files cleaned.
         /// </summary>
         private static int filesCleaned;
@@ -61,21 +52,6 @@ namespace CleanSource
         /// The number of files scanned.
         /// </summary>
         private static int fileCount;
-
-        /// <summary>
-        /// Clean summaries.
-        /// </summary>
-        private static bool cleanSummary;
-
-        /// <summary>
-        /// Indents summaries.
-        /// </summary>
-        private static bool indentSummary;
-
-        /// <summary>
-        /// Remove regions.
-        /// </summary>
-        private static bool cleanRegions;
 
         /// <summary>
         /// The executable to check out files.
@@ -96,7 +72,7 @@ namespace CleanSource
         /// The main entry point of the program.
         /// </summary>
         /// <param name="args">The args.</param>
-        private static void Main(string[] args)
+        public static void Main(string[] args)
         {
             Console.WriteLine(Utilities.ApplicationHeader);
 
@@ -107,15 +83,6 @@ namespace CleanSource
                 var argx = arg.Split('=');
                 switch (argx[0].ToLower())
                 {
-                    case "/cleansummary":
-                        cleanSummary = true;
-                        continue;
-                    case "/indentsummary":
-                        indentSummary = true;
-                        continue;
-                    case "/cleanregions":
-                        cleanRegions = true;
-                        continue;
                     case "/scc":
                         if (string.Equals(argx[1], "p4", StringComparison.InvariantCultureIgnoreCase))
                         {
@@ -129,14 +96,18 @@ namespace CleanSource
                 Scan(arg);
             }
 
-            Console.WriteLine("{0} files cleaned (of {1})", filesCleaned, fileCount);
+            Console.WriteLine("{0} files modified.", filesCleaned);
+            Console.WriteLine("{0} files scanned.", fileCount);
+#if DEBUG
+            Console.ReadKey();
+#endif
         }
 
         /// <summary>
         /// Scans the specified directory.
         /// </summary>
         /// <param name="directory">The directory.</param>
-        private static void Scan(string directory)
+        public static void Scan(string directory)
         {
             if (Utilities.IsExcluded(exclude, directory))
             {
@@ -151,7 +122,7 @@ namespace CleanSource
         /// Cleans the specified file.
         /// </summary>
         /// <param name="file">The file.</param>
-        private static void Clean(string file)
+        public static void Clean(string file)
         {
             if (Utilities.IsExcluded(exclude, file))
             {
@@ -184,136 +155,119 @@ namespace CleanSource
         }
 
         /// <summary>
-        /// Cleans the code.
+        /// Splits the specified code to lines.
         /// </summary>
         /// <param name="text">The code.</param>
-        /// <returns>The cleaned code.</returns>
-        private static string CleanCode(string text)
+        /// <returns>A sequence of strings.</returns>
+        public static IEnumerable<string> ToLines(this string text)
         {
-            // dependency properties
-            text = Regex.Replace(text, @"(?<=/// <summary>\s*/// )(?<summary>.*?)(?=\s*/// </summary>\s*public static readonly DependencyProperty (?<name>.*?)Property)",
-                "Identifies the <see cref=\"${name}\"/> dependency property.");
-
-            // routed events
-            text = Regex.Replace(text, @"(?<=/// <summary>\s*/// )(?<summary>.*?)(?=\s*/// </summary>\s*public static readonly RoutedEvent (?<name>.*?)Event)",
-                "Identifies the <see cref=\"${name}\"/> routed event.");
-
-            // regions
-            if (cleanRegions)
-            {
-                text = Regex.Replace(text, @"([^\S\r\n]*#(?:end)?region[^\r\n]*)", string.Empty);
-            }
-
-            // empty remarks
-            text = Regex.Replace(text, @"/// <remarks>\s*(/// )?</remarks>", string.Empty);
-
-            // Whitespace at end of line
-            text = Regex.Replace(text, @"[^\S\r\n]+(?=[\r\n$])", string.Empty);
-
-            // Replace double new lines
-            text = Regex.Replace(text, @"(\r?\n\r?){3,}", "\r\n\r\n");
-
-            return text;
+            var newLineSeparators = new[] { "\r\n", "\n", "\r" };
+            return text.Split(newLineSeparators, StringSplitOptions.None);
         }
 
-        private static string CleanCodeOld(string text)
+        /// <summary>
+        /// Formats the specified lines to a <see cref="string" />.
+        /// </summary>
+        /// <param name="lines">The lines to format.</param>
+        /// <returns>A <see cref="string" />.</returns>
+        public static string ToText(this IEnumerable<string> lines)
         {
-            var input = text.Split('\n');
-            var output = new StringBuilder();
-
-            int end;
-
-            // Remove blank lines at end of file
-            // http://stylecop.soyuz5.com/SA1518.html
-            for (end = input.Length - 1; end >= 0; end--)
+            var sb = new StringBuilder();
+            foreach (var line in lines)
             {
-                if (!string.IsNullOrWhiteSpace(input[end]))
+                if (sb.Length > 0)
                 {
-                    break;
-                }
-            }
-
-            int start;
-
-            // remove blank lines at start of file
-            // http://stylecop.soyuz5.com/SA1517.html
-            for (start = 0; start < end; start++)
-            {
-                if (!string.IsNullOrWhiteSpace(input[start]))
-                {
-                    break;
+                    sb.AppendLine();
                 }
 
+                sb.Append(line);
             }
 
-            string previousLine = null;
+            return sb.ToString();
+        }
 
-            for (int i = start; i <= end; i++)
+        /// <summary>
+        /// Cleans the code.
+        /// </summary>
+        /// <param name="code">The code to clean.</param>
+        /// <returns>The cleaned code.</returns>
+        public static string CleanCode(string code)
+        {
+            return code
+                .ToLines()
+                .TrimLineEnds()
+                .ReplaceTabs()
+                .RemoveDoubleNewLines()
+                .RemoveRegions()
+                .CleanComments()
+                .ToText()
+                .Trim();
+        }
+
+        public static IEnumerable<string> TrimLineEnds(this IEnumerable<string> lines)
+        {
+            return lines.Select(l => l.StartsWith("// ") ? l : l.TrimEnd());
+        }
+
+        public static IEnumerable<string> ReplaceTabs(this IEnumerable<string> lines)
+        {
+            return lines.Select(l => l.Replace("\t", "    "));
+        }
+
+        public static IEnumerable<string> RemoveDoubleNewLines(this IEnumerable<string> lines)
+        {
+            // TODO: do not change inside strings...
+
+            bool previousLineWasEmpty = false;
+            foreach (var line in lines)
             {
-                var thisline = input[i];
-                var nextline = i + 1 < end ? input[i + 1] : null;
-
-                if (cleanRegions && RegionExpression.Match(thisline).Success)
+                var thisLineIsEmpty = line.Length == 0;
+                if (previousLineWasEmpty && thisLineIsEmpty)
                 {
+                    continue;
+                }
 
-                    // skip the following blank line
-                    if (string.IsNullOrWhiteSpace(nextline))
+                previousLineWasEmpty = thisLineIsEmpty;
+
+                yield return line;
+            }
+        }
+
+        public static IEnumerable<string> RemoveRegions(this IEnumerable<string> lines)
+        {
+            return lines.Where(l => !Regex.Match(l, @"\w*#(?:end)?region").Success);
+        }
+
+        public static IEnumerable<string> CleanComments(this IEnumerable<string> lines)
+        {
+            var commentExpression = new Regex(@"\s+///\s", RegexOptions.Compiled);
+            var comments = new StringBuilder();
+            string prefix = null;
+            foreach (var line in lines)
+            {
+                var match = commentExpression.Match(line);
+                if (match.Success)
+                {
+                    prefix = line.Substring(0, match.Length);
+                    comments.AppendLine(line.Substring(match.Length).Trim());
+                }
+                else
+                {
+                    if (prefix != null)
                     {
-                        i++;
+                        var documentationComments = new DocumentationComments(comments.ToString(), line);
+                        foreach (var c in documentationComments.ToString().ToLines())
+                        {
+                            yield return prefix + c;
+                        }
+
+                        comments.Clear();
+                        prefix = null;
                     }
 
-                    continue;
+                    yield return line;
                 }
-
-                // Remove duplicate lines containing "/// Initializes a new instance of the"
-                if (cleanSummary && previousLine != null && previousLine.Contains(ConstructorSummarySubString)
-                    && thisline.Contains(ConstructorSummarySubString))
-                {
-                    continue;
-                }
-
-                // remove double blank lines
-                // http://stylecop.soyuz5.com/SA1507.html
-                if (string.IsNullOrWhiteSpace(thisline) && string.IsNullOrWhiteSpace(previousLine))
-                {
-                    continue;
-                }
-
-                // remove empty remarks comments
-                if (nextline != null && Regex.IsMatch(thisline, @"^\s*///\s<remarks>\s*$")
-                    && Regex.IsMatch(nextline, @"^\s*///\s</remarks>\s*$"))
-                {
-                    i++;
-                    continue;
-                }
-
-                if (Regex.IsMatch(thisline, @"^\s*///\s*<remarks>\s*</remarks>\s*$"))
-                {
-                    continue;
-                }
-
-                // trim whitespace
-                var trimmed1 = Regex.Replace(thisline, @"///\s+(?=[^<])", indentSummary ? "///     " : "/// ");
-                if (!string.Equals(trimmed1, thisline))
-                {
-                }
-
-                // trim the end
-                var trimmed = trimmed1.TrimEnd();
-                if (!string.Equals(trimmed, thisline))
-                {
-                }
-
-                if (output.Length > 0)
-                {
-                    output.AppendLine();
-                }
-
-                output.Append(trimmed);
-                previousLine = trimmed;
             }
-
-            return output.ToString();
         }
     }
 }
