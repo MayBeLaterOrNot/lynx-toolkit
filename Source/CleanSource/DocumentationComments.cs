@@ -80,7 +80,9 @@
         /// <summary>
         /// Returns a <see cref="System.String" /> that represents this instance.
         /// </summary>
-        /// <returns>A <see cref="System.String" /> that represents this instance.</returns>
+        /// <returns>
+        /// A <see cref="System.String" /> that represents this instance.
+        /// </returns>
         public override string ToString()
         {
             var sb = new StringBuilder();
@@ -108,7 +110,9 @@
 
             if (this.Returns != null)
             {
-                sb.AppendLine("<returns>" + this.Returns + "</returns>");
+                sb.AppendLine("<returns>");
+                sb.AppendLine(this.Returns);
+                sb.AppendLine("</returns>");
             }
 
             foreach (var e in this.SeeAlsoComments)
