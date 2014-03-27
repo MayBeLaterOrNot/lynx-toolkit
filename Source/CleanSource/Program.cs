@@ -69,6 +69,12 @@ namespace CleanSource
         private static string exclude;
 
         /// <summary>
+        /// The line endings in the output files.
+        /// </summary>
+        /// <remarks>If set to <c>null</c>, the line ending will be detected from the input file.</remarks>
+        private static string lineEndings = null;
+
+        /// <summary>
         /// The main entry point of the program.
         /// </summary>
         /// <param name="args">The args.</param>
@@ -132,7 +138,8 @@ namespace CleanSource
             fileCount++;
 
             var input = File.ReadAllText(file);
-            var output = CleanCode(input);
+            var eol = lineEndings ?? GetLineEnding(input);
+            var output = CleanCode(input, eol);
 
             if (!string.Equals(input, output))
             {
@@ -155,10 +162,35 @@ namespace CleanSource
         }
 
         /// <summary>
+        /// Gets the line ending from the specified input text.
+        /// </summary>
+        /// <param name="input">The text to evaluate.</param>
+        /// <returns>The line ending.</returns>
+        public static string GetLineEnding(string input)
+        {
+            const string WindowsLineEnding = "\r\n"; // CR LF
+            const string EarlyMacLineEnding = "\r"; // CR
+            const string UnixLineEnding = "\n"; // LF
+            if (input.Contains(WindowsLineEnding))
+            {
+                return WindowsLineEnding;
+            }
+
+            if (input.Contains(EarlyMacLineEnding))
+            {
+                return EarlyMacLineEnding;
+            }
+
+            return UnixLineEnding;
+        }
+
+        /// <summary>
         /// Splits the specified code to lines.
         /// </summary>
         /// <param name="text">The code.</param>
-        /// <returns>A sequence of strings.</returns>
+        /// <returns>
+        /// A sequence of lines.
+        /// </returns>
         public static IEnumerable<string> ToLines(this string text)
         {
             var newLineSeparators = new[] { "\r\n", "\n", "\r" };
@@ -169,15 +201,18 @@ namespace CleanSource
         /// Formats the specified lines to a <see cref="string" />.
         /// </summary>
         /// <param name="lines">The lines to format.</param>
-        /// <returns>A <see cref="string" />.</returns>
-        public static string ToText(this IEnumerable<string> lines)
+        /// <param name="lineEnding">The line ending.</param>
+        /// <returns>
+        /// A <see cref="string" />.
+        /// </returns>
+        public static string ToText(this IEnumerable<string> lines, string lineEnding = "\r\n")
         {
             var sb = new StringBuilder();
             foreach (var line in lines)
             {
                 if (sb.Length > 0)
                 {
-                    sb.AppendLine();
+                    sb.Append(lineEnding);
                 }
 
                 sb.Append(line);
@@ -190,34 +225,50 @@ namespace CleanSource
         /// Cleans the code.
         /// </summary>
         /// <param name="code">The code to clean.</param>
+        /// <param name="lineEnding">The line endings.</param>
         /// <returns>The cleaned code.</returns>
-        public static string CleanCode(string code)
+        public static string CleanCode(string code, string lineEnding = "\r\n")
         {
-            return code
+            return
+                code
                 .ToLines()
                 .TrimLineEnds()
                 .ReplaceTabs()
                 .RemoveDoubleNewLines()
                 .RemoveRegions()
                 .CleanComments()
-                .ToText()
+                .ToText(lineEnding)
                 .Trim();
         }
 
+        /// <summary>
+        /// Removes the line ends from a sequence of lines.
+        /// </summary>
+        /// <param name="lines">The lines.</param>
+        /// <returns>A sequence of cleaned up lines.</returns>
         public static IEnumerable<string> TrimLineEnds(this IEnumerable<string> lines)
         {
             return lines.Select(l => l.StartsWith("// ") ? l : l.TrimEnd());
         }
 
+        /// <summary>
+        /// Removes the tabs from a sequence of lines.
+        /// </summary>
+        /// <param name="lines">The lines.</param>
+        /// <returns>A sequence of cleaned up lines.</returns>
         public static IEnumerable<string> ReplaceTabs(this IEnumerable<string> lines)
         {
             return lines.Select(l => l.Replace("\t", "    "));
         }
 
+        /// <summary>
+        /// Removes the double new lines from a sequence of lines.
+        /// </summary>
+        /// <param name="lines">The lines.</param>
+        /// <returns>A sequence of cleaned up lines.</returns>
         public static IEnumerable<string> RemoveDoubleNewLines(this IEnumerable<string> lines)
         {
             // TODO: do not change inside strings...
-
             bool previousLineWasEmpty = false;
             foreach (var line in lines)
             {
@@ -233,11 +284,21 @@ namespace CleanSource
             }
         }
 
+        /// <summary>
+        /// Removes the #regions from a sequence of lines.
+        /// </summary>
+        /// <param name="lines">The lines.</param>
+        /// <returns>A sequence of cleaned up lines.</returns>
         public static IEnumerable<string> RemoveRegions(this IEnumerable<string> lines)
         {
             return lines.Where(l => !Regex.Match(l, @"\w*#(?:end)?region").Success);
         }
 
+        /// <summary>
+        /// Cleans the XML documentation comments from a sequence of lines.
+        /// </summary>
+        /// <param name="lines">The lines.</param>
+        /// <returns>A sequence of cleaned up lines.</returns>
         public static IEnumerable<string> CleanComments(this IEnumerable<string> lines)
         {
             var commentExpression = new Regex(@"\s+///\s", RegexOptions.Compiled);
