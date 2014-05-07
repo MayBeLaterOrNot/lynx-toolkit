@@ -1,0 +1,165 @@
+body {
+    font-family: 'Segoe UI', Verdana, Arial;
+    font-size: 0.8em;
+    max-width:60em;
+}
+
+p .key {
+  border: solid 1px black;
+  border-radius: 3px;
+  padding: 0px 4px 0px 4px;
+  background: lightgray;
+}
+
+p .command {
+  font-weight: bold;
+  font-style: italic;
+}
+
+p .file {
+    background: black;
+    color: white;
+    padding: 0px 2px 0px 2px;
+    font-weight: bold;
+    font-family: 'Courier New';    
+}
+
+code {
+  font-family: Consolas, 'Courier New';
+}
+
+blockquote {
+    border-left: dotted 1px gray;
+    padding-left: 4pt;
+}
+
+/* C# */
+
+code .string {
+  color: #A31515;
+}
+
+code .keyword {
+  color: blue;
+}
+
+code .comment {
+  color: #008000;
+}
+
+code .doc {
+  color: gray;
+}
+
+/* XML */
+code .tag {
+  color: blue;
+}
+
+code .name {
+  color: #A31515;
+}
+
+code .key {
+  color: red;
+}
+
+code .value {
+  color: blue;
+}
+
+pre  {
+  border-left: dotted 1px gray;
+  border: solid 1px black;
+  background: #ffffe0;
+  padding: 6pt;
+}
+
+
+h1, h2 {
+    font-weight: bold;
+    color: #3F529C;
+}
+
+h1 {
+    font-size: 2em;
+}
+
+h2 {
+    font-size: 1.6em;
+}
+
+h3 {
+    font-size: 1.2em;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+td, th {
+    border: solid 1px #BBB;
+    padding: 4px;
+    vertical-align: top;
+}
+
+.api table {
+    width:100%;
+}
+
+.api td:first-child {
+    word-break: break-all;
+    width:25%;
+}
+
+th {
+    background-color: #E5E5E5;
+    text-align: left;
+}
+
+footer {
+    color: gray;
+    margin-top:0.8em;
+    border-top: solid 1px gray;
+}
+
+.figure {
+  border: none; 
+  padding: 2pt;
+  margin: 4pt;
+}
+
+.style111 td, .style12 td, .style21 td, .style11 td {
+  border: none;
+}
+
+.caption {
+  text-align: center;
+  font-style: italic;
+}
+
+.style12 td:first-child {
+  width:34%;
+padding-right: 2%;
+}
+
+.style21 td:first-child {
+  width:66%;
+  padding-right: 2%;
+}
+
+.style11 td:first-child {
+  width:51%;
+  padding-right:2%;
+}
+
+.style11 img, .style12 img, .style21 img, .style111 img {
+  max-width: 100%;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.figure {
+    text-align: center;
+}

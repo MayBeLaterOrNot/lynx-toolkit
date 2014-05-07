@@ -1,0 +1,14 @@
+<WikiProject>
+  <Format>html</Format>
+  <Template>ExampleTemplate.html</Template>
+  <LocalLinks>{0}.html</LocalLinks>
+  <Input>*.wiki</Input>
+  <Scc>p4</Scc>
+  <Output>.</Output>
+  <Variables>
+    <Variable Key="version">1.0</Variable>
+  </Variables>
+  <Defines>
+    <Define>ONLINE</Define>
+  </Defines>
+</WikiProject>

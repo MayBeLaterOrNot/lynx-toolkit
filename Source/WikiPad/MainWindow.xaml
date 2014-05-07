@@ -1,0 +1,68 @@
+﻿<Window x:Class="WikiPad.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:local="clr-namespace:WikiPad"
+        Title="{Binding Title}" Icon="Lynx_64.png" Height="800" Width="1200" Closing="Window_Closing" Closed="Window_Closed"
+        >
+    <Window.Resources>
+        <local:BooleanToFontWeight x:Key="BooleanToFontWeight"/>
+        <local:VisibilityConverter x:Key="VisibilityConverter"/>
+        <Style TargetType="Menu">
+            <Setter Property="Background" Value="LightGray"/>
+        </Style>
+    </Window.Resources>
+    <Window.InputBindings>
+        <KeyBinding Key="S" Modifiers="Control" Command="{Binding SaveCommand}"/>
+        <KeyBinding Key="S" Modifiers="Control+Shift" Command="{Binding SaveAllCommand}"/>
+        <KeyBinding Key="E" Modifiers="Control" Command="{Binding ExploreCommand}"/>
+        <KeyBinding Key="Enter" Command="{Binding OpenExternalEditorCommand}"/>
+    </Window.InputBindings>
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="File">
+                <MenuItem Header="Open project..." Command="{Binding OpenProjectCommand}"/>
+                <Separator/>
+                <MenuItem Header="Revert changes" Command="{Binding RevertCommand}"/>
+                <MenuItem Header="Save" Command="{Binding SaveCommand}" InputGestureText="Ctrl+S"/>
+                <Separator/>
+                <MenuItem Header="Save all" Command="{Binding SaveAllCommand}" InputGestureText="Ctrl+Shift+S"/>
+                <Separator/>
+                <MenuItem Header="Open in external program..." Command="{Binding OpenExternalEditorCommand}" InputGestureText="Enter"/>
+                <MenuItem Header="Explore..." Command="{Binding ExploreCommand}" InputGestureText="Ctrl+E"/>
+                <Separator/>
+                <MenuItem Header="Exit" Command="{Binding ExitCommand}" InputGestureText="Alt+F4"/>
+            </MenuItem>
+        </Menu>
+        <ToolBar DockPanel.Dock="Top" Visibility="Collapsed">
+            <Button Content="Open project..." Command="{Binding OpenProjectCommand}"/>
+            <Separator/>
+            <Button Content="Revert changes" Command="{Binding RevertCommand}"/>
+            <Separator/>
+            <Button Content="Save" Command="{Binding SaveCommand}"/>
+            <Separator/>
+            <Button Content="Save all" Command="{Binding SaveAllCommand}"/>
+        </ToolBar>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="200px"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <ListBox SelectedItem="{Binding SelectedDocument}" ItemsSource="{Binding Project.Documents}" IsSynchronizedWithCurrentItem="False" BorderThickness="0">
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="local:WikiDocument">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding FileName}" FontWeight="{Binding IsModified, Converter={StaticResource BooleanToFontWeight}}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <TextBox Grid.Column="1" AcceptsReturn="True" FontFamily="Consolas" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" FontSize="13" BorderThickness="1 0 1 0" Text="{Binding Input, UpdateSourceTrigger=PropertyChanged}"/>
+            <DockPanel Grid.Column="2">
+                <TextBlock DockPanel.Dock="Top" Margin="4" TextWrapping="Wrap" Text="{Binding ErrorMessage}" IsHitTestVisible="False" Foreground="Red" Visibility="{Binding ErrorMessage, Converter={StaticResource VisibilityConverter}}"/>
+                <WebBrowser local:WebBrowserBehavior.Source="{Binding OutputSource}" LoadCompleted="WebBrowser_OnLoadCompleted" />
+            </DockPanel>
+            <GridSplitter Width="4" VerticalAlignment="Stretch" Background="Transparent"/>
+            <GridSplitter Grid.Column="1" Width="4" VerticalAlignment="Stretch" Background="Transparent"/>
+        </Grid>
+    </DockPanel>
+</Window>

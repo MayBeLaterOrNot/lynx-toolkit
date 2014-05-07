@@ -1,0 +1,449 @@
+﻿<!DOCTYPE html>
+<html>
+    <head>
+        <title>Lynx Toolkit Document model</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta http-equiv="Content-Style-Type" content="text/css" />
+        <link rel="stylesheet" href="style.css" />
+        <style type="text/css" media="screen,projection"><!--@import url("style.css");--></style>
+    </head>
+    <body>
+    <h1>Lynx Toolkit Document model</h1>
+    <h2>Introduction</h2>
+    <h3>Document model</h3>
+    <p>The document model is influenced by HTML and FlowDocument.</p>
+    <h3>Wiki syntax</h3>
+    <p>The "OWiki" syntax was designed to be easy and efficient to parse. It was influenced by Markdown, Creole and Confluence, but the syntax is stricter.</p>
+    <h3>Output formats</h3>
+    <p>The document model can be formatted to the following formats</p>
+    <ul>
+      <li>OWiki</li>
+      <li>Markdown wiki</li>
+      <li>Creole wiki</li>
+      <li>Confluence wiki</li>
+      <li>Codeplex wiki</li>
+      <li>XHtml</li>
+      <li>FlowDocument</li>
+      <li>OpenXML (Word)</li>
+    </ul>
+    <h2>Examples</h2>
+    <h3>Headings</h3>
+    <p>Headings are prefixed with <code>=</code> characters as in Creole. Note that the headings should not be suffixed by <code>=</code>.The markdown syntax was not chosen because it is more difficult to implement in the parser.</p>
+    <h3>Paragraphs</h3>
+    <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diamnonummy nibh euismod tincidunt ut laoreet dolore magna aliquam eratvolutpat.</p>
+    <p>Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorpersuscipit lobortis nisl ut aliquip ex ea commodo consequat.</p>
+    <h3>Line breaks</h3>
+    <p>Two backslashes defines a line break.<br />Lorem ipsum dolor sit amet,<br />consectetuer adipiscing elit,<br />sed diam nonummy</p>
+    <h3>Horizontal ruler</h3>
+    <p>Use three or more hyphens to add a horizontal ruler:</p>
+    <hr />
+    <hr />
+    <h3>Emphasized (italic) text</h3>
+    <p>Lorem <em>ipsum</em> dolor sit amet</p>
+    <h3>Strong (bold) text</h3>
+    <p>Lorem <strong>ipsum</strong> dolor sit amet</p>
+    <h3>Links</h3>
+    <p>
+      <a href="http://www.google.com">www.google.com</a>
+      <br />
+      <a href="http://www.google.com">google</a>  </p>
+    <h3>
+      <a name="name1" /> Anchors</h3>
+    <ul>
+      <li>Anchor defined <a name="name2" /> in text</li>
+      <li>
+        <a href="#name1.html">Go to anchor</a>
+      </li>
+    </ul>
+    <h3>Images</h3>
+    <p>
+      <div class="figure">
+        <img src="lorem.jpg" alt="" />
+      </div>  <div class="figure"><img src="lorem.jpg" alt="alternative text" /><div class="caption">alternative text</div></div>  <a href="http://www.google.com"><div class="figure"><img src="lorem.jpg" alt="alt text" /><div class="caption">alt text</div></div></a></p>
+    <h3>Unordered List</h3>
+    <ul>
+      <li>consectetuer adipiscing elit</li>
+      <li>sed diam nonummy</li>
+      <li>Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.</li>
+      <li>Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy</li>
+    </ul>
+    <h3>Ordered list</h3>
+    <ol>
+      <li>First</li>
+      <li>Second</li>
+      <li>Third</li>
+    </ol>
+    <h3>Table</h3>
+    <table>
+      <tr>
+        <th>header1 </th>
+        <th>header2  </th>
+        <th>header 3 </th>
+      </tr>
+      <tr>
+        <td>cell A1  </td>
+        <td>cell B1  </td>
+        <td>cell C1 </td>
+      </tr>
+      <tr>
+        <td>cell A2  </td>
+        <td>cell B2  </td>
+        <td>cell C2 </td>
+      </tr>
+    </table>
+    <h3>Table with column span</h3>
+    <table>
+      <tr>
+        <td>cell 1</td>
+        <td>cell2</td>
+      </tr>
+      <tr>
+        <td colspan="2">cell 3</td>
+      </tr>
+    </table>
+    <h3>Table with row span</h3>
+    <table>
+      <tr>
+        <td rowspan="2">cell 1</td>
+        <td>cell2</td>
+      </tr>
+      <tr>
+        <td>cell3</td>
+      </tr>
+    </table>
+    <h3>Quote</h3>
+    <blockquote>
+      <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummynibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.Lorem ipsum dolor sit amet,  consectetuer adipiscing elit,  sed diam nonummy</p>
+    </blockquote>
+    <h3>Code (C#)</h3>
+    <pre><code>code line 1
+code line 2</code></pre>
+    <h3>Code (xml)</h3>
+    <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+<span class="tag">&lt;</span><span class="name">xml</span><span class="key"> a</span><span class="value">="b"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;</span><span class="name">c</span><span class="tag">&gt;</span>d<span class="tag">&lt;/</span><span class="name">c</span><span class="tag">&gt;</span>
+<span class="tag">&lt;/</span><span class="name">xml</span><span class="tag">&gt;</span></code></pre>
+    <h3>Included code (xml)</h3>
+    <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+<span class="tag">&lt;</span><span class="name">xml</span><span class="key"> a</span><span class="value">="b"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;</span><span class="name">c</span><span class="tag">&gt;</span>d<span class="tag">&lt;/</span><span class="name">c</span><span class="tag">&gt;</span>
+<span class="tag">&lt;/</span><span class="name">xml</span><span class="tag">&gt;</span></code></pre>
+    <h3>Code (html)</h3>
+    <pre><code>&lt;!doctype html&gt;
+<span class="tag">&lt;</span><span class="name">html</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;</span><span class="name">body</span><span class="tag">&gt;</span>Hello<span class="tag">&lt;/</span><span class="name">body</span><span class="tag">&gt;</span>
+<span class="tag">&lt;/</span><span class="name">html</span><span class="tag">&gt;</span></code></pre>
+    <h3>Inline code</h3>
+    <p>Lorem <code>ipsum</code> dolor sit amet</p>
+    <h3>Equations</h3>
+    <p>Equations are written in <a href="http://en.wikipedia.org/wiki/TeX">TeX</a> syntax.Make sure <span class="file">latex.exe</span> and <span class="file">dvipng.exe</span> is in the <code>PATH</code> environment variable.If you install <a href="http://miktex.org">MiKTeX</a>, both programs will be available in your PATH.</p>
+    <p>
+      <img src="Example/Equation1.png" alt="Equation 1" />
+    </p>
+    <p>
+      <img src="Example/Equation2.png" alt="Equation 2" />
+    </p>
+    <p>
+      <img src="Example/Equation3.png" alt="Equation 3" />
+    </p>
+    <h3>Spans</h3>
+    <p>Press <span class="key">Ctrl</span>+<span class="key">C</span> to copy.Or select <span class="command">Edit | Copy</span> on the menu.</p>
+    <p>See <span class="file">ReadMe.txt</span> for more information.</p>
+    <h3>Style111</h3>
+    <div class="style111">
+      <table>
+        <tr>
+          <td>
+            <div class="figure">
+              <img src="lorem.jpg" alt="Caption 1." />
+              <div class="caption">Caption 1.</div>
+            </div> </td>
+          <td>
+            <div class="figure">
+              <img src="lorem.jpg" alt="Caption 2." />
+              <div class="caption">Caption 2.</div>
+            </div> </td>
+          <td>
+            <div class="figure">
+              <img src="lorem.jpg" alt="Caption 3." />
+              <div class="caption">Caption 3.</div>
+            </div> </td>
+        </tr>
+      </table>
+    </div>
+    <h3>Style12</h3>
+    <div class="style12">
+      <table>
+        <tr>
+          <td>
+            <div class="figure">
+              <img src="lorem.jpg" alt="Image 1." />
+              <div class="caption">Image 1.</div>
+            </div>
+            <br />
+            <div class="figure">
+              <img src="lorem.jpg" alt="Image 2." />
+              <div class="caption">Image 2.</div>
+            </div> </td>
+          <td>Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Typi non habent claritatem insitam; est usus legentis in iis qui facit eorum claritatem. Investigationes demonstraverunt lectores legere me lius quod ii legunt saepius. Claritas est etiam processus dynamicus, qui sequitur mutationem consuetudium lectorum. Mirum est notare quam littera gothica, quam nunc putamus parum claram, anteposuerit litterarum formas humanitatis per seacula quarta decima et quinta decima. Eodem modo typi, qui nunc nobis videntur parum clari, fiant sollemnes in futurum. </td>
+        </tr>
+      </table>
+    </div>
+    <h3>Style21</h3>
+    <div class="style21">
+      <table>
+        <tr>
+          <td>
+            <div class="figure">
+              <img src="lorem.jpg" alt="Image 1." />
+              <div class="caption">Image 1.</div>
+            </div>
+            <br />
+            <div class="figure">
+              <img src="lorem.jpg" alt="Image 2." />
+              <div class="caption">Image 2.</div>
+            </div> </td>
+          <td>Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Typi non habent claritatem insitam; est usus legentis in iis qui facit eorum claritatem. Investigationes demonstraverunt lectores legere me lius quod ii legunt saepius. Claritas est etiam processus dynamicus, qui sequitur mutationem consuetudium lectorum. Mirum est notare quam littera gothica, quam nunc putamus parum claram, anteposuerit litterarum formas humanitatis per seacula quarta decima et quinta decima. Eodem modo typi, qui nunc nobis videntur parum clari, fiant sollemnes in futurum. </td>
+        </tr>
+      </table>
+    </div>
+    <h3>Style11</h3>
+    <div class="style11">
+      <table>
+        <tr>
+          <td>
+            <div class="figure">
+              <img src="lorem.jpg" alt="Image 1." />
+              <div class="caption">Image 1.</div>
+            </div>
+            <br />
+            <div class="figure">
+              <img src="lorem.jpg" alt="Image 2." />
+              <div class="caption">Image 2.</div>
+            </div> </td>
+          <td>Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Typi non habent claritatem insitam; est usus legentis in iis qui facit eorum claritatem. Investigationes demonstraverunt lectores legere me lius quod ii legunt saepius. Claritas est etiam processus dynamicus, qui sequitur mutationem consuetudium lectorum. Mirum est notare quam littera gothica, quam nunc putamus parum claram, anteposuerit litterarum formas humanitatis per seacula quarta decima et quinta decima. Eodem modo typi, qui nunc nobis videntur parum clari, fiant sollemnes in futurum. </td>
+        </tr>
+      </table>
+    </div>
+    <h3>Special characters</h3>
+    <table>
+      <tr>
+        <td>(C) / (c) </td>
+        <td>© </td>
+        <td>Copyright </td>
+      </tr>
+      <tr>
+        <td>(R) / (r) </td>
+        <td>® </td>
+        <td>Registered trademark </td>
+      </tr>
+      <tr>
+        <td>(TM) / (tm)</td>
+        <td>™ </td>
+        <td>Trademark </td>
+      </tr>
+      <tr>
+        <td>3&gt;2 </td>
+        <td />
+        <td>Greater than </td>
+      </tr>
+      <tr>
+        <td>2&lt;3 </td>
+        <td />
+        <td>Less than </td>
+      </tr>
+      <tr>
+        <td>&amp; </td>
+        <td />
+        <td>This is not Ampère's and</td>
+      </tr>
+      <tr>
+        <td>... </td>
+        <td>… </td>
+        <td>Ellipsis</td>
+      </tr>
+      <tr>
+        <td>&lt;-&gt; -&gt; &lt;- </td>
+        <td>↔ → ← </td>
+        <td>Arrows</td>
+      </tr>
+      <tr>
+        <td>&lt;=&gt; =&gt; &lt;= </td>
+        <td>⇔ ⇒ ⇐ </td>
+        <td>Double arrows</td>
+      </tr>
+      <tr>
+        <td>1024×768 </td>
+        <td>1024 × 768  </td>
+        <td>Cross </td>
+      </tr>
+      <tr>
+        <td>-- --- </td>
+        <td>— – </td>
+        <td>Long dashes </td>
+      </tr>
+    </table>
+    <h3>Smileys</h3>
+    <table>
+      <tr>
+        <td>
+          <code>:)</code> </td>
+        <td>
+          <img src="Images/smile.png" alt="" /> </td>
+      </tr>
+      <tr>
+        <td>
+          <code>:(</code> </td>
+        <td>
+          <img src="Images/sad.png" alt="" /> </td>
+      </tr>
+      <tr>
+        <td>
+          <code>:P</code> </td>
+        <td>
+          <img src="Images/tongue.png" alt="" /> </td>
+      </tr>
+      <tr>
+        <td>
+          <code>:D</code> </td>
+        <td>
+          <img src="Images/biggrin.png" alt="" /> </td>
+      </tr>
+      <tr>
+        <td>
+          <code>;)</code> </td>
+        <td>
+          <img src="Images/wink.png" alt="" /> </td>
+      </tr>
+    </table>
+    <h3>Symbols</h3>
+    <table>
+      <tr>
+        <td>
+          <code>(*)</code> </td>
+        <td>
+          <img src="Images/star_yellow.png" alt="" /> </td>
+      </tr>
+      <tr>
+        <td>
+          <code>(i)</code> </td>
+        <td>
+          <img src="Images/information.png" alt="" /> </td>
+      </tr>
+      <tr>
+        <td>
+          <code>(/)</code> </td>
+        <td>
+          <img src="Images/check.png" alt="" /> </td>
+      </tr>
+      <tr>
+        <td>
+          <code>(x)</code> </td>
+        <td>
+          <img src="Images/error.png" alt="" /> </td>
+      </tr>
+      <tr>
+        <td>
+          <code>(!)</code> </td>
+        <td>
+          <img src="Images/warning.png" alt="" /> </td>
+      </tr>
+      <tr>
+        <td>
+          <code>(+)</code> </td>
+        <td>
+          <img src="Images/add.png" alt="" /> </td>
+      </tr>
+      <tr>
+        <td>
+          <code>(-)</code> </td>
+        <td>
+          <img src="Images/forbidden.png" alt="" /> </td>
+      </tr>
+      <tr>
+        <td>
+          <code>(?)</code> </td>
+        <td>
+          <img src="Images/help.png" alt="" /> </td>
+      </tr>
+      <tr>
+        <td>
+          <code>(_)</code> </td>
+        <td>
+          <img src="Images/under_construction.png" alt="" /> </td>
+      </tr>
+      <tr>
+        <td>
+          <code>(y)</code> </td>
+        <td>
+          <img src="Images/thumbs_up.png" alt="" /> </td>
+      </tr>
+      <tr>
+        <td>
+          <code>(n)</code> </td>
+        <td>
+          <img src="Images/thumbs_down.png" alt="" /> </td>
+      </tr>
+      <tr>
+        <td>
+          <code>(on)</code> </td>
+        <td>
+          <img src="Images/lightbulb_on.png" alt="" /> </td>
+      </tr>
+      <tr>
+        <td>
+          <code>(off)</code> </td>
+        <td>
+          <img src="Images/lightbulb.png" alt="" /> </td>
+      </tr>
+      <tr>
+        <td>
+          <code>(h)</code> </td>
+        <td>
+          <img src="Images/home.png" alt="" /> </td>
+      </tr>
+    </table>
+    <h3>Escaped characters</h3>
+    <p>\\ Not a new line<br />*Not emphasized*<br />**Not bold**<br />[Not link|not link]<br />  ---<br />=== Not a header<br />* Not a list<br /># Not an ordered list<br />||Not a table|<br />|Not a cell|<br /></p>
+    <h3>Syntax links</h3>
+    <ul>
+      <li>
+        <a href="http://en.wikipedia.org/wiki/Lightweight_markup_language">en.wikipedia.org/wiki/Lightweight_markup_language</a>
+      </li>
+      <li>
+        <a href="http://daringfireball.net/projects/markdown">daringfireball.net/projects/markdown</a>
+      </li>
+      <li>
+        <a href="http://github.github.com/github-flavored-markdown">github.github.com/github-flavored-markdown</a>
+      </li>
+      <li>
+        <a href="https://confluence.atlassian.com/display/BITBUCKET/Using+Wiki+Markup">confluence.atlassian.com/display/BITBUCKET/Using+Wiki+Markup</a>
+      </li>
+      <li>
+        <a href="http://codeplex.codeplex.com/wikipage?title=CodePlex%20Wiki%20Markup%20Guide">codeplex.codeplex.com/wikipage?title=CodePlex%20Wiki%20Markup%20Guide</a>
+      </li>
+      <li>
+        <a href="http://wikicreole.org">wikicreole.org</a>
+      </li>
+      <li>
+        <a href="http://en.wikipedia.org/wiki/Creole_%28markup%29">en.wikipedia.org/wiki/Creole_%28markup%29</a>
+      </li>
+      <li>
+        <a href="http://code.google.com/p/support/wiki/WikiSyntax">code.google.com/p/support/wiki/WikiSyntax</a>
+      </li>
+      <li>
+        <a href="http://www.mediawiki.org/wiki/Help:Contents">www.mediawiki.org/wiki/Help:Contents</a>
+      </li>
+      <li>
+        <a href="http://en.wikipedia.org/wiki/Wikipedia:Cheatsheet">en.wikipedia.org/wiki/Wikipedia:Cheatsheet</a>
+      </li>
+      <li>
+        <a href="https://confluence.atlassian.com/display/DOC/Confluence+Wiki+Markup">confluence.atlassian.com/display/DOC/Confluence+Wiki+Markup</a>
+      </li>
+      <li>
+        <a href="http://en.wikipedia.org/wiki/Textile_(markup_language)">en.wikipedia.org/wiki/Textile_(markup_language)</a>
+      </li>
+    </ul>
+        <footer><p>Example version 1.0<br/>© Lynx Toolkit.</p></footer>
+    </body>
+</html>

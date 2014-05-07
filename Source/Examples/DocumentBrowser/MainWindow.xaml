@@ -1,0 +1,79 @@
+﻿<Window x:Class="DocumentBrowser.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:local="clr-namespace:DocumentBrowser"
+        Title="DocumentBrowser" Icon="Lynx_64.png" Height="900" Width="1200">
+    <Window.Resources>
+        <Style TargetType="TextBox">
+            <Setter Property="AcceptsReturn" Value="True"/>
+            <Setter Property="FontFamily" Value="Consolas"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
+        </Style>
+    </Window.Resources>
+    <DockPanel>
+        <Menu DockPanel.Dock="Top" Background="#EFEFF2">
+            <MenuItem Header="FILE">
+                <MenuItem Header="New" Command="ApplicationCommands.New"/>
+                <MenuItem Header="Open..."  Command="ApplicationCommands.Open"/>
+                <MenuItem Header="Close"  Command="ApplicationCommands.Close"/>
+                <MenuItem Header="Save"  Command="ApplicationCommands.Save"/>
+                <MenuItem Header="Save as..."  Command="ApplicationCommands.SaveAs"/>
+                <Separator/>
+                <MenuItem Header="Exit"  Command="local:ApplicationCommands.Exit"/>
+            </MenuItem>
+            <MenuItem Header="EDIT">
+            </MenuItem>
+            <MenuItem Header="VIEW">
+            </MenuItem>
+            <MenuItem Header="EDIT">
+                <MenuItem Header="Export to HTML"/>
+                <MenuItem Header="Export to Word"/>
+            </MenuItem>
+        </Menu>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="3*"/>
+            </Grid.ColumnDefinitions>
+            <TextBox Text="{Binding Input, UpdateSourceTrigger=PropertyChanged}"/>
+            <TabControl Grid.Column="1">
+                <TabItem Header="Wiki">
+                    <TextBox Text="{Binding Wiki}"/>
+                </TabItem>
+                <TabItem Header="Wiki (from html)">
+                    <TextBox Text="{Binding Wiki2}"/>
+                </TabItem>
+                <TabItem Header="Wiki (Creole)">
+                    <TextBox Text="{Binding WikiCreole}"/>
+                </TabItem>
+                <TabItem Header="Wiki (Markdown)">
+                    <TextBox Text="{Binding WikiMarkdown}"/>
+                </TabItem>
+                <TabItem Header="Wiki (Confluence)">
+                    <TextBox Text="{Binding WikiConfluence}"/>
+                </TabItem>
+                <TabItem Header="Wiki (Codeplex)">
+                    <TextBox Text="{Binding WikiCodeplex}"/>
+                </TabItem>
+                <TabItem Header="Document">
+                    <TextBox Text="{Binding Document}"/>
+                </TabItem>
+                <TabItem Header="Document (json)">
+                    <TextBox Text="{Binding DocumentJSON}"/>
+                </TabItem>
+                <TabItem Header="Html (source)">
+                    <TextBox Text="{Binding Html}"/>
+                </TabItem>
+                <TabItem Header="Html">
+                    <WebBrowser local:WebBrowserBehavior.Html="{Binding Html}"/>
+                </TabItem>
+                <TabItem Header="FlowDocument">
+                    <FlowDocumentScrollViewer Document="{Binding FlowDocument}" />
+                </TabItem>
+            </TabControl>
+            <GridSplitter Width="4" Background="Transparent"/>
+        </Grid>
+    </DockPanel>
+</Window>

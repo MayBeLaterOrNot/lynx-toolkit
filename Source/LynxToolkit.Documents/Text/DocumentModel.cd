@@ -1,0 +1,270 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="LynxToolkit.Documents.Section" Collapsed="true">
+    <Position X="4" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DocumentModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LynxToolkit.Documents.ContentBlock" Collapsed="true">
+    <Position X="5.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DocumentModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LynxToolkit.Documents.Header" Collapsed="true">
+    <Position X="5.75" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAA=</HashCode>
+      <FileName>DocumentModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LynxToolkit.Documents.CodeBlock" Collapsed="true">
+    <Position X="7.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAA=</HashCode>
+      <FileName>DocumentModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LynxToolkit.Documents.List" Collapsed="true">
+    <Position X="11" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DocumentModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LynxToolkit.Documents.Table" Collapsed="true">
+    <Position X="14.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DocumentModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LynxToolkit.Documents.ListItem" Collapsed="true">
+    <Position X="12.25" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DocumentModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LynxToolkit.Documents.TableRow" Collapsed="true">
+    <Position X="14.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DocumentModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LynxToolkit.Documents.TableCell" Collapsed="true">
+    <Position X="14.5" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAgAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DocumentModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LynxToolkit.Documents.Run" Collapsed="true">
+    <Position X="1.5" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAA=</HashCode>
+      <FileName>DocumentModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LynxToolkit.Documents.InlineContent" Collapsed="true">
+    <Position X="6.75" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DocumentModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LynxToolkit.Documents.InlineCode" Collapsed="true">
+    <Position X="3.25" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAA=</HashCode>
+      <FileName>DocumentModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LynxToolkit.Documents.Hyperlink" Collapsed="true">
+    <Position X="6.75" Y="12.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAA=</HashCode>
+      <FileName>DocumentModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LynxToolkit.Documents.Item" Collapsed="true">
+    <Position X="11.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DocumentModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LynxToolkit.Documents.Document" Collapsed="true">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAEAAAAAAAgAEAIAIAAAAAAAEAAAQABEAAAAAAAiAA=</HashCode>
+      <FileName>DocumentModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LynxToolkit.Documents.StyleSheet" Collapsed="true">
+    <Position X="0.5" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>GAAIAAAAAAAAAAAgAAAAAEAQACAAAAAgAAAAAAQgAAA=</HashCode>
+      <FileName>DocumentModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LynxToolkit.Documents.Block" Collapsed="true">
+    <Position X="8.5" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DocumentModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LynxToolkit.Documents.HorizontalRuler" Collapsed="true">
+    <Position X="9.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DocumentModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LynxToolkit.Documents.NonBreakingSpace" Collapsed="true">
+    <Position X="8.5" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DocumentModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LynxToolkit.Documents.Paragraph" Collapsed="true">
+    <Position X="4" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DocumentModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LynxToolkit.Documents.Quote" Collapsed="true">
+    <Position X="7.5" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DocumentModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LynxToolkit.Documents.TableOfContents" Collapsed="true">
+    <Position X="0.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DocumentModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LynxToolkit.Documents.Index" Collapsed="true">
+    <Position X="2.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DocumentModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LynxToolkit.Documents.OrderedList" Collapsed="true">
+    <Position X="11.75" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DocumentModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LynxToolkit.Documents.UnorderedList" Collapsed="true">
+    <Position X="10" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DocumentModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LynxToolkit.Documents.DefinitionList" Collapsed="true">
+    <Position X="12.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DocumentModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LynxToolkit.Documents.DefinitionItem" Collapsed="true">
+    <Position X="10.5" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DocumentModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LynxToolkit.Documents.DefinitionTerm" Collapsed="true">
+    <Position X="9.5" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DocumentModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LynxToolkit.Documents.DefinitionDescription" Collapsed="true">
+    <Position X="11.25" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DocumentModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LynxToolkit.Documents.TableHeaderCell" Collapsed="true">
+    <Position X="14.5" Y="6.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DocumentModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LynxToolkit.Documents.Style" Collapsed="true">
+    <Position X="0.5" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAADAgAAEAAgAAgFAAAgAAAAAAAAEAAAIgAAAAEAA=</HashCode>
+      <FileName>DocumentModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LynxToolkit.Documents.Inline" Collapsed="true">
+    <Position X="8.5" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DocumentModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LynxToolkit.Documents.LineBreak" Collapsed="true">
+    <Position X="10.25" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DocumentModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LynxToolkit.Documents.Anchor" Collapsed="true">
+    <Position X="5" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DocumentModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LynxToolkit.Documents.Emphasized" Collapsed="true">
+    <Position X="5" Y="12.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DocumentModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LynxToolkit.Documents.Strong" Collapsed="true">
+    <Position X="8.5" Y="12.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DocumentModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LynxToolkit.Documents.Symbol" Collapsed="true">
+    <Position X="13.75" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DocumentModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LynxToolkit.Documents.Image" Collapsed="true">
+    <Position X="12" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAABAAgAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAA=</HashCode>
+      <FileName>DocumentModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
