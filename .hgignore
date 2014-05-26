@@ -37,6 +37,7 @@ Output/
 ClientBin/
 lib/
 Backup/
+*.sln.ide/
 
 Tools/    # Add manually
 
