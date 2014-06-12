@@ -5,13 +5,12 @@
     using NUnit.Framework;
 
     [TestFixture]
-    public class JsonFormatterTests
+    public class JsonFormatterTests : FormatterTests
     {
         [Test, ExpectedException]
         public void Format()
         {
-            var parser = new WikiParser(File.OpenRead);
-            var doc = parser.ParseFile(@"Input/Example.wiki");
+            var doc = LoadExample();
             var ms = new MemoryStream();
             var jf = new JsonFormatter();
             var json = jf.Format(doc);

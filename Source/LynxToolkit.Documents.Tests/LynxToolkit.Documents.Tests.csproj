@@ -58,16 +58,21 @@
     <Compile Include="Spreadsheet\WorkbookLibrary.cs" />
     <Compile Include="Spreadsheet\WorkbookTests.cs" />
     <Compile Include="Text\Formatters\FlowDocumentFormatterTests.cs" />
+    <Compile Include="Text\Formatters\FormatterTests.cs" />
     <Compile Include="Text\Formatters\HtmlFormatterTests.cs" />
     <Compile Include="Text\Formatters\JsonFormatterTests.cs" />
     <Compile Include="Text\Formatters\WikiFormatterTests.cs" />
     <Compile Include="Text\Formatters\XmlFormatterTests.cs" />
+    <Compile Include="Text\Parsers\MarkdownParserTests.cs" />
     <Compile Include="Text\Parsers\WikiParserTests.cs" />
     <Compile Include="Text\Utilities\XmlSyntaxHighligherTests.cs" />
     <Compile Include="Text\Utilities\CsSyntaxHighligherTests.cs" />
     <Compile Include="Utilities\JsonSerializerTests.cs" />
     <Compile Include="Utilities\PathUtilitiesTests.cs" />
     <Content Include="Input\Subfolder\Test.wiki">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Input\Template.docx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="Text\WikiTests.cs" />

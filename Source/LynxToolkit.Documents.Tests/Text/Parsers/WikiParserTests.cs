@@ -11,15 +11,19 @@
         [Test]
         public void ParseFile()
         {
-            var o2 = new WikiParser(File.OpenRead);
-            var model = o2.ParseFile(@"Input/Example.wiki");
+            const string FileName = @"Input/Example.wiki";
+            var parser = new WikiParser(File.OpenRead, Path.GetDirectoryName(FileName));
+            using (var stream = File.OpenRead(FileName))
+            {
+                parser.Parse(stream);
+            }
         }
 
         [Test]
         public void Header1()
         {
             var o2 = new WikiParser();
-            var model = o2.Parse("= Header 1");
+            var model = o2.ParseText("= Header 1");
             Assert.AreEqual(1, model.Blocks.Count);
             var h1 = model.Blocks[0] as Header;
             var r1 = h1.Content[0] as Run;
@@ -31,7 +35,7 @@
         public void Header2()
         {
             var o2 = new WikiParser();
-            var model = o2.Parse("\r\n== Header 2");
+            var model = o2.ParseText("\r\n== Header 2");
             Assert.AreEqual(1, model.Blocks.Count);
             var h1 = model.Blocks[0] as Header;
             var r1 = h1.Content[0] as Run;
@@ -43,7 +47,7 @@
         public void Header3()
         {
             var o2 = new WikiParser();
-            var model = o2.Parse("=== Header 3\r\n");
+            var model = o2.ParseText("=== Header 3\r\n");
             Assert.AreEqual(1, model.Blocks.Count);
             var h1 = model.Blocks[0] as Header;
             var r1 = h1.Content[0] as Run;
@@ -55,7 +59,7 @@
         public void Paragraph1()
         {
             var o2 = new WikiParser();
-            var model = o2.Parse("Paragraph 1");
+            var model = o2.ParseText("Paragraph 1");
             Assert.AreEqual(1, model.Blocks.Count);
             var p1 = model.Blocks[0] as Paragraph;
             Assert.AreEqual(1, p1.Content.Count);
@@ -67,7 +71,7 @@
         public void Paragraph2()
         {
             var o2 = new WikiParser();
-            var model = o2.Parse("\r\nParagraph 1");
+            var model = o2.ParseText("\r\nParagraph 1");
             Assert.AreEqual(1, model.Blocks.Count);
             var p1 = model.Blocks[0] as Paragraph;
             Assert.AreEqual(1, p1.Content.Count);
@@ -79,7 +83,7 @@
         public void Paragraph3()
         {
             var o2 = new WikiParser();
-            var model = o2.Parse("Paragraph 1\r\n");
+            var model = o2.ParseText("Paragraph 1\r\n");
             Assert.AreEqual(1, model.Blocks.Count);
             var p1 = model.Blocks[0] as Paragraph;
             Assert.AreEqual(1, p1.Content.Count);
@@ -91,7 +95,7 @@
         public void Paragraph4()
         {
             var o2 = new WikiParser();
-            var model = o2.Parse("Line 1 \r\nLine 2");
+            var model = o2.ParseText("Line 1 \r\nLine 2");
             Assert.AreEqual(1, model.Blocks.Count);
             var p1 = model.Blocks[0] as Paragraph;
             Assert.AreEqual(2, p1.Content.Count);
@@ -105,7 +109,7 @@
         public void Paragraph5()
         {
             var o2 = new WikiParser();
-            var model = o2.Parse("Paragraph 1\r\nLine 2\r\n\r\nParagraph 2");
+            var model = o2.ParseText("Paragraph 1\r\nLine 2\r\n\r\nParagraph 2");
 
             Assert.AreEqual(2, model.Blocks.Count);
             var p1 = model.Blocks[0] as Paragraph;
@@ -125,7 +129,7 @@
         public void ParagraphFollowedByCode()
         {
             var o2 = new WikiParser();
-            var model = o2.Parse("Line 1 \r\n```\r\ncode\r\n```");
+            var model = o2.ParseText("Line 1 \r\n```\r\ncode\r\n```");
             Assert.AreEqual(2, model.Blocks.Count);
             var p1 = (Paragraph)model.Blocks[0];
             Assert.AreEqual(2, p1.Content.Count);
@@ -140,7 +144,7 @@
         public void Code1()
         {
             var o2 = new WikiParser();
-            var model = o2.Parse("```xml\r\n<a></a>\r\n```");
+            var model = o2.ParseText("```xml\r\n<a></a>\r\n```");
 
             Assert.AreEqual(1, model.Blocks.Count);
             var p1 = model.Blocks[0] as CodeBlock;
@@ -152,7 +156,7 @@
         public void Code_Included()
         {
             var o2 = new WikiParser(File.OpenRead);
-            var model = o2.Parse("```xml\r\n@include Input/Example.xml\r\n```");
+            var model = o2.ParseText("```xml\r\n@include Input/Example.xml\r\n```");
 
             Assert.AreEqual(1, model.Blocks.Count);
             var p1 = model.Blocks[0] as CodeBlock;
@@ -164,7 +168,7 @@
         public void InlineCode1()
         {
             var o2 = new WikiParser();
-            var model = o2.Parse("Inline `co\\de` !");
+            var model = o2.ParseText("Inline `co\\de` !");
 
             Assert.AreEqual(1, model.Blocks.Count);
             var p1 = model.Blocks[0] as Paragraph;
@@ -180,7 +184,7 @@
         public void Strong1()
         {
             var o2 = new WikiParser();
-            var model = o2.Parse("This is **strong** text");
+            var model = o2.ParseText("This is **strong** text");
 
             Assert.AreEqual(1, model.Blocks.Count);
             var p1 = model.Blocks[0] as Paragraph;
@@ -198,7 +202,7 @@
         public void Strong2()
         {
             var o2 = new WikiParser();
-            var model = o2.Parse("This is **str~*ong** text");
+            var model = o2.ParseText("This is **str~*ong** text");
 
             Assert.AreEqual(1, model.Blocks.Count);
             var p1 = model.Blocks[0] as Paragraph;
@@ -216,7 +220,7 @@
         public void Emphasized1()
         {
             var o2 = new WikiParser();
-            var model = o2.Parse("This is //emphasized// text");
+            var model = o2.ParseText("This is //emphasized// text");
 
             Assert.AreEqual(1, model.Blocks.Count);
             var p1 = model.Blocks[0] as Paragraph;
@@ -234,7 +238,7 @@
         public void Hyperlink1()
         {
             var o2 = new WikiParser();
-            var model = o2.Parse("[http://www.google.com] text");
+            var model = o2.ParseText("[http://www.google.com] text");
 
             Assert.AreEqual(1, model.Blocks.Count);
             var p1 = model.Blocks[0] as Paragraph;
@@ -246,7 +250,7 @@
         public void Hyperlink2()
         {
             var o2 = new WikiParser();
-            var model = o2.Parse("[link1|text] following text");
+            var model = o2.ParseText("[link1|text] following text");
 
             Assert.AreEqual(1, model.Blocks.Count);
             var p1 = model.Blocks[0] as Paragraph;
@@ -258,7 +262,7 @@
         public void Hyperlink3()
         {
             var o2 = new WikiParser();
-            var model = o2.Parse("[link1|text **bold~***] text");
+            var model = o2.ParseText("[link1|text **bold~***] text");
 
             Assert.AreEqual(1, model.Blocks.Count);
             var p1 = model.Blocks[0] as Paragraph;
@@ -278,7 +282,7 @@
         public void Image1()
         {
             var o2 = new WikiParser();
-            var model = o2.Parse("{image1.png} text");
+            var model = o2.ParseText("{image1.png} text");
 
             Assert.AreEqual(1, model.Blocks.Count);
             var p1 = model.Blocks[0] as Paragraph;
@@ -291,7 +295,7 @@
         public void Image2()
         {
             var o2 = new WikiParser();
-            var model = o2.Parse("{image1.png|alt1} text");
+            var model = o2.ParseText("{image1.png|alt1} text");
 
             Assert.AreEqual(1, model.Blocks.Count);
             var p1 = (Paragraph)model.Blocks[0];
@@ -304,7 +308,7 @@
         public void Image3()
         {
             var o2 = new WikiParser();
-            var model = o2.Parse("[link1|{image1.png|alt1}] text");
+            var model = o2.ParseText("[link1|{image1.png|alt1}] text");
 
             Assert.AreEqual(1, model.Blocks.Count);
             var p1 = model.Blocks[0] as Paragraph;
@@ -321,7 +325,7 @@
         public void Image4()
         {
             var o2 = new WikiParser { CurrentDirectory = "tmp" };
-            var model = o2.Parse("{..\\image1.png|image 1} text");
+            var model = o2.ParseText("{..\\image1.png|image 1} text");
 
             Assert.AreEqual(1, model.Blocks.Count);
             var p1 = (Paragraph)model.Blocks[0];
@@ -334,7 +338,7 @@
         public void LineBreak1()
         {
             var o2 = new WikiParser();
-            var model = o2.Parse(@"Line1\\Line2");
+            var model = o2.ParseText(@"Line1\\Line2");
 
             Assert.AreEqual(1, model.Blocks.Count);
             var p1 = model.Blocks[0] as Paragraph;
@@ -349,7 +353,7 @@
         public void HorizontalRuler()
         {
             var o2 = new WikiParser();
-            var model = o2.Parse("Line1\r\n\r\n---\r\n\r\nLine2");
+            var model = o2.ParseText("Line1\r\n\r\n---\r\n\r\nLine2");
 
             Assert.AreEqual(3, model.Blocks.Count);
             Assert.IsTrue(model.Blocks[1] is HorizontalRuler);
@@ -359,7 +363,7 @@
         public void LineBreak()
         {
             var o2 = new WikiParser();
-            var model = o2.Parse("Line1  \r\nLine2");
+            var model = o2.ParseText("Line1  \r\nLine2");
             var p = (Paragraph)model.Blocks[0];
             Assert.AreEqual(3, p.Content.Count);
             Assert.IsTrue(p.Content[1] is LineBreak);
@@ -369,7 +373,7 @@
         public void OrderedList()
         {
             var o2 = new WikiParser();
-            var model = o2.Parse("# Item 1\r\n# Item 2");
+            var model = o2.ParseText("# Item 1\r\n# Item 2");
 
             Assert.AreEqual(1, model.Blocks.Count);
             var list = model.Blocks[0] as OrderedList;
@@ -383,7 +387,7 @@
         public void UnorderedList()
         {
             var o2 = new WikiParser();
-            var model = o2.Parse("- Item 1\r\n- Item 2");
+            var model = o2.ParseText("- Item 1\r\n- Item 2");
 
             Assert.AreEqual(1, model.Blocks.Count);
             var list = model.Blocks[0] as UnorderedList;
@@ -397,7 +401,7 @@
         public void Table1()
         {
             var o2 = new WikiParser();
-            var model = o2.Parse("|Cell 1|");
+            var model = o2.ParseText("|Cell 1|");
 
             Assert.AreEqual(1, model.Blocks.Count);
             var table = model.Blocks[0] as Table;
@@ -419,7 +423,7 @@
         public void Table2()
         {
             var o2 = new WikiParser();
-            var model = o2.Parse("|Cell1|Cell2|\r\n|Cell3|Cell4|");
+            var model = o2.ParseText("|Cell1|Cell2|\r\n|Cell3|Cell4|");
 
             Assert.AreEqual(1, model.Blocks.Count);
             var table = model.Blocks[0] as Table;
@@ -467,7 +471,7 @@
         public void Table3()
         {
             var o2 = new WikiParser();
-            var model = o2.Parse("|Cell1\r\n|Cell2|\r\n|Cell3|Cell4|\r\ntext");
+            var model = o2.ParseText("|Cell1\r\n|Cell2|\r\n|Cell3|Cell4|\r\ntext");
 
             Assert.AreEqual(2, model.Blocks.Count);
             AssertBlock("text", model.Blocks[1]);
@@ -485,7 +489,7 @@
         public void Table4()
         {
             var o2 = new WikiParser();
-            var model = o2.Parse("||Cell1||Cell2|\r\n|Cell3|Cell4|\r\ntext");
+            var model = o2.ParseText("||Cell1||Cell2|\r\n|Cell3|Cell4|\r\ntext");
 
             Assert.AreEqual(2, model.Blocks.Count);
             AssertBlock("text", model.Blocks[1]);
@@ -505,7 +509,7 @@
         public void Table_ColumnSpan()
         {
             var o2 = new WikiParser();
-            var model = o2.Parse("|Cell1|^|\r\n|Cell3|Cell4|");
+            var model = o2.ParseText("|Cell1|^|\r\n|Cell3|Cell4|");
 
             Assert.AreEqual(1, model.Blocks.Count);
             var table = model.Blocks[0] as Table;
@@ -522,7 +526,7 @@
         public void Table_RowSpan()
         {
             var o2 = new WikiParser();
-            var model = o2.Parse("|Cell1|Cell2|\r\n|¨|Cell3|");
+            var model = o2.ParseText("|Cell1|Cell2|\r\n|¨|Cell3|");
 
             Assert.AreEqual(1, model.Blocks.Count);
             var table = model.Blocks[0] as Table;
@@ -539,7 +543,7 @@
         public void Span1()
         {
             var o2 = new WikiParser();
-            var model = o2.Parse("Press {{key:F1}} for help.");
+            var model = o2.ParseText("Press {{key:F1}} for help.");
 
             Assert.AreEqual(1, model.Blocks.Count);
             var p = model.Blocks[0] as Paragraph;
@@ -558,7 +562,7 @@
         public void Div1()
         {
             var o2 = new WikiParser();
-            var model = o2.Parse("[[figure:{image1.png|caption}]]");
+            var model = o2.ParseText("[[figure:{image1.png|caption}]]");
 
             Assert.AreEqual(1, model.Blocks.Count);
             var s = (Section)model.Blocks[0];
@@ -574,7 +578,7 @@
         public void Equation1()
         {
             var o2 = new WikiParser();
-            var model = o2.Parse("$$x^2$$");
+            var model = o2.ParseText("$$x^2$$");
 
             Assert.AreEqual(1, model.Blocks.Count);
             var p = (Paragraph)model.Blocks[0];
@@ -587,7 +591,7 @@
         {
             var o2 = new WikiParser();
             o2.Defines.Add("DEBUG");
-            var model = o2.Parse("@if DEBUG\r\ndebug\r\n@endif");
+            var model = o2.ParseText("@if DEBUG\r\ndebug\r\n@endif");
 
             Assert.AreEqual(1, model.Blocks.Count);
             AssertBlock("debug", model.Blocks[0]);
@@ -597,7 +601,7 @@
         public void Defines2()
         {
             var o2 = new WikiParser();
-            var model = o2.Parse("@if DEBUG\r\ndebug\r\n@endif");
+            var model = o2.ParseText("@if DEBUG\r\ndebug\r\n@endif");
 
             Assert.AreEqual(0, model.Blocks.Count);
         }
@@ -607,7 +611,7 @@
         {
             var o2 = new WikiParser();
             o2.Variables.Add("title", "Hello");
-            var model = o2.Parse("'$title'");
+            var model = o2.ParseText("'$title'");
             Assert.AreEqual(1, model.Blocks.Count);
             AssertBlock("'Hello'", model.Blocks[0]);
         }
@@ -617,7 +621,7 @@
         {
             var o2 = new WikiParser();
             o2.Variables.Add("title", "Hello");
-            var model = o2.Parse("@title $title");
+            var model = o2.ParseText("@title $title");
             Assert.AreEqual("Hello", model.Title);
         }
 
@@ -626,7 +630,7 @@
         {
             var o2 = new WikiParser();
             o2.Variables.Add("title", "Hello");
-            var model = o2.Parse("[hello|$title]");
+            var model = o2.ParseText("[hello|$title]");
             var p = (Paragraph)model.Blocks[0];
             Assert.AreEqual(1, model.Blocks.Count);
             AssertLink("hello", "Hello", p.Content[0]);
@@ -636,7 +640,7 @@
         public void Quote1()
         {
             var o2 = new WikiParser();
-            var model = o2.Parse("> line1\r\n> line2\r\nparagraph");
+            var model = o2.ParseText("> line1\r\n> line2\r\nparagraph");
             var q = (Quote)model.Blocks[0];
             var p = (Paragraph)model.Blocks[1];
             Assert.AreEqual(2, model.Blocks.Count);
@@ -649,7 +653,7 @@
         public void Quote2()
         {
             var o2 = new WikiParser();
-            var model = o2.Parse("text\r\n\r\n> line1\r\n> line2\r\nparagraph");
+            var model = o2.ParseText("text\r\n\r\n> line1\r\n> line2\r\nparagraph");
             Assert.AreEqual(3, model.Blocks.Count);
             var p1 = (Paragraph)model.Blocks[0];
             var q = (Quote)model.Blocks[1];
@@ -667,7 +671,7 @@
             foreach (var s in SymbolResolver.GetSymbolNames())
             {
                 //    if (!s.StartsWith("(")) continue;
-                var model = o2.Parse(s);
+                var model = o2.ParseText(s);
                 Assert.AreEqual(1, model.Blocks.Count);
                 var p1 = (Paragraph)model.Blocks[0];
                 Assert.AreEqual(1, p1.Content.Count);
@@ -681,7 +685,7 @@
         {
             var o2 = new WikiParser(File.OpenRead);
             o2.IncludeDefaultExtension = ".wiki";
-            var model = o2.Parse("@include Input/Example");
+            var model = o2.ParseText("@include Input/Example");
         }
     }
 }

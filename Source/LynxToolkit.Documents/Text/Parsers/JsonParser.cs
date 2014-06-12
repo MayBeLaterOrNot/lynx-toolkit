@@ -2,9 +2,9 @@
 {
     using System.IO;
 
-    public class JsonParser :IDocumentParser
+    public class JsonParser : IDocumentParser
     {
-        private static JsonSerializer js;
+        private static readonly JsonSerializer js;
 
         static JsonParser()
         {

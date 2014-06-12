@@ -416,8 +416,12 @@ namespace WikiT
             }
 
             var filePath = Path.Combine(inputFolder, relativeFilePath);
-            var parser = new WikiParser(Defines, Variables, File.OpenRead) { IncludeDefaultExtension = Path.GetExtension(Input) };
-            var doc = parser.ParseFile(filePath);
+            var parser = new WikiParser(Defines, Variables, File.OpenRead, Path.GetDirectoryName(filePath)) { IncludeDefaultExtension = Path.GetExtension(Input), CurrentDirectory = Path.GetDirectoryName(filePath) };
+            Document doc;
+            using (var stream = File.OpenRead(filePath))
+            {
+                doc = parser.Parse(stream);
+            }
 
             if (FlattenOutput)
             {

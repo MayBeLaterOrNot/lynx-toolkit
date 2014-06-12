@@ -27,8 +27,11 @@ namespace LynxToolkit.Documents.TestApp
             var input = File.ReadAllText(fileName);
             input = input + input;
 
-            var wikiParser = new WikiParser(File.OpenRead);
-            wikiParser.ParseFile(fileName);
+            var wikiParser = new WikiParser(File.OpenRead) { CurrentDirectory = Path.GetDirectoryName(fileName) };
+            using (var stream = File.OpenRead(fileName))
+            {
+                wikiParser.Parse(stream);
+            }
 
             Console.WriteLine(fileName);
             for (int j = 0; j < 5; j++)
@@ -37,7 +40,7 @@ namespace LynxToolkit.Documents.TestApp
                 int n = 1000;
                 for (int i = 0; i < n; i++)
                 {
-                    wikiParser.Parse(input);
+                    wikiParser.ParseText(input);
                 }
 
                 var bps = input.Length * n / (w.ElapsedMilliseconds * 0.001) / 1024 / 1024;

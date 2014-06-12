@@ -41,16 +41,7 @@ namespace LynxToolkit.Documents
         /// <summary>
         /// The XML serializer
         /// </summary>
-        private static readonly XmlSerializer Serializer = new XmlSerializer(
-            typeof(Document),
-            new[] {
-                    typeof(BlockCollection), typeof(InlineCollection), typeof(Header), typeof(Paragraph),
-                    typeof(CodeBlock), typeof(Quote), typeof(Section), typeof(HorizontalRuler), typeof(UnorderedList),
-                    typeof(OrderedList), typeof(ListItem), typeof(ListItemCollection), typeof(Table),
-                    typeof(TableRowCollection), typeof(TableRow), typeof(TableCellCollection), typeof(TableCell),
-                    typeof(TableHeaderCell), typeof(LineBreak), typeof(Run), typeof(Emphasized), typeof(Strong),
-                    typeof(Symbol), typeof(InlineCode), typeof(Anchor), typeof(Hyperlink), typeof(Image)
-                });
+        private static readonly XmlSerializer Serializer = new XmlSerializer(typeof(Document), XmlParser.DocumentTypes);
 
         /// <summary>
         /// Formats the specified <see cref="Document" /> to the specified <see cref="Stream" />.

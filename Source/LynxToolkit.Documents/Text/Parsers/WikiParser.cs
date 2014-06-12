@@ -36,7 +36,7 @@ namespace LynxToolkit.Documents
     /// <summary>
     /// Implements a simple wiki parser.  
     /// </summary>
-    public class WikiParser
+    public class WikiParser : IDocumentParser
     {
         private Func<string, Stream> OpenRead { get; set; }
 
@@ -82,22 +82,23 @@ namespace LynxToolkit.Documents
 
         private string text;
 
-        public WikiParser(Func<string, Stream> openRead = null)
-            : this(new string[] { }, new Dictionary<string, string>(), openRead)
+        public WikiParser(Func<string, Stream> openRead = null, string currentDirectory = "")
+            : this(new string[] { }, new Dictionary<string, string>(), openRead, currentDirectory)
         {
         }
 
         public WikiParser(
             IEnumerable<string> defines,
-            Dictionary<string, string> variables,
-            Func<string, Stream> openRead)
+            IDictionary<string, string> variables,
+            Func<string, Stream> openRead,
+            string currentDirectory)
         {
             this.OpenRead = openRead;
             this.ImportPaths = new List<string>();
             this.IncludePaths = new List<string>();
             this.Defines = new List<string>(defines);
             this.Variables = new Dictionary<string, string>(variables);
-            this.CurrentDirectory = string.Empty;
+            this.CurrentDirectory = currentDirectory;
         }
 
         public string Syntax { get; set; }
@@ -119,7 +120,7 @@ namespace LynxToolkit.Documents
         /// </summary>
         /// <param name="input">The text to parse.</param>
         /// <returns>the parsed <see cref="Document"/>.</returns>
-        public Document Parse(string input)
+        private Document Parse(string input)
         {
             this.text = input.Replace("\r", string.Empty);
             this.n = this.text.Length;
@@ -137,11 +138,20 @@ namespace LynxToolkit.Documents
             }
         }
 
-        public Document ParseFile(string fileName)
+        private Document ParseFile(string fileName)
         {
             this.CurrentDirectory = PathUtilities.GetDirectoryName(fileName);
             var content = this.ReadAllText(fileName);
             return this.Parse(content);
+        }
+
+        public Document Parse(Stream stream)
+        {
+            using (var reader = new StreamReader(stream))
+            {
+                var content = reader.ReadToEnd();
+                return this.Parse(content);
+            }
         }
 
         private void ParseCodeBlock(BlockCollection blocks)
@@ -440,9 +450,13 @@ namespace LynxToolkit.Documents
             if (this.Match("import"))
             {
                 var s = this.ReadArg();
-                var parser = new WikiParser(this.Defines, this.Variables, this.OpenRead) { IncludeDefaultExtension = this.IncludeDefaultExtension };
-                var importedDocument = parser.ParseFile(this.ResolveIncludeFile(s, this.ImportPaths));
-                b.AddRange(importedDocument.Blocks);
+                var filename = this.ResolveIncludeFile(s, this.ImportPaths);
+                var parser = new WikiParser(this.Defines, this.Variables, this.OpenRead, PathUtilities.GetDirectoryName(filename)) { IncludeDefaultExtension = this.IncludeDefaultExtension };
+                using (var stream = this.OpenRead(filename))
+                {
+                    var importedDocument = parser.Parse(stream);
+                    b.AddRange(importedDocument.Blocks);
+                }
 
                 return;
             }

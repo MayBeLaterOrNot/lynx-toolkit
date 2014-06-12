@@ -7,13 +7,12 @@
     using NUnit.Framework;
 
     [TestFixture]
-    public class HtmlFormatterTests
+    public class HtmlFormatterTests : FormatterTests
     {
         [Test]
         public void Format()
         {
-            var parser = new WikiParser(File.OpenRead);
-            var doc = parser.ParseFile(@"Input/Example.wiki");
+            var doc = LoadExample();
             var formatter = new HtmlFormatter { SymbolDirectory = @"Input\Images" };
             using (var stream = File.Create("Example.html"))
             {

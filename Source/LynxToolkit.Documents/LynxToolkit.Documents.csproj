@@ -44,6 +44,7 @@
     <Compile Include="Text\Formatters\DocumentFormatterExtensions.cs" />
     <Compile Include="Text\Formatters\IDocumentFormatter.cs" />
     <Compile Include="Text\Parsers\IDocumentParser.cs" />
+    <Compile Include="Text\Parsers\MarkdownParser.cs" />
     <Compile Include="Utilities\JsonSerializer.cs" />
     <Compile Include="Text\Formatters\XmlFormatter.cs" />
     <Compile Include="Utilities\PathUtilities.cs" />
@@ -70,7 +71,7 @@
     <Compile Include="Text\Formatters\WikiFormatterBase.cs" />
     <Compile Include="Text\Utilities\CharacterReplacements.cs" />
     <None Include="Text\Parsers\obsolete\CreoleParser.cs" />
-    <Compile Include="Text\Parsers\DocumentParser.cs" />
+    <None Include="Text\Parsers\obsolete\DocumentParser.cs" />
     <None Include="Text\Parsers\obsolete\HtmlParser.cs" />
     <Compile Include="Text\Formatters\OWikiFormatter.cs" />
     <None Include="Text\Parsers\obsolete\MarkdownParser.cs" />

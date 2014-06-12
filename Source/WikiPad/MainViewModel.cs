@@ -348,11 +348,11 @@ namespace WikiPad
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                var parser = new WikiParser(this.Project.GetDefines(), this.Project.GetVariables(), File.OpenRead);
-
-                parser.CurrentDirectory = documentFolder;
-                parser.IncludeDefaultExtension = includeDefaultExtension;
-                var doc = parser.Parse(this.Input);
+                var parser = new WikiParser(this.Project.GetDefines(), this.Project.GetVariables(), File.OpenRead, documentFolder)
+                                 {
+                                     IncludeDefaultExtension = includeDefaultExtension
+                                 };
+                var doc = parser.ParseText(this.Input);
 
                 cancellationToken.ThrowIfCancellationRequested();
 
@@ -381,12 +381,12 @@ namespace WikiPad
 
             //// File.WriteAllText("temp.txt", Html, Encoding.UTF8);
             //// System.Diagnostics.Process.Start("temp.txt");
-            // var doc2 = HtmlParser.Parse(this.Html);
+            // var doc2 = HtmlParser.ParseText(this.Html);
             // this.Wiki2 = OWikiFormatter.Format(doc2);
 
             //// File.WriteAllText("Index.html", Html);
-            //// var docCreole = CreoleParser.Parse(WikiCreole);
-            //// var docMarkdown = MarkdownParser.Parse(WikiCreole);
+            //// var docCreole = CreoleParser.ParseText(WikiCreole);
+            //// var docMarkdown = MarkdownParser.ParseText(WikiCreole);
             // this.Document = XmlFormatter.Format(doc);
             // this.FlowDocument = FlowDocumentFormatter.Format(doc, "images");
             // var js = new JsonSerializer();

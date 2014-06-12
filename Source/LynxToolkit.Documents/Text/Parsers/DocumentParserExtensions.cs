@@ -44,7 +44,7 @@ namespace LynxToolkit.Documents
         /// <param name="parser">The parser.</param>
         /// <param name="input">The input string.</param>
         /// <returns>A <see cref="Document"/>.</returns>
-        public static Document Parse(this IDocumentParser parser, string input)
+        public static Document ParseText(this IDocumentParser parser, string input)
         {
             using (var s = new MemoryStream(Encoding.UTF8.GetBytes(input)))
             {

@@ -26,25 +26,35 @@
 // --------------------------------------------------------------------------------------------------------------------
 namespace LynxToolkit.Documents
 {
+    using System;
     using System.IO;
     using System.Xml.Serialization;
 
+    /// <summary>
+    /// Implements a document parser that parses documents from XML.
+    /// </summary>
     public class XmlParser : IDocumentParser
     {
         /// <summary>
+        /// The types in a <see cref="Document" />.
+        /// </summary>
+        public static readonly Type[] DocumentTypes = 
+                                           {
+                                               typeof(BlockCollection), typeof(InlineCollection), typeof(Header),
+                                               typeof(Paragraph), typeof(CodeBlock), typeof(Quote), typeof(Section),
+                                               typeof(HorizontalRuler), typeof(UnorderedList), typeof(OrderedList),
+                                               typeof(ListItem), typeof(ListItemCollection), typeof(Table),
+                                               typeof(TableRowCollection), typeof(TableRow),
+                                               typeof(TableCellCollection), typeof(TableCell), typeof(TableHeaderCell),
+                                               typeof(LineBreak), typeof(Run), typeof(Emphasized), typeof(Strong),
+                                               typeof(Symbol), typeof(InlineCode), typeof(Anchor), typeof(Hyperlink),
+                                               typeof(Image)
+                                           };
+
+        /// <summary>
         /// The serializer.
         /// </summary>
-        private static readonly XmlSerializer Serializer = new XmlSerializer(
-            typeof(Document),
-            new[]
-                {
-                    typeof(BlockCollection), typeof(InlineCollection), typeof(Header), typeof(Paragraph),
-                    typeof(CodeBlock), typeof(Quote), typeof(Section), typeof(HorizontalRuler), typeof(UnorderedList),
-                    typeof(OrderedList), typeof(ListItem), typeof(ListItemCollection), typeof(Table),
-                    typeof(TableRowCollection), typeof(TableRow), typeof(TableCellCollection), typeof(TableCell),
-                    typeof(TableHeaderCell), typeof(LineBreak), typeof(Run), typeof(Emphasized), typeof(Strong),
-                    typeof(Symbol), typeof(InlineCode), typeof(Anchor), typeof(Hyperlink), typeof(Image)
-                });
+        private static readonly XmlSerializer Serializer = new XmlSerializer(typeof(Document), DocumentTypes);
 
         /// <summary>
         /// Parses a <see cref="Document" /> from the specified <see cref="Stream" />.

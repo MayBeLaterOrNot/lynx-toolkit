@@ -62,16 +62,27 @@ namespace LynxToolkit.Documents
 
             // http://daringfireball.net/projects/markdown/syntax#header
             this.HeaderPrefix = "#";
+            this.NoUnderlineHeaders = true;
 
             // http://daringfireball.net/projects/markdown/syntax#code
             this.InlineCodePrefix = this.InlineCodeSuffix = "`";
         }
 
-        [SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1126:PrefixCallsCorrectly", Justification = "Reviewed. Suppression is OK here.")]
+        /// <summary>
+        /// Gets or sets a value indicating whether to use underline for headers of level 1-2.
+        /// </summary>
+        /// <value><c>true</c> if headers should not be underlined; otherwise, <c>false</c>.</value>
+        public bool NoUnderlineHeaders { get; set; }
+
+        /// <summary>
+        /// Writes the specified header.
+        /// </summary>
+        /// <param name="header">The header.</param>
+        /// <param name="context">The context.</param>
         protected override void Write(Header header, TextWriter context)
         {
             // http://daringfireball.net/projects/markdown/syntax#header
-            if (header.Level > 2)
+            if (header.Level > 2 || this.NoUnderlineHeaders)
             {
                 base.Write(header, context);
                 return;
