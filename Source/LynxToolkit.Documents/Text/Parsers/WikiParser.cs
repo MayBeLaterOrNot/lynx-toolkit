@@ -115,6 +115,15 @@ namespace LynxToolkit.Documents
 
         public Dictionary<string, string> Variables { get; private set; }
 
+        public Document Parse(Stream stream)
+        {
+            using (var reader = new StreamReader(stream))
+            {
+                var content = reader.ReadToEnd();
+                return this.Parse(content);
+            }
+        }
+
         /// <summary>
         /// Parses the specified text.
         /// </summary>
@@ -135,22 +144,6 @@ namespace LynxToolkit.Documents
             using (var r = new StreamReader(this.OpenRead(fileName)))
             {
                 return r.ReadToEnd();
-            }
-        }
-
-        private Document ParseFile(string fileName)
-        {
-            this.CurrentDirectory = PathUtilities.GetDirectoryName(fileName);
-            var content = this.ReadAllText(fileName);
-            return this.Parse(content);
-        }
-
-        public Document Parse(Stream stream)
-        {
-            using (var reader = new StreamReader(stream))
-            {
-                var content = reader.ReadToEnd();
-                return this.Parse(content);
             }
         }
 
