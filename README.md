@@ -8,7 +8,7 @@ The library is licensed under the [The MIT License (MIT)](https://raw.githubuser
 
 ### Source
 
-The master source repository can be found at http://github.com/objorke/lynx-toolkit
+The origin source repository can be found at http://github.com/objorke/lynx-toolkit
 
 ### Build
 
