@@ -1,0 +1,33 @@
+version: 2014.1.{build}
+
+environment:
+  nuget_api_key:
+    secure: kM3Kse+ivuuE5RVoe6dPdw+aguWx56K2YeXujGa9tMPQTms3lv7QxNpTLFMALYNa
+      
+install:
+  - cinst stylecop
+
+platform: Any CPU
+
+configuration: Release
+
+build:
+  project: Source/LynxToolkit.sln
+  verbosity: normal
+
+before_build:
+  - cmd: Tools\LynxToolkit\UpdateVersionNumbers.exe /Version=%APPVEYOR_BUILD_VERSION% /Directory=Source /Dependency=LynxToolkit.Documents /ReleaseNotesFile=release-notes.txt
+  
+after_build:
+  - cmd: mkdir Packages
+  - cmd: NuGet.exe pack Source\LynxToolkit.Documents\LynxToolkit.Documents.nuspec -OutputDirectory Packages
+  - cmd: NuGet.exe pack Source\LynxToolkit.Documents.Html\LynxToolkit.Documents.Html.nuspec -OutputDirectory Packages
+  - cmd: NuGet.exe pack Source\LynxToolkit.Documents.OpenXml\LynxToolkit.Documents.OpenXml.nuspec -OutputDirectory Packages
+  - cmd: NuGet.exe pack Source\LynxToolkit.Documents.Wpf\LynxToolkit.Documents.Wpf.nuspec -OutputDirectory Packages
+  - cmd: NuGet.exe push Packages\LynxToolkit.Documents %nuget_api_key%  
+  - cmd: NuGet.exe push Packages\LynxToolkit.Documents.Html %nuget_api_key%  
+  - cmd: NuGet.exe push Packages\LynxToolkit.Documents.OpenXml %nuget_api_key%  
+  - cmd: NuGet.exe push Packages\LynxToolkit.Documents.Wpf %nuget_api_key%  
+artifacts:
+  - path: Output
+  - path: Packages\*.nupkg
