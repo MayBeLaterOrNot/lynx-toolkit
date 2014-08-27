@@ -38,27 +38,6 @@ namespace UpdateVersionNumbers
     using System.Text;
     using System.Text.RegularExpressions;
 
-    // Description:
-    //   Does a recursive scan on all AssemblyInfo.cs and *.nuspec files from the specified root folder.
-    //   The program updates version and company/copyright information.
-    //
-    // Syntax:
-    //   UpdateVersionNumbers.exe [/Directory=..\src] [/VersionFile=..\version.txt] [/Version=x.x.x.x] [/VersionFromNuGet=packagename] [/Build=x] [/Revision=x] [/Company=xxx] [/Copyright=xxx]
-    // Arguments:
-    //   /Directory - specifies the root directory (all subdirectories will be scanned)
-    //   /Version - specifies the version number (Major.Minor.Build.Revision)
-    //      * = automatic build/revision numbers
-    //      yyyy = year
-    //      MM = month
-    //      dd = day
-    //   /VersionFile - gets the version number from a file
-    //   /VersionFromNuGet - gets the version number from the latest version of the specified package
-    //   /Build - overwrites the build number
-    //   /Revision - overwrites the revision number
-    //   /Company
-    //   /Copyright
-    //   /Dependency - specifies a NuGet package that should have the same version number
-
     public class Program
     {
         private static void Main(string[] args)
@@ -66,8 +45,7 @@ namespace UpdateVersionNumbers
             Console.WriteLine(LynxToolkit.Utilities.ApplicationHeader);
 
             // default parameters
-            var updater = new Updater();
-            updater.Version = "yyyy.MM.*";
+            var updater = new Updater { Version = "yyyy.MM.*" };
             string directory = Directory.GetCurrentDirectory();
 
             // command line argument parsing
@@ -87,8 +65,14 @@ namespace UpdateVersionNumbers
                         case "/Version":
                             updater.Version = kv[1];
                             break;
+                        case "/PreRelease":
+                            updater.PreRelease = kv[1];
+                            break;
                         case "/InformationalVersion":
                             updater.InformationalVersion = kv[1];
+                            break;
+                        case "/ReleaseNotesFile":
+                            updater.ReleaseNotes = GetFromFile(kv[1]);
                             break;
                         case "/Directory":
                             directory = kv[1];
@@ -121,6 +105,17 @@ namespace UpdateVersionNumbers
                 updater.Copyright = string.Format("Copyright © {0} {1}", updater.Company, DateTime.Now.Year);
             }
 
+            updater.Initialize();
+
+            Console.WriteLine("Version               = '{0}'", updater.Version);
+            Console.WriteLine("File Version          = '{0}'", updater.FileVersion);
+            Console.WriteLine("Informational Version = '{0}'", updater.InformationalVersion);
+            Console.WriteLine("NuGet Version         = '{0}'", updater.NuGetVersion);
+            Console.WriteLine("Copyright             = '{0}'", updater.Copyright);
+            Console.WriteLine("Company               = '{0}'", updater.Company);
+            Console.WriteLine("Release Notes         = '{0}'", updater.ReleaseNotes);
+            Console.WriteLine();
+
             updater.UpdateFolder(directory);
         }
 
@@ -130,6 +125,11 @@ namespace UpdateVersionNumbers
             var response = client.DownloadString("http://www.nuget.org/api/v2/package-versions/" + packageId);
             var versions = response.Trim("[]".ToCharArray()).Split(',');
             return versions.Last().Trim("\"".ToCharArray());
+        }
+
+        private static string GetFromFile(string fileName)
+        {
+            return File.ReadAllText(fileName).Trim();
         }
 
         /// <summary>
@@ -173,9 +173,15 @@ namespace UpdateVersionNumbers
 
             public string Version { get; set; }
 
+            public string NuGetVersion { get; set; }
+
+            public string PreRelease { get; set; }
+
             public string Build { get; set; }
 
             public string Revision { get; set; }
+
+            public string ReleaseNotes { get; set; }
 
             public string InformationalVersion { get; set; }
 
@@ -187,60 +193,36 @@ namespace UpdateVersionNumbers
 
             public List<string> Dependencies { get; private set; }
 
-            private void Initialize()
+            public void Initialize()
             {
-                var version = this.Version;
+                this.Version = this.CreateVersionNumber(this.Version);
 
-                version = version.Replace("yyyy", DateTime.Now.Year.ToString(CultureInfo.InvariantCulture));
-                version = version.Replace("MM", DateTime.Now.Month.ToString(CultureInfo.InvariantCulture));
-                version = version.Replace("dd", DateTime.Now.Day.ToString(CultureInfo.InvariantCulture));
-
-                // split up the version number string
-                var versionNumbers = version.Split('.');
-                if (versionNumbers.Length < 4)
+                // AssemblyInfo
+                this.FileVersion = this.Version.Replace(".*", ".0");
+                this.InformationalVersion = this.InformationalVersion ?? this.Version;
+                if (this.PreRelease != null)
                 {
-                    var tmp = new string[4];
-                    for (int i = 0; i < 4; i++)
-                    {
-                        tmp[i] = i < versionNumbers.Length ? versionNumbers[i] : "0";
-                    }
-
-                    versionNumbers = tmp;
+                    this.InformationalVersion += "-" + this.PreRelease;
                 }
 
-                // replace build and revision number if they are specified
-                if (this.Build != null)
+
+                // NuGet package version
+                this.NuGetVersion = this.Version.Replace(".*", ".0");
+                if (this.PreRelease != null)
                 {
-                    versionNumbers[2] = this.Build;
+                    this.NuGetVersion += "-" + this.PreRelease;
                 }
 
-                if (this.Revision != null)
-                {
-                    versionNumbers[3] = this.Revision;
-                }
-
-                // rebuild the version number string
-                version = string.Format("{0}.{1}.{2}.{3}", versionNumbers[0], versionNumbers[1], versionNumbers[2], versionNumbers[3]);
-
-                // truncate to 16 bit values
-                version = To16BitVersionNumbers(version);
-
-                this.Version = version;
-                this.InformationalVersion = this.InformationalVersion ?? version;
-
-                string nuspecVersion = version.Replace(".*", ".0");
-
-                this.FileVersion = nuspecVersion;
 
                 this.NuSpecReplacements = new Dictionary<Regex, string> 
                 {
-                    { new Regex(@"<version>.*</version>"), string.Format(@"<version>{0}</version>", nuspecVersion) },
-                    { new Regex(@"\$version"), nuspecVersion }, 
+                    { new Regex(@"<version>.*</version>"), string.Format(@"<version>{0}</version>", this.NuGetVersion) },
+                    { new Regex(@"\$version"), this.NuGetVersion }, 
                     { new Regex(@"\$copyright"), this.Copyright ?? string.Empty },
                 };
                 foreach (var dependency in this.Dependencies)
                 {
-                    this.NuSpecReplacements.Add(new Regex("(<dependency id=\"" + dependency + "\" version=\"\\[?)(.*?)(\\]?\"\\s?/>)"), "${1}" + nuspecVersion + "${3}");
+                    this.NuSpecReplacements.Add(new Regex("(<dependency id=\"" + dependency + "\" version=\"\\[?)(.*?)(\\]?\"\\s?/>)"), "${1}" + this.NuGetVersion + "${3}");
                 }
 
                 this.AssemblyInfoReplacements = new Dictionary<Regex, string>
@@ -267,6 +249,51 @@ namespace UpdateVersionNumbers
                     this.AssemblyInfoReplacements.Add(
                         new Regex(@"AssemblyCopyright\(.*\)"), string.Format("AssemblyCopyright(\"{0}\")", this.Copyright));
                 }
+
+                if (this.ReleaseNotes != null)
+                {
+                    this.NuSpecReplacements.Add(
+                        new Regex(@"<releaseNotes>.*</releaseNotes>"),
+                        string.Format(@"<releaseNotes>{0}</releaseNotes>", this.ReleaseNotes));
+                }
+            }
+
+            private string CreateVersionNumber(string version)
+            {
+                version = version.Replace("yyyy", DateTime.Now.Year.ToString(CultureInfo.InvariantCulture));
+                version = version.Replace("MM", DateTime.Now.Month.ToString(CultureInfo.InvariantCulture));
+                version = version.Replace("dd", DateTime.Now.Day.ToString(CultureInfo.InvariantCulture));
+
+                // split up the version number string
+                var versionNumbers = version.Split('.').ToList();
+
+                // replace build and revision number if they are specified
+                if (this.Build != null)
+                {
+                    while (versionNumbers.Count < 3)
+                    {
+                        versionNumbers.Add("0");
+                    }
+
+                    versionNumbers[2] = this.Build;
+                }
+
+                if (this.Revision != null)
+                {
+                    while (versionNumbers.Count < 4)
+                    {
+                        versionNumbers.Add("0");
+                    }
+
+                    versionNumbers[3] = this.Revision;
+                }
+
+                // rebuild the version number string
+                version = string.Join(".", versionNumbers);
+
+                // truncate to 16 bit values
+                version = To16BitVersionNumbers(version);
+                return version;
             }
 
             /// <summary>
@@ -308,8 +335,6 @@ namespace UpdateVersionNumbers
 
             public void UpdateFolder(string path)
             {
-                this.Initialize();
-
                 foreach (string file in Directory.GetFiles(path, "*AssemblyInfo.cs"))
                 {
                     this.UpdateFile(file, this.AssemblyInfoReplacements);
