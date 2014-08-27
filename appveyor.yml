@@ -24,10 +24,7 @@ after_build:
   - cmd: NuGet.exe pack Source\LynxToolkit.Documents.Html\LynxToolkit.Documents.Html.nuspec -OutputDirectory Packages
   - cmd: NuGet.exe pack Source\LynxToolkit.Documents.OpenXml\LynxToolkit.Documents.OpenXml.nuspec -OutputDirectory Packages
   - cmd: NuGet.exe pack Source\LynxToolkit.Documents.Wpf\LynxToolkit.Documents.Wpf.nuspec -OutputDirectory Packages
-  - cmd: NuGet.exe push Packages\LynxToolkit.Documents.nupkg %nuget_api_key%  
-  - cmd: NuGet.exe push Packages\LynxToolkit.Documents.Html.nupkg %nuget_api_key%  
-  - cmd: NuGet.exe push Packages\LynxToolkit.Documents.OpenXml.nupkg %nuget_api_key%  
-  - cmd: NuGet.exe push Packages\LynxToolkit.Documents.Wpf.nupkg %nuget_api_key%  
+  - cmd: for %%G in (Packages\*.nupkg) do NuGet.exe push %%G %nuget_api_key%  
 artifacts:
   - path: Output
   - path: Packages\*.nupkg
