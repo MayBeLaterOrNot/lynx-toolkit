@@ -7,9 +7,9 @@
     <authors>objo</authors>
     <description>WPF exporter for Lynx.Documents.</description>
     <releaseNotes></releaseNotes>
-    <licenseUrl>http://lynx.codeplex.com/license</licenseUrl>
-    <projectUrl>http://lynx.codeplex.com/</projectUrl>
-    <iconUrl>http://www.objo.net/codeplex/icons/lynx.png</iconUrl>
+    <licenseUrl>https://raw.githubusercontent.com/objorke/lynx-toolkit/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/objorke/lynx-toolkit/</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/objorke/lynx-toolkit/master/Images/Lynx_64.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <tags>wpf document model</tags>
     <dependencies>
