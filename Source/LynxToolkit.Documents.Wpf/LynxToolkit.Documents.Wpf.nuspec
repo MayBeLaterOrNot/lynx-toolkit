@@ -1,18 +1,26 @@
 <?xml version="1.0"?>
 <package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
-    <id>Lynx.Documents.Wpf</id>
+    <id>LynxToolkit.Documents.Wpf</id>
     <version>2014.1.1.1</version>
-    <title>Lynx Documents WPF</title>
+    <title>Lynx Toolkit Documents for WPF</title>
     <authors>objo</authors>
+    <description>WPF exporter for Lynx.Documents.</description>
+    <releaseNotes></releaseNotes>
     <licenseUrl>http://lynx.codeplex.com/license</licenseUrl>
     <projectUrl>http://lynx.codeplex.com/</projectUrl>
     <iconUrl>http://www.objo.net/codeplex/icons/lynx.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>WPF exporter for Lynx.Documents.</description>
     <tags>wpf document model</tags>
     <dependencies>
-      <dependency id="Lynx.Documents" version="2014.1" />
+      <dependency id="LynxToolkit.Documents" version="2014.1" />
     </dependencies>
   </metadata>
+  <files>
+    <file src="..\..\Output\LynxToolkit.Documents.Wpf.???" target="lib\net40" />
+    <file src="..\..\LICENSE" />
+    <file src="..\..\AUTHORS" />
+    <file src="..\..\CONTRIBUTORS" />
+    <file src="..\..\README.md" />
+  </files>
 </package>
