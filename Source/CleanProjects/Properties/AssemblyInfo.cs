@@ -27,5 +27,5 @@
 using System.Reflection;
 
 [assembly: AssemblyProduct("CleanProjects")]
-[assembly: AssemblyTitle("CleanProjects")]
-[assembly: AssemblyDescription("Cleans bin/, obj/, _Resharper folders")]
+[assembly: AssemblyTitle("Cleans bin/, obj/, _Resharper folders")]
+[assembly: AssemblyDescription("Syntax: CleanProjects.exe [directory]")]

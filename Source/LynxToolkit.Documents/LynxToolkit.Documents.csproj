@@ -70,6 +70,7 @@
     <Compile Include="Text\Utilities\SymbolResolver.cs" />
     <Compile Include="Text\Formatters\WikiFormatterBase.cs" />
     <Compile Include="Text\Utilities\CharacterReplacements.cs" />
+    <None Include="README.md" />
     <None Include="Text\Parsers\obsolete\CreoleParser.cs" />
     <None Include="Text\Parsers\obsolete\DocumentParser.cs" />
     <None Include="Text\Parsers\obsolete\HtmlParser.cs" />

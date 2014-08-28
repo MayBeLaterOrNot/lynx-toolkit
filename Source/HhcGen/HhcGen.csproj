@@ -55,7 +55,7 @@
     <CodeAnalysisDictionary Include="..\Lynx.ico">
       <Link>Lynx.ico</Link>
     </CodeAnalysisDictionary>
-    <Content Include="ReadMe.txt" />
+    <None Include="README.md" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SiteMap.cs" />

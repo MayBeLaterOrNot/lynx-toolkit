@@ -27,5 +27,5 @@
 using System.Reflection;
 
 [assembly: AssemblyProduct("CleanSource")]
-[assembly: AssemblyTitle("CleanSource")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Cleans C# source code")]
+[assembly: AssemblyDescription("Syntax: CleanSource.exe [/scc=<sccprovider>]")]

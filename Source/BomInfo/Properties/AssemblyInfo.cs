@@ -28,5 +28,5 @@
 using System.Reflection;
 
 [assembly: AssemblyProduct("BomInfo")]
-[assembly: AssemblyTitle("BomInfo")]
-[assembly: AssemblyDescription("Shows information about the Byte-order-marks of text files.")]
+[assembly: AssemblyTitle("Shows information about the Byte-order-marks of text files.")]
+[assembly: AssemblyDescription("Syntax: BomInfo.exe /directory=<name> /searchPattern=<pattern> /ignore=<pattern> /donotreport=<encoding> /ignore=<pattern> /force")]

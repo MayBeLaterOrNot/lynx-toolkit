@@ -1,0 +1,1 @@
+﻿Converts tab-delimited tables on the clipboard to wiki-delimited ('|')

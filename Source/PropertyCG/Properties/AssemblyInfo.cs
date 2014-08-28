@@ -27,5 +27,5 @@
 using System.Reflection;
 
 [assembly: AssemblyProduct("Property Code Generator")]
-[assembly: AssemblyTitle("Generates property code.")]
+[assembly: AssemblyTitle("Generates observable property code.")]
 [assembly: AssemblyDescription("Syntax: PropertyCG.exe <folder> <search-pattern>")]

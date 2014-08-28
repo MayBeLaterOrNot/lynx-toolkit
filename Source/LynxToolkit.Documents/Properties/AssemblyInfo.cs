@@ -28,4 +28,4 @@ using System.Reflection;
 
 [assembly: AssemblyProduct("LynxToolkit.Documents")]
 [assembly: AssemblyTitle("LynxToolkit.Documents")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Text and spreadsheet document models")]
