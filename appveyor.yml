@@ -13,12 +13,12 @@ configuration: Release
 
 build:
   project: Source/LynxToolkit.sln
-  verbosity: normal
+  verbosity: minimal
 
 before_build:
   - cmd: Tools\LynxToolkit\UpdateVersionNumbers.exe /Version=%APPVEYOR_BUILD_VERSION% /Directory=Source /Dependency=LynxToolkit.Documents /ReleaseNotesFile=release-notes.txt
   
-after_build:
+deploy_script:
   - cmd: mkdir Packages
   - cmd: NuGet.exe pack Source\LynxToolkit.Documents\LynxToolkit.Documents.nuspec -OutputDirectory Packages
   - cmd: NuGet.exe pack Source\LynxToolkit.Documents.Html\LynxToolkit.Documents.Html.nuspec -OutputDirectory Packages
