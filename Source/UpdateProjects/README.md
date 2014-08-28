@@ -1,7 +1,7 @@
-﻿Updates file headers in all .cs files.
+﻿Updates csproj files (currently only setting TreatWarningsAsErrors=true).
 
 ## Syntax
 
 ```
-UpdateFileHeaders.exe </company=companyName> [/copyright=copyrightNotice] [/copyright-file=path] [/exclude=filestoExclude] <directory>
+UpdateProjects.exe <path>
 ```

@@ -1,10 +1,10 @@
 ﻿Transforms documents from wiki format
 
 ```
-WikiT [/input=folder/search-pattern] [/format=html] [/output=folder] [/forceoutput] 
-      [/extension=.html] [/template=file] [/stylesheet=file] 
-	  [/define=key] ... 
-	  [/$key=value] ... 
+WikiT [/input=folder/search-pattern] [/format=html] [/output=folder] [/forceoutput]
+      [/extension=.html] [/template=file] [/stylesheet=file]
+      [/define=key ...]
+	    [/$key=value ...]
 
 
   /input         Specifies the input folder (and search pattern). The default value is "*.wiki".
@@ -15,5 +15,5 @@ WikiT [/input=folder/search-pattern] [/format=html] [/output=folder] [/forceoutp
   /template      Specifies the output template.
   /stylesheet    Specifies the output stylesheet.
   /define        Defines a conditional variable.
-  /$key          Defines a key to be replaced by the specified value.
+  /$key          Defines "$key" to be replaced by the specified value.
 ```

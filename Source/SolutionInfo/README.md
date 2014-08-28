@@ -1,4 +1,4 @@
-﻿Generates information about C# projects.
+﻿Generates information about the C# projects in a solution.
 
 ## Syntax
 

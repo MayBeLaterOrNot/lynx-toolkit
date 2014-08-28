@@ -22,3 +22,10 @@ Argument               | Description
 /extension             | Specify the output extension.
 /ignore                | Specify the name of an attribute.
 /$key                  | Specify key/value pairs. The keys will be replaced by the value.
+
+- [Recommended tags](http://msdn.microsoft.com/en-us/library/5ast78ax.aspx) (MSDN)
+- [On writing good XML comments](http://www.paraesthesia.com/archive/2007/11/14/on-writing-good-xml-documentation-comments.aspx)
+- [GhostDoc](http://submain.com/products/ghostdoc.aspx)
+- [Doxygen](http://www.doxygen.org/)
+- [DocumentX](http://www.innovasys.com/products/dx2011/overview.aspx)
+- [Generating documentation from C# xml comments](http://stackoverflow.com/questions/48381/generating-documentation-from-c-xml-comments) (stack overflow)

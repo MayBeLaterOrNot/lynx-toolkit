@@ -1,4 +1,4 @@
-﻿Updates version numbers and comanpy/copyright information in AssemblyInfo and NuSpec files.
+﻿Updates version numbers and company/copyright information in AssemblyInfo and NuSpec files.
 
 This program does a recursive scan to find all *AssemblyInfo.cs and *.nuspec files under the specified root folder.
 
