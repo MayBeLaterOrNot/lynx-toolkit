@@ -1,4 +1,4 @@
-version: 2014.1.{build}
+version: 2014.2.{build}
 
 environment:
   nuget_api_key:

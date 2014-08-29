@@ -31,5 +31,5 @@ using System.Reflection;
 [assembly: AssemblyCopyright("Copyright (c) LynxToolkit 2012")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
-[assembly: AssemblyVersion("2014.1.1.*")]
-[assembly: AssemblyFileVersion("2014.1.1.0")]
+[assembly: AssemblyVersion("2014.2.*")]
+[assembly: AssemblyFileVersion("2014.2.1")]
