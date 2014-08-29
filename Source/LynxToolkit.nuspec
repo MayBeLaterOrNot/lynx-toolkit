@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <id>LynxToolkit</id>
+    <version>0.0.0</version>
+    <title>Lynx Toolkit</title>
+    <authors>objo</authors>
+    <description>Lynx Toolkit is a collection of small command line tools</description>
+    <releaseNotes></releaseNotes>
+    <licenseUrl>https://raw.githubusercontent.com/objorke/lynx-toolkit/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/objorke/lynx-toolkit/</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/objorke/lynx-toolkit/master/Images/Lynx_64.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <tags>tools</tags>
+  </metadata>
+  <files>
+    <file src="chocolateyInstall.ps1" target="tools" />
+    <file src="..\Output\UpdateVersionNumbers.exe" target="bin" />
+    <file src="..\LICENSE" />
+    <file src="..\AUTHORS" />
+    <file src="..\CONTRIBUTORS" />
+    <file src="..\README.md" />
+  </files>
+</package>

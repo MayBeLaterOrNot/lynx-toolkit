@@ -3,6 +3,8 @@ version: 2014.2.{build}
 environment:
   nuget_api_key:
     secure: kM3Kse+ivuuE5RVoe6dPdw+aguWx56K2YeXujGa9tMPQTms3lv7QxNpTLFMALYNa
+  chocolatey_api_key:
+    secure: VoMjz8m05p36wSWVftaYelpfzEBZjZx9EzvamZaNQx0evttLbtQtK1w0eXLrfDbj
       
 install:
   - cinst stylecop
@@ -19,14 +21,16 @@ before_build:
   - cmd: Tools\LynxToolkit\UpdateVersionNumbers.exe /Version=%APPVEYOR_BUILD_VERSION% /Directory=Source /Dependency=LynxToolkit.Documents /ReleaseNotesFile=release-notes.txt
   
 deploy_script:
-  - cmd: mkdir Packages
-  - cmd: NuGet.exe pack Source\LynxToolkit.Documents\LynxToolkit.Documents.nuspec -OutputDirectory Packages
-  - cmd: NuGet.exe pack Source\LynxToolkit.Documents.Html\LynxToolkit.Documents.Html.nuspec -OutputDirectory Packages
-  - cmd: NuGet.exe pack Source\LynxToolkit.Documents.OpenXml\LynxToolkit.Documents.OpenXml.nuspec -OutputDirectory Packages
-  - cmd: NuGet.exe pack Source\LynxToolkit.Documents.Wpf\LynxToolkit.Documents.Wpf.nuspec -OutputDirectory Packages
-  - cmd: for %%G in (Packages\*.nupkg) do NuGet.exe push %%G %nuget_api_key%  
+  - cmd: mkdir NuGet
+  - cmd: NuGet.exe pack Source\LynxToolkit.Documents\LynxToolkit.Documents.nuspec -OutputDirectory NuGet
+  - cmd: NuGet.exe pack Source\LynxToolkit.Documents.Html\LynxToolkit.Documents.Html.nuspec -OutputDirectory NuGet
+  - cmd: NuGet.exe pack Source\LynxToolkit.Documents.OpenXml\LynxToolkit.Documents.OpenXml.nuspec -OutputDirectory NuGet
+  - cmd: NuGet.exe pack Source\LynxToolkit.Documents.Wpf\LynxToolkit.Documents.Wpf.nuspec -OutputDirectory NuGet
+  - cmd: for %%G in (NuGet\*.nupkg) do NuGet.exe push %%G %nuget_api_key%
+
+  - cmd: mkdir Chocolatey
+  - cmd: NuGet.Exe pack Source\LynxToolkit.nuspec -NoPackageAnalysis -NonInteractive -OutputDirectory Chocolatey
+  - cmd: for %%G in (Chocolatey\*.nupkg) do NuGet.exe push %%G %chocolatey_api_key% -source http://chocolatey.org/ -NonInteractive
+
 artifacts:
   - path: Output
-  - path: Packages\*.nupkg
-  - path: Output\UpdateVersionNumbers.exe
-  
