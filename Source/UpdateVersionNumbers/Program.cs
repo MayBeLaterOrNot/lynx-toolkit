@@ -111,9 +111,22 @@ namespace UpdateVersionNumbers
             Console.WriteLine("File Version          = '{0}'", updater.FileVersion);
             Console.WriteLine("Informational Version = '{0}'", updater.InformationalVersion);
             Console.WriteLine("NuGet Version         = '{0}'", updater.NuGetVersion);
-            Console.WriteLine("Copyright             = '{0}'", updater.Copyright);
-            Console.WriteLine("Company               = '{0}'", updater.Company);
-            Console.WriteLine("Release Notes         = '{0}'", updater.ReleaseNotes);
+
+            if (updater.Copyright != null)
+            {
+                Console.WriteLine("Copyright             = '{0}'", updater.Copyright);
+            }
+
+            if (updater.Company != null)
+            {
+                Console.WriteLine("Company               = '{0}'", updater.Company);
+            }
+
+            if (updater.ReleaseNotes != null)
+            {
+                Console.WriteLine("Release Notes         = '{0}'", updater.ReleaseNotes);
+            }
+
             Console.WriteLine();
 
             updater.UpdateFolder(directory);
@@ -218,11 +231,23 @@ namespace UpdateVersionNumbers
                 {
                     { new Regex(@"<version>.*</version>"), string.Format(@"<version>{0}</version>", this.NuGetVersion) },
                     { new Regex(@"\$version"), this.NuGetVersion }, 
-                    { new Regex(@"\$copyright"), this.Copyright ?? string.Empty },
                 };
+
+                if (this.Copyright != null)
+                {
+                    this.NuSpecReplacements.Add(new Regex(@"\$copyright"), this.Copyright);
+                }
+
                 foreach (var dependency in this.Dependencies)
                 {
                     this.NuSpecReplacements.Add(new Regex("(<dependency id=\"" + dependency + "\" version=\"\\[?)(.*?)(\\]?\"\\s?/>)"), "${1}" + this.NuGetVersion + "${3}");
+                }
+
+                if (this.ReleaseNotes != null)
+                {
+                    this.NuSpecReplacements.Add(
+                        new Regex(@"<releaseNotes>.*</releaseNotes>"),
+                        string.Format(@"<releaseNotes>{0}</releaseNotes>", this.ReleaseNotes));
                 }
 
                 this.AssemblyInfoReplacements = new Dictionary<Regex, string>
@@ -248,13 +273,6 @@ namespace UpdateVersionNumbers
                 {
                     this.AssemblyInfoReplacements.Add(
                         new Regex(@"AssemblyCopyright\(.*\)"), string.Format("AssemblyCopyright(\"{0}\")", this.Copyright));
-                }
-
-                if (this.ReleaseNotes != null)
-                {
-                    this.NuSpecReplacements.Add(
-                        new Regex(@"<releaseNotes>.*</releaseNotes>"),
-                        string.Format(@"<releaseNotes>{0}</releaseNotes>", this.ReleaseNotes));
                 }
             }
 
