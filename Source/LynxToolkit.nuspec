@@ -15,6 +15,15 @@
   </metadata>
   <files>
     <file src="chocolateyInstall.ps1" target="tools" />
+    <file src="..\Output\BomInfo.exe" target="bin" />
+    <file src="..\Output\CleanSource.exe" target="bin" />
+    <file src="..\Output\CleanProjects.exe" target="bin" />
+    <file src="..\Output\FindObsoleteFiles.exe" target="bin" />
+    <file src="..\Output\FtpUpload.exe" target="bin" />
+    <file src="..\Output\PropertyCG.exe" target="bin" />
+    <file src="..\Output\ReplaceTool.exe" target="bin" />
+    <file src="..\Output\UpdateFileHeaders.exe" target="bin" />
+    <file src="..\Output\UpdateProjects.exe" target="bin" />
     <file src="..\Output\UpdateVersionNumbers.exe" target="bin" />
     <file src="..\LICENSE" />
     <file src="..\AUTHORS" />
