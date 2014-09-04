@@ -64,7 +64,7 @@ namespace UpdateFileHeaders
         /// <summary>
         ///     Determines whether to replace copyright symbol (C) or not.
         /// </summary>
-        private static bool replaceSymbol;
+        private static bool copyrightSymbol;
 
         /// <summary>
         /// Defines the entry point of the application.
@@ -89,6 +89,23 @@ namespace UpdateFileHeaders
 
             Console.WriteLine(Utilities.ApplicationHeader);
 
+            if (args.Length == 0)
+            {
+                Console.WriteLine(Utilities.ApplicationDescription);
+                Console.WriteLine();
+                Console.WriteLine("UpdateFileHeaders /company=companyName [/copyright=copyrightNotice] [/copyright-file=path] [/exclude=filestoExclude]");
+                Console.WriteLine("                 [/directory=directory] [/scc=p4] [/replacesymbol]");
+                Console.WriteLine();
+                Console.WriteLine("  /company          the company name (required)");
+                Console.WriteLine("  /copyright        the copyright text");
+                Console.WriteLine("  /copyright-file   path to a file containing the copyright text");
+                Console.WriteLine("  /exclude          directory/file exclude pattern");
+                Console.WriteLine("  /directory        directory to search");
+                Console.WriteLine("  /scc              version control system (e.g. 'p4')");
+                Console.WriteLine("  /copyrightsymbol  replace (C) and (c) by ©");
+                return;
+            }
+
             string company = null;
             string copyright = null;
             string exclude = "Packages *.Designer.cs obj bin _*";
@@ -106,8 +123,8 @@ namespace UpdateFileHeaders
                     case "/exclude":
                         exclude = kv[1];
                         continue;
-                    case "/replacesymbol":
-                        replaceSymbol = true;
+                    case "/copyrightsymbol":
+                        copyrightSymbol = true;
                         continue;
                     case "/company":
                         company = kv[1];
@@ -165,10 +182,10 @@ namespace UpdateFileHeaders
             {
                 if (copyright == null && company != null)
                 {
-                    copyright = string.Format("Copyright © {0}. All rights reserved.", company);
+                    copyright = string.Format("Copyright (C) {0}. All rights reserved.", company);
                 }
 
-                if (replaceSymbol && copyright != null)
+                if (copyrightSymbol && copyright != null)
                 {
                     copyright = copyright.Replace("(c)", "©");
                     copyright = copyright.Replace("(C)", "©");

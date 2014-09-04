@@ -3,11 +3,11 @@
 ## Syntax
 
 ```
-UpdateFileHeaders.exe </company=companyName> [/copyright=copyrightNotice] [/copyright-file=path] [/exclude=filestoExclude] <directory>
+UpdateFileHeaders /company=companyName [/copyright=copyrightNotice] [/copyright-file=path] [/exclude=filestoExclude] <directory>
 ```
 
 - AssemblyInfo.cs is excluded by default.
-- The default copyright notice is "Copyright © {Company}. All rights reserved."
+- The default copyright notice is "Copyright (C) {Company}. All rights reserved."
 
 ## Example
 
