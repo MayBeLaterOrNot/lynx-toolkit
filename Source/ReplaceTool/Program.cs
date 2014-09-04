@@ -31,7 +31,6 @@ namespace ReplaceTool
 {
     using System;
     using System.IO;
-    using System.Reflection;
     using System.Text;
     using System.Text.RegularExpressions;
 
@@ -43,7 +42,7 @@ namespace ReplaceTool
         /// <summary>
         /// Valid text file types.
         /// </summary>
-        public static string ValidTextFileTypes { get; set; }
+        private static string validTextFileTypes;
 
         /// <summary>
         /// The expression.
@@ -65,10 +64,18 @@ namespace ReplaceTool
         {
             Console.WriteLine(LynxToolkit.Utilities.ApplicationHeader);
 
-            ValidTextFileTypes = ".cs .xml .xaml .sln .csproj .DotSettings .user .StyleCop .txt .cmd";
+            validTextFileTypes = ".cs .xml .xaml .sln .csproj .DotSettings .user .StyleCop .txt .cmd .sh";
 
             if (args.Length < 2)
             {
+                Console.WriteLine(LynxToolkit.Utilities.ApplicationDescription);
+                Console.WriteLine();
+                Console.WriteLine("REPLACETOOL pattern replacement <folder> [include ...]");
+                Console.WriteLine();
+                Console.WriteLine("  pattern          the regular search expression");
+                Console.WriteLine("  replacement      the replacement string");
+                Console.WriteLine("  folder           the folder to search (default is '.')");
+                Console.WriteLine("  include          files to include (e.g. '*.ext')");
                 return;
             }
 
@@ -79,15 +86,16 @@ namespace ReplaceTool
             {
                 if (arg.StartsWith("*"))
                 {
-                    ValidTextFileTypes += " " + arg.Substring(1);
+                    validTextFileTypes += " " + arg.Substring(1);
                 }
             }
+
             expression = new Regex(pattern, RegexOptions.Compiled);
 
             Console.WriteLine("Search pattern: \"{0}\"", pattern);
-            Console.WriteLine("Replace by: \"{0}\"", replacement);
-            Console.WriteLine("Start in: \"{0}\"", source);
-            Console.WriteLine("File types: \"{0}\"", ValidTextFileTypes);
+            Console.WriteLine("Replace by:     \"{0}\"", replacement);
+            Console.WriteLine("Start in:       \"{0}\"", source);
+            Console.WriteLine("File types:     \"{0}\"", validTextFileTypes);
             Console.WriteLine();
 
             Search(source);
@@ -224,7 +232,7 @@ namespace ReplaceTool
 
                 Try(() =>
                 {
-                    if (ValidTextFileTypes.Contains(ext) || IsText(newPath))
+                    if (validTextFileTypes.Contains(ext) || IsText(newPath))
                     {
                         var content = File.ReadAllText(newPath);
                         var newContent = expression.Replace(content, replacement);

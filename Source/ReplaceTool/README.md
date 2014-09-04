@@ -3,5 +3,5 @@
 ## Syntax
 
 ```
-ReplaceTool.exe <pattern> <replacement> <startdirectory> <*.ext>
+ReplaceTool.exe pattern replacement <startdirectory> [include ...]
 ```
