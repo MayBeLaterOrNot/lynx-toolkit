@@ -57,7 +57,14 @@ namespace UpdateVersionNumbers
                     switch (kv[0])
                     {
                         case "/VersionFromNuGet":
-                            updater.Version = GetVersionFromNuGetPackage(kv[1]);
+                            var version = GetVersionFromNuGetPackage(kv[1], true);
+                            var versionParts = version.Split('-');
+                            if (versionParts.Length > 1)
+                            {
+                                updater.PreRelease = versionParts[1];
+                            }
+
+                            updater.Version = versionParts[0];
                             break;
                         case "/VersionFile":
                             updater.Version = GetVersionFromFile(kv[1]);
@@ -132,10 +139,16 @@ namespace UpdateVersionNumbers
             updater.UpdateFolder(directory);
         }
 
-        private static string GetVersionFromNuGetPackage(string packageId)
+        private static string GetVersionFromNuGetPackage(string packageId, bool includePrerelease)
         {
             var client = new WebClient();
-            var response = client.DownloadString("http://www.nuget.org/api/v2/package-versions/" + packageId);
+            var address = string.Format("http://www.nuget.org/api/v2/package-versions/{0}", packageId);
+            if (includePrerelease)
+            {
+                address += "?includePrerelease=true";
+            }
+
+            var response = client.DownloadString(address);
             var versions = response.Trim("[]".ToCharArray()).Split(',');
             return versions.Last().Trim("\"".ToCharArray());
         }
