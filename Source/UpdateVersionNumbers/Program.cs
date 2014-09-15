@@ -139,6 +139,12 @@ namespace UpdateVersionNumbers
             updater.UpdateFolder(directory);
         }
 
+        /// <summary>
+        /// Gets the version from a NuGet package.
+        /// </summary>
+        /// <param name="packageId">The package identifier.</param>
+        /// <param name="includePrerelease">Include pre-release versions if set to <c>true</c>.</param>
+        /// <returns>A version number.</returns>
         private static string GetVersionFromNuGetPackage(string packageId, bool includePrerelease)
         {
             var client = new WebClient();
@@ -153,6 +159,11 @@ namespace UpdateVersionNumbers
             return versions.Last().Trim("\"".ToCharArray());
         }
 
+        /// <summary>
+        /// Gets the version number from a file.
+        /// </summary>
+        /// <param name="fileName">Name of the file.</param>
+        /// <returns>A version number.</returns>
         private static string GetFromFile(string fileName)
         {
             return File.ReadAllText(fileName).Trim();
@@ -289,42 +300,26 @@ namespace UpdateVersionNumbers
                 }
             }
 
-            private string CreateVersionNumber(string version)
+            /// <summary>
+            /// Updates the specified folder.
+            /// </summary>
+            /// <param name="path">The folder path.</param>
+            public void UpdateFolder(string path)
             {
-                version = version.Replace("yyyy", DateTime.Now.Year.ToString(CultureInfo.InvariantCulture));
-                version = version.Replace("MM", DateTime.Now.Month.ToString(CultureInfo.InvariantCulture));
-                version = version.Replace("dd", DateTime.Now.Day.ToString(CultureInfo.InvariantCulture));
-
-                // split up the version number string
-                var versionNumbers = version.Split('.').ToList();
-
-                // replace build and revision number if they are specified
-                if (this.Build != null)
+                foreach (string file in Directory.GetFiles(path, "*AssemblyInfo.cs"))
                 {
-                    while (versionNumbers.Count < 3)
-                    {
-                        versionNumbers.Add("0");
-                    }
-
-                    versionNumbers[2] = this.Build;
+                    this.UpdateFile(file, this.AssemblyInfoReplacements);
                 }
 
-                if (this.Revision != null)
+                foreach (string file in Directory.GetFiles(path, "*.nuspec"))
                 {
-                    while (versionNumbers.Count < 4)
-                    {
-                        versionNumbers.Add("0");
-                    }
-
-                    versionNumbers[3] = this.Revision;
+                    this.UpdateFile(file, this.NuSpecReplacements);
                 }
 
-                // rebuild the version number string
-                version = string.Join(".", versionNumbers);
-
-                // truncate to 16 bit values
-                version = To16BitVersionNumbers(version);
-                return version;
+                foreach (string dir in Directory.GetDirectories(path))
+                {
+                    this.UpdateFolder(dir);
+                }
             }
 
             /// <summary>
@@ -364,47 +359,72 @@ namespace UpdateVersionNumbers
                 return sb.ToString();
             }
 
-            public void UpdateFolder(string path)
+            /// <summary>
+            /// Creates the version number.
+            /// </summary>
+            /// <param name="version">The version format string.</param>
+            /// <returns>A version string.</returns>
+            private string CreateVersionNumber(string version)
             {
-                foreach (string file in Directory.GetFiles(path, "*AssemblyInfo.cs"))
+                version = version.Replace("yyyy", DateTime.Now.Year.ToString(CultureInfo.InvariantCulture));
+                version = version.Replace("MM", DateTime.Now.Month.ToString(CultureInfo.InvariantCulture));
+                version = version.Replace("dd", DateTime.Now.Day.ToString(CultureInfo.InvariantCulture));
+
+                // split up the version number string
+                var versionNumbers = version.Split('.').ToList();
+
+                // replace build and revision number if they are specified
+                if (this.Build != null)
                 {
-                    this.UpdateFile(file, this.AssemblyInfoReplacements);
+                    while (versionNumbers.Count < 3)
+                    {
+                        versionNumbers.Add("0");
+                    }
+
+                    versionNumbers[2] = this.Build;
                 }
 
-                foreach (string file in Directory.GetFiles(path, "*.nuspec"))
+                if (this.Revision != null)
                 {
-                    this.UpdateFile(file, this.NuSpecReplacements);
+                    while (versionNumbers.Count < 4)
+                    {
+                        versionNumbers.Add("0");
+                    }
+
+                    versionNumbers[3] = this.Revision;
                 }
 
-                foreach (string dir in Directory.GetDirectories(path))
-                {
-                    this.UpdateFolder(dir);
-                }
+                // rebuild the version number string
+                version = string.Join(".", versionNumbers);
+
+                // truncate to 16 bit values
+                version = To16BitVersionNumbers(version);
+
+                return version;
             }
 
+            /// <summary>
+            /// Updates the specified file.
+            /// </summary>
+            /// <param name="file">The file path.</param>
+            /// <param name="replacements">The update expressions and replacement strings.</param>
             private void UpdateFile(string file, Dictionary<Regex, string> replacements)
             {
-                string text;
-                using (var sr = new StreamReader(file))
-                {
-                    text = sr.ReadToEnd();
+                var originalContent = File.ReadAllText(file);
+                var updatedContent = originalContent;
 
-                    foreach (var kvp in replacements)
-                    {
-                        var regex = kvp.Key;
-                        string replacement = kvp.Value;
-                        text = regex.Replace(text, replacement);
-                    }
+                foreach (var kvp in replacements)
+                {
+                    var expression = kvp.Key;
+                    var replacement = kvp.Value;
+                    updatedContent = expression.Replace(updatedContent, replacement);
                 }
 
-                File.WriteAllText(file, text, Encoding.UTF8);
-
-                this.Log(file);
-            }
-
-            private void Log(string msg)
-            {
-                Console.WriteLine(msg);
+                if (!string.Equals(originalContent, updatedContent))
+                {
+                    File.WriteAllText(file, updatedContent, Encoding.UTF8);
+                    Console.WriteLine(file);
+                }
             }
         }
     }
