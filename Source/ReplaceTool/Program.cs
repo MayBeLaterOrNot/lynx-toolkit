@@ -64,7 +64,7 @@ namespace ReplaceTool
         {
             Console.WriteLine(LynxToolkit.Utilities.ApplicationHeader);
 
-            validTextFileTypes = ".cs .xml .xaml .sln .csproj .DotSettings .user .StyleCop .txt .cmd .sh";
+            validTextFileTypes = ".cs .xml .yml .xaml .config .sln .suo .csproj .user.dic .DotSettings .user .StyleCop .txt .md .cmd .sh LICENSE AUTHORS CONTRIBUTORS";
 
             if (args.Length < 2)
             {
@@ -72,7 +72,7 @@ namespace ReplaceTool
                 Console.WriteLine();
                 Console.WriteLine("REPLACETOOL pattern replacement <folder> [include ...]");
                 Console.WriteLine();
-                Console.WriteLine("  pattern          the regular search expression");
+                Console.WriteLine("  pattern          the search pattern (regular expression)");
                 Console.WriteLine("  replacement      the replacement string");
                 Console.WriteLine("  folder           the folder to search (default is '.')");
                 Console.WriteLine("  include          files to include (e.g. '*.ext')");
@@ -183,7 +183,7 @@ namespace ReplaceTool
                         streamWriter.Write(text);
                         streamWriter.Flush();
 
-                        // Get the buffer from the memory stream for comparision
+                        // Get the buffer from the memory stream for comparison
                         var memoryBuffer = memoryStream.GetBuffer();
 
                         // Compare only bytes read
@@ -207,12 +207,13 @@ namespace ReplaceTool
         private static void Search(string folder)
         {
             // Rename folder
-            var destFolder = expression.Replace(folder, replacement);
-            if (folder != destFolder)
+            var newFolder = expression.Replace(folder, replacement);
+            if (folder != newFolder)
             {
-                Console.WriteLine("Rename folder to {0}", destFolder);
-                Try(() => Directory.Move(folder, destFolder));
-                folder = destFolder;
+                Console.WriteLine("Rename folder to {0}", newFolder);
+                var oldFolder = folder;
+                Try(() => Directory.Move(oldFolder, newFolder));
+                folder = newFolder;
             }
 
             foreach (var path in Directory.GetFiles(folder, "*.*"))
@@ -227,12 +228,13 @@ namespace ReplaceTool
                 {
                     // Rename file
                     Console.WriteLine("Rename file to {0}", newPath);
-                    Try(() => File.Move(path, newPath));
+                    var oldPath = path;
+                    Try(() => File.Move(oldPath, newPath));
                 }
 
                 Try(() =>
                 {
-                    if (validTextFileTypes.Contains(ext) || IsText(newPath))
+                    if (validTextFileTypes.Contains(filename) || validTextFileTypes.Contains(ext) || IsText(newPath))
                     {
                         var content = File.ReadAllText(newPath);
                         var newContent = expression.Replace(content, replacement);
@@ -241,7 +243,6 @@ namespace ReplaceTool
                             Console.WriteLine("Modified {0}", newPath);
                             Try(() => File.WriteAllText(newPath, newContent));
                         }
-
                     }
                 });
             }
