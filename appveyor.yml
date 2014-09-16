@@ -34,3 +34,4 @@ deploy_script:
 
 artifacts:
   - path: Output
+    name: LynxToolkit-$(APPVEYOR_BUILD_VERSION)
