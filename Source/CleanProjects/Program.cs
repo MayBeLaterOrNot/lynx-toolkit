@@ -1,5 +1,4 @@
-﻿
-namespace CleanProjects
+﻿namespace CleanProjects
 {
     using System;
     using System.IO;
@@ -7,7 +6,10 @@ namespace CleanProjects
 
     using LynxToolkit;
 
-    class Program
+    /// <summary>
+    /// The 'CleanProjects' program.
+    /// </summary>
+    public static class Program
     {
         private static long totalSize;
 
@@ -16,6 +18,7 @@ namespace CleanProjects
             Console.WriteLine(Utilities.ApplicationHeader);
             var rootDirectory = args.Length > 0 ? args[0] : ".";
             Clean(rootDirectory);
+            Console.WriteLine();
             Console.WriteLine("{0} MB deleted", totalSize / 1024 / 1024);
         }
 
@@ -34,6 +37,12 @@ namespace CleanProjects
             }
 
             if (string.Equals(name, "obj", StringComparison.InvariantCultureIgnoreCase))
+            {
+                Remove(directory);
+                return;
+            }
+
+            if (string.Equals(name, "packages", StringComparison.InvariantCulture))
             {
                 Remove(directory);
                 return;
@@ -58,6 +67,7 @@ namespace CleanProjects
             totalSize += di.EnumerateFiles("*", SearchOption.AllDirectories).Sum(x => x.Length);
             try
             {
+                // Delete recursively
                 Directory.Delete(directory, true);
             }
             catch
