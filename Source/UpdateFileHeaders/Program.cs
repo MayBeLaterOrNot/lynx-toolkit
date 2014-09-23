@@ -66,6 +66,10 @@ namespace UpdateFileHeaders
         /// </summary>
         private static bool copyrightSymbol;
 
+        private static string company;
+
+        private static string copyright;
+
         /// <summary>
         /// Defines the entry point of the application.
         /// </summary>
@@ -89,12 +93,17 @@ namespace UpdateFileHeaders
 
             Console.WriteLine(Utilities.ApplicationHeader);
 
-            if (args.Length == 0)
+            string exclude = "Packages *.Designer.cs obj bin _*";
+            string directory = Directory.GetCurrentDirectory();
+
+            TryLoadSettingsFrom("Settings.StyleCop");
+
+            if (args.Length == 0 && company == null)
             {
                 Console.WriteLine(Utilities.ApplicationDescription);
                 Console.WriteLine();
-                Console.WriteLine("UpdateFileHeaders /company=companyName [/copyright=copyrightNotice] [/copyright-file=path] [/exclude=filestoExclude]");
-                Console.WriteLine("                 [/directory=directory] [/scc=p4] [/replacesymbol]");
+                Console.WriteLine("UpdateFileHeaders [/company=company name] [/copyright=copyright notice] [/copyright-file=path] [/exclude=filestoExclude]");
+                Console.WriteLine("                  [/directory=directory] [/scc=p4] [/replacesymbol]");
                 Console.WriteLine();
                 Console.WriteLine("  /company          the company name (required)");
                 Console.WriteLine("  /copyright        the copyright text");
@@ -105,11 +114,6 @@ namespace UpdateFileHeaders
                 Console.WriteLine("  /copyrightsymbol  replace (C) and (c) by ©");
                 return;
             }
-
-            string company = null;
-            string copyright = null;
-            string exclude = "Packages *.Designer.cs obj bin _*";
-            string directory = Directory.GetCurrentDirectory();
 
             // command line argument parsing
             foreach (string arg in args)
@@ -147,12 +151,40 @@ namespace UpdateFileHeaders
                         directory = arg;
                         break;
                 }
-
-                var updater = new HeaderUpdater(copyright, company, exclude);
-                updater.ScanFolder(directory);
-
-                Console.WriteLine("{0} files updated (of {1})", filesCleaned, fileCount);
             }
+
+            var updater = new HeaderUpdater(copyright, company, exclude);
+            updater.ScanFolder(directory);
+
+            Console.WriteLine("{0} files updated (of {1})", filesCleaned, fileCount);
+        }
+
+        /// <summary>
+        /// Tries to load company and copyright from StyleCop settings file.
+        /// </summary>
+        /// <param name="styleCopSettingsPath">The path to the StyleCop settings file.</param>
+        /// <returns><c>true</c> if settings were loaded, <c>false</c> otherwise.</returns>
+        private static bool TryLoadSettingsFrom(string styleCopSettingsPath)
+        {
+            if (!File.Exists(styleCopSettingsPath))
+            {
+                return false;
+            }
+
+            var text = File.ReadAllText(styleCopSettingsPath);
+            var companyMatch = Regex.Match(text, "<StringProperty Name=\"CompanyName\">(.*?)</StringProperty>", RegexOptions.Singleline);
+            if (companyMatch.Success)
+            {
+                company = companyMatch.Groups[1].Value;
+            }
+
+            var copyrightMatch = Regex.Match(text, "<StringProperty Name=\"Copyright\">(.*?)</StringProperty>", RegexOptions.Singleline);
+            if (copyrightMatch.Success)
+            {
+                copyright = copyrightMatch.Groups[1].Value;
+            }
+
+            return true;
         }
 
         /// <summary>
@@ -333,10 +365,10 @@ namespace UpdateFileHeaders
                 summary = Regex.Replace(summary, "</?c>", string.Empty);
 
                 // remove <see cref="..." />
-                summary = Regex.Replace(summary, "<see cref=\"(.+?)\"\\s*/>", string.Empty);
+                summary = Regex.Replace(summary, "<see cref=\"(.+?)\"\\s*/>", "$1");
 
                 // remove <paramref name="..." />
-                summary = Regex.Replace(summary, "<paramref name=\"(.+?)\"\\s*/>", string.Empty);
+                summary = Regex.Replace(summary, "<paramref name=\"(.+?)\"\\s*/>", "$1");
 
                 return summary;
             }
