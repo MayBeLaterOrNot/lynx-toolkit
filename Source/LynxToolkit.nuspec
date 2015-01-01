@@ -5,7 +5,12 @@
     <version>0.0.0</version>
     <title>Lynx Toolkit</title>
     <authors>objo</authors>
-    <description>Lynx Toolkit is a collection of small command line tools</description>
+    <description>Lynx Toolkit is a collection of small command line tools for C# developers:
+- source code clean-up
+- property code generation
+- update file headers
+- updating version numbers in assemblyinfo files
+and more</description>
     <releaseNotes></releaseNotes>
     <licenseUrl>https://raw.githubusercontent.com/objorke/lynx-toolkit/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/objorke/lynx-toolkit/</projectUrl>
