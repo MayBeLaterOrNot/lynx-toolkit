@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Document tools", "Document tools", "{0F73B4D4-6E41-4DEE-9446-2D5031B14C0C}"
 EndProject
@@ -87,6 +87,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Obsolete", "Obsolete", "{CE3B9D43-F107-4ED2-91C0-D30675E21206}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Obsolete", "Obsolete", "{4AD7F9E2-3B8D-482B-8128-1EFF5CDBB4B7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExtractText", "ExtractText\ExtractText.csproj", "{894FAD45-7656-4137-879C-37664F421259}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -218,6 +220,10 @@ Global
 		{1EF6B543-9C92-4647-9820-BF48812E294B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1EF6B543-9C92-4647-9820-BF48812E294B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1EF6B543-9C92-4647-9820-BF48812E294B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{894FAD45-7656-4137-879C-37664F421259}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{894FAD45-7656-4137-879C-37664F421259}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{894FAD45-7656-4137-879C-37664F421259}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{894FAD45-7656-4137-879C-37664F421259}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -257,5 +263,6 @@ Global
 		{1EF6B543-9C92-4647-9820-BF48812E294B} = {2736C5F5-2CBB-44E0-8B11-9D5DEF527E01}
 		{CE3B9D43-F107-4ED2-91C0-D30675E21206} = {0F73B4D4-6E41-4DEE-9446-2D5031B14C0C}
 		{4AD7F9E2-3B8D-482B-8128-1EFF5CDBB4B7} = {44BEA144-B14D-4072-BBA4-7F468A8D3369}
+		{894FAD45-7656-4137-879C-37664F421259} = {2736C5F5-2CBB-44E0-8B11-9D5DEF527E01}
 	EndGlobalSection
 EndGlobal
