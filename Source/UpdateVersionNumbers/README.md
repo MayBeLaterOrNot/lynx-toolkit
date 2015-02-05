@@ -6,7 +6,8 @@ This program does a recursive scan to find all *AssemblyInfo.cs and *.nuspec fil
 
 ```
 UpdateVersionNumbers.exe [/Directory=..\src] [/VersionFile=..\version.txt] [/Version=x.x.x.x] [/VersionFromNuGet=packagename] 
-    [/Build=x] [/Revision=x] [/PreRelease=name] [/Company=xxx] [/Copyright=xxx] [/Dependency=packagename] [/ReleaseNotesFile=filename]
+    [/Build=x] [/Revision=x] [/PreRelease=name] [/Company=xxx] [/Copyright=xxx] [/Dependency=packagename] 
+	[/ReleaseNotesFile=filename] [/ExtractReleaseNotes=filename]
 ```
 
 Arguments
@@ -23,6 +24,7 @@ Arguments
   /Build - overwrites the build number
   /Revision - overwrites the revision number
   /ReleaseNotesFile - gets the release notes from a file
+  /ExtractReleaseNotes - gets the release notes from a file and extracts the first Markdown ## section
   /Company
   /Copyright
   /Dependency - specifies a NuGet package that should have the same version number

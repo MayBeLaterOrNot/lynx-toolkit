@@ -81,6 +81,9 @@ namespace UpdateVersionNumbers
                         case "/ReleaseNotesFile":
                             updater.ReleaseNotes = GetFromFile(kv[1]);
                             break;
+                        case "/ExtractReleaseNotes":
+                            updater.ReleaseNotes = Extract(@"\n\#\#.*?\n(.*?)\n\#\#[^#]", GetFromFile(kv[1]));
+                            break;
                         case "/Directory":
                             directory = kv[1];
                             break;
@@ -167,6 +170,23 @@ namespace UpdateVersionNumbers
         private static string GetFromFile(string fileName)
         {
             return File.ReadAllText(fileName).Trim();
+        }
+
+        /// <summary>
+        /// Extracts the text matching a regular expression.
+        /// </summary>
+        /// <param name="pattern">The pattern.</param>
+        /// <param name="input">The input.</param>
+        /// <returns>The text of the first group in the pattern.</returns>
+        private static string Extract(string pattern, string input)
+        {
+            var match = Regex.Match(input, pattern, RegexOptions.Singleline);
+            if (match.Success)
+            {
+                return match.Groups[1].Value.Trim();
+            }
+
+            return input;
         }
 
         /// <summary>
