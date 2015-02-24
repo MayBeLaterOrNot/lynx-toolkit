@@ -37,6 +37,7 @@ namespace UpdateVersionNumbers
     using System.Net;
     using System.Text;
     using System.Text.RegularExpressions;
+    using System.Xml;
 
     public class Program
     {
@@ -140,6 +141,19 @@ namespace UpdateVersionNumbers
             Console.WriteLine();
 
             updater.UpdateFolder(directory);
+        }
+
+        /// <summary>
+        /// Escapes the specified string for XML.
+        /// </summary>
+        /// <param name="unescaped">The unescaped string.</param>
+        /// <returns>An escaped string.</returns>
+        private static string XmlEscape(string unescaped)
+        {
+            var doc = new XmlDocument();
+            var node = doc.CreateElement("root");
+            node.InnerText = unescaped;
+            return node.InnerXml;
         }
 
         /// <summary>
@@ -291,7 +305,7 @@ namespace UpdateVersionNumbers
                 {
                     this.NuSpecReplacements.Add(
                         new Regex(@"<releaseNotes>.*</releaseNotes>"),
-                        string.Format(@"<releaseNotes>{0}</releaseNotes>", this.ReleaseNotes));
+                        string.Format(@"<releaseNotes>{0}</releaseNotes>", XmlEscape(this.ReleaseNotes)));
                 }
 
                 this.AssemblyInfoReplacements = new Dictionary<Regex, string>
