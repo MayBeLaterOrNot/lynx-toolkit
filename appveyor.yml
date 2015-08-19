@@ -6,9 +6,6 @@ environment:
   chocolatey_api_key:
     secure: VoMjz8m05p36wSWVftaYelpfzEBZjZx9EzvamZaNQx0evttLbtQtK1w0eXLrfDbj
       
-install:
-  - cinst stylecop
-
 platform: Any CPU
 
 configuration: Release
