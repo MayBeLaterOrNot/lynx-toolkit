@@ -10,13 +10,14 @@ platform: Any CPU
 
 configuration: Release
 
+before_build:
+  - cmd: Tools\LynxToolkit\UpdateVersionNumbers.exe /Version=%APPVEYOR_BUILD_VERSION% /Directory=Source /Dependency=LynxToolkit.Documents /ReleaseNotesFile=release-notes.txt
+  - nuget restore Source/LynxToolkit.sln
+
 build:
   project: Source/LynxToolkit.sln
   verbosity: minimal
 
-before_build:
-  - cmd: Tools\LynxToolkit\UpdateVersionNumbers.exe /Version=%APPVEYOR_BUILD_VERSION% /Directory=Source /Dependency=LynxToolkit.Documents /ReleaseNotesFile=release-notes.txt
-  
 deploy_script:
   - cmd: mkdir NuGet
   - cmd: NuGet.exe pack Source\LynxToolkit.Documents\LynxToolkit.Documents.nuspec -OutputDirectory NuGet
