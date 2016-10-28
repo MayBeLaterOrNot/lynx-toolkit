@@ -131,10 +131,9 @@ namespace SolutionInfo
 
             var s3 = wb.AddSheet("ProjectReferences");
             s3[0, 0] = "Project";
-            s3[0, 1] = "Include";
-            s3[0, 2] = "Name";
-            s3[0, 3] = "Guid";
-            s3[0, 4] = "Guid (in project)";
+            s3[0, 1] = "Name";
+            s3[0, 2] = "Guid";
+            s3[0, 3] = "Guid (in project)";
             s3.ApplyStyle("A1:E1", headerStyle);
 
             i = 1;
@@ -142,20 +141,19 @@ namespace SolutionInfo
             foreach (var r in solution.Projects.SelectMany(p => p.ProjectReferences).OrderBy(r => r.Include))
             {
                 s3[i, 0] = r.ReferencingProject.AssemblyName;
-                s3[i, 1] = r.Include;
-                s3[i, 2] = r.Name;
-                s3[i, 3] = r.Project;
+                s3[i, 1] = r.Name;
+                s3[i, 2] = r.Project;
 
                 var p2 = solution.Projects.FirstOrDefault(p => p.FilePath == r.Include);
                 if (p2 != null)
                 {
                     if (string.Equals(p2.ProjectGuid, r.Project, StringComparison.InvariantCultureIgnoreCase))
                     {
-                        s3[i, 4] = "ok";
+                        s3[i, 3] = "ok";
                     }
                     else
                     {
-                        s3[i, 4] = p2.ProjectGuid;
+                        s3[i, 3] = p2.ProjectGuid;
                     }
                 }
                 else
