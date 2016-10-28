@@ -64,6 +64,7 @@ namespace SolutionInfo
             }
 
             var wb = new Workbook();
+            var headerStyle = wb.AddStyle(bold: true);
             var s1 = wb.AddSheet("Projects");
             s1[0, 0] = "Project";
             s1[0, 1] = "AssemblyName";
@@ -73,6 +74,7 @@ namespace SolutionInfo
             s1[0, 5] = "SignAssembly";
             s1[0, 6] = "ProjectGuid";
             s1[0, 7] = "ProjectGuid (in .sln)";
+            s1.ApplyStyle("A1:H1", headerStyle);
 
             int i = 1;
             foreach (var project in solution.Projects.Where(IsCSProject))
@@ -84,8 +86,7 @@ namespace SolutionInfo
                 s1[i, 4] = project.TargetFrameworkProfile;
                 s1[i, 5] = project.SignAssembly;
                 s1[i, 6] = project.ProjectGuid;
-                if (string.Compare(
-                    project.SolutionProjectGuid, project.ProjectGuid, StringComparison.InvariantCultureIgnoreCase) != 0)
+                if (string.Compare(project.SolutionProjectGuid, project.ProjectGuid, StringComparison.InvariantCultureIgnoreCase) != 0)
                 {
                     s1[i, 7] = project.SolutionProjectGuid;
                 }
@@ -101,19 +102,28 @@ namespace SolutionInfo
 
             var s2 = wb.AddSheet("References");
             s2[0, 0] = "Project";
-            s2[0, 1] = "Include";
-            s2[0, 2] = "RequiredTargetFramework";
-            s2[0, 3] = "SpecificVersion";
-            s2[0, 4] = "HintPath";
+            s2[0, 1] = "Reference";
+            s2[0, 2] = "Version";
+            s2[0, 3] = "Culture";
+            s2[0, 4] = "RequiredTargetFramework";
+            s2[0, 5] = "SpecificVersion";
+            s2[0, 6] = "SpecificVersion (computed)";
+            s2[0, 7] = "HintPath";
+            s2[0, 8] = "Full HintPath";
+            s2.ApplyStyle("A1:I1", headerStyle);
 
             i = 1;
             foreach (var r in solution.Projects.SelectMany(p => p.References).OrderBy(r => r.Include))
             {
                 s2[i, 0] = r.ReferencingProject.AssemblyName;
-                s2[i, 1] = r.Include;
-                s2[i, 2] = r.RequiredTargetFramework;
-                s2[i, 3] = r.SpecificVersion;
-                s2[i, 4] = r.HintPath;
+                s2[i, 1] = r.Project;
+                s2[i, 2] = r.Version;
+                s2[i, 3] = r.Culture;
+                s2[i, 4] = r.RequiredTargetFramework;
+                s2[i, 5] = r.SpecificVersion;
+                s2[i, 6] = r.ActualSpecificVersion;
+                s2[i, 7] = r.HintPath;
+                s2[i, 8] = r.FullHintPath;
                 i++;
             }
 
@@ -125,6 +135,7 @@ namespace SolutionInfo
             s3[0, 2] = "Name";
             s3[0, 3] = "Guid";
             s3[0, 4] = "Guid (in project)";
+            s3.ApplyStyle("A1:E1", headerStyle);
 
             i = 1;
 
@@ -169,6 +180,7 @@ namespace SolutionInfo
             s4[0, 8] = "WarningLevel";
             s4[0, 9] = "CodeAnalysisRuleSet";
             s4[0, 10] = "DocumentationFile";
+            s4.ApplyStyle("A1:K1", headerStyle);
 
             i = 1;
             foreach (var c in solution.Projects.SelectMany(p => p.Configurations).OrderBy(c => c.Configuration))
@@ -189,7 +201,6 @@ namespace SolutionInfo
             }
 
             s4.AutoSizeColumns();
-
 
             ExcelWriter.Export(wb, outputFile);
             Process.Start(outputFile);
@@ -279,7 +290,17 @@ namespace SolutionInfo
 
         public string RequiredTargetFramework { get; set; }
 
-        public bool SpecificVersion { get; set; }
+        public string SpecificVersion { get; set; }
+
+        public string Project { get; set; }
+
+        public string Version { get; set; }
+
+        public string Culture { get; set; }
+
+        public string ActualSpecificVersion { get; set; }
+
+        public string FullHintPath { get; set; }
     }
 
     public class ProjectReference
@@ -331,7 +352,7 @@ namespace SolutionInfo
         public Project(string filePath, string projectGuidInSolutionFile)
         {
             this.FilePath = Path.GetFullPath(filePath);
-            var dir = Path.GetDirectoryName(this.FilePath);
+            var dir = Path.GetDirectoryName(this.FilePath) ?? string.Empty;
 
             this.SolutionProjectGuid = projectGuidInSolutionFile;
             this.IncludeFiles = new List<string>();
@@ -378,18 +399,36 @@ namespace SolutionInfo
                     continue;
                 }
 
+                var specificVersion = this.GetValue(node, "b:SpecificVersion");
+                var hintPath = this.GetValue(node, "b:HintPath");
+                var framework = this.GetValue(node, "b:RequiredTargetFramework");
+
+                var include = GetAttribute(node, "Include");
+                var includeValues = GetIncludeValues(include);
+                string reference, version, culture, architecture;
+                includeValues.TryGetValue("$Name", out reference);
+                includeValues.TryGetValue("Version", out version);
+                includeValues.TryGetValue("Culture", out culture);
+                includeValues.TryGetValue("processorArchitecture", out architecture);
+
+                var actualSpecificVersion = !string.IsNullOrEmpty(specificVersion)
+                                                ? specificVersion
+                                                : (!string.IsNullOrEmpty(version)).ToString();
+                var fullHintPath = hintPath != null ? Path.GetFullPath(Path.Combine(dir, hintPath)) : null;
+
                 var r = new Reference
-                            {
-                                Include = GetAttribute(node, "Include"),
-                                ReferencingProject = this,
-                                RequiredTargetFramework = this.GetValue(node, "b:RequiredTargetFramework"),
-                                SpecificVersion =
-                                    string.Equals(
-                                        this.GetValue(node, "b:SpecificVersion"),
-                                        "TRUE",
-                                        StringComparison.InvariantCultureIgnoreCase),
-                                HintPath = this.GetValue(node, "b:HintPath")
-                            };
+                {
+                    ReferencingProject = this,
+                    Include = include,
+                    Project = reference,
+                    Version = version,
+                    Culture = culture,
+                    RequiredTargetFramework = framework,
+                    SpecificVersion = specificVersion,
+                    ActualSpecificVersion = actualSpecificVersion,
+                    HintPath = hintPath,
+                    FullHintPath = fullHintPath
+                };
 
                 this.References.Add(r);
             }
@@ -404,12 +443,12 @@ namespace SolutionInfo
                 var include = GetAttribute(node, "Include");
                 var includeFullPath = Path.GetFullPath(Path.Combine(dir, include));
                 var pr = new ProjectReference
-                             {
-                                 ReferencingProject = this,
-                                 Include = includeFullPath,
-                                 Project = this.GetValue(node, "b:Project"),
-                                 Name = this.GetValue(node, "b:Name")
-                             };
+                {
+                    ReferencingProject = this,
+                    Include = includeFullPath,
+                    Project = this.GetValue(node, "b:Project"),
+                    Name = this.GetValue(node, "b:Name")
+                };
                 this.ProjectReferences.Add(pr);
             }
 
@@ -434,19 +473,19 @@ namespace SolutionInfo
                 }
 
                 var c = new Condition
-                            {
-                                Project = this,
-                                Configuration = m.Groups[1].Value.Trim(),
-                                Platform = m.Groups[2].Value.Trim(),
-                                DebugType = this.GetValue(node, "b:DebugType"),
-                                Optimize = this.GetValue(node, "b:Optimize"),
-                                OutputPath = this.GetValue(node, "b:OutputPath"),
-                                DefineConstants = this.GetValue(node, "b:DefineConstants"),
-                                ErrorReport = this.GetValue(node, "b:ErrorReport"),
-                                WarningLevel = this.GetValue(node, "b:WarningLevel"),
-                                CodeAnalysisRuleSet = this.GetValue(node, "b:CodeAnalysisRuleSet"),
-                                DocumentationFile = this.GetValue(node, "b:DocumentationFile"),
-                            };
+                {
+                    Project = this,
+                    Configuration = m.Groups[1].Value.Trim(),
+                    Platform = m.Groups[2].Value.Trim(),
+                    DebugType = this.GetValue(node, "b:DebugType"),
+                    Optimize = this.GetValue(node, "b:Optimize"),
+                    OutputPath = this.GetValue(node, "b:OutputPath"),
+                    DefineConstants = this.GetValue(node, "b:DefineConstants"),
+                    ErrorReport = this.GetValue(node, "b:ErrorReport"),
+                    WarningLevel = this.GetValue(node, "b:WarningLevel"),
+                    CodeAnalysisRuleSet = this.GetValue(node, "b:CodeAnalysisRuleSet"),
+                    DocumentationFile = this.GetValue(node, "b:DocumentationFile"),
+                };
 
                 this.Configurations.Add(c);
             }
@@ -630,6 +669,25 @@ namespace SolutionInfo
             Console.WriteLine("  Changed {0}/{1} to {2}", node.Name, attributeName, s);
 
             return true;
+        }
+
+        private static Dictionary<string, string> GetIncludeValues(string include)
+        {
+            var dictionary = new Dictionary<string, string>();
+            foreach (var field in include.Split(','))
+            {
+                var keyValuePair = field.Split('=');
+                if (keyValuePair.Length == 1)
+                {
+                    dictionary.Add("$Name", keyValuePair[0]);
+                }
+                else
+                {
+                    dictionary.Add(keyValuePair[0].Trim(), keyValuePair[1].Trim());
+                }
+            }
+
+            return dictionary;
         }
     }
 }
