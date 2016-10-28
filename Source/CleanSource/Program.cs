@@ -64,6 +64,11 @@ namespace CleanSource
         private static string openForEditArguments;
 
         /// <summary>
+        /// Whether to add a new line at end
+        /// </summary>
+        private static string newLineAtEnd = "yes";
+
+        /// <summary>
         /// The exclude list.
         /// </summary>
         private static string exclude;
@@ -229,6 +234,8 @@ namespace CleanSource
         /// <returns>The cleaned code.</returns>
         public static string CleanCode(string code, string lineEnding = "\r\n")
         {
+            var endsWithNewLine = code.EndsWith("\r") || code.EndsWith("\n");
+
             return
                 code
                 .ToLines()
@@ -236,9 +243,33 @@ namespace CleanSource
                 .ReplaceTabs()
                 .RemoveDoubleNewLines()
                 .RemoveRegions()
-                .CleanComments()
+                // .CleanComments()
                 .ToText(lineEnding)
-                .Trim();
+                .Trim()
+                .AddNewLineAtEnd(endsWithNewLine, lineEnding);
+        }
+
+        /// <summary>
+        /// Adds the new line at end.
+        /// </summary>
+        /// <param name="input">The trimmed input.</param>
+        /// <param name="original">Did the original file end with new line?</param>
+        /// <param name="lineEnding">The line ending.</param>
+        /// <returns>The cleaned code.</returns>
+        public static string AddNewLineAtEnd(this string input, bool original, string lineEnding)
+        {
+            switch (newLineAtEnd)
+            {
+                case "yes":
+                    // newline at end
+                    return input + lineEnding;
+                case "no":
+                    // no newline at end
+                    return input;
+                default:
+                    // keep it as is
+                    return original ? input + lineEnding : input;
+            }
         }
 
         /// <summary>
