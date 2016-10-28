@@ -44,7 +44,8 @@ namespace LynxToolkit.Documents.Spreadsheet
         /// <param name="name">
         /// The name.
         /// </param>
-        public Worksheet(string name)
+        /// <remarks>The worksheet should be created in the <see cref="Workbook.AddSheet" /> method.</remarks>
+        internal Worksheet(string name)
         {
             this.Name = name;
             this.Cells = new List<Cell>();
@@ -55,17 +56,17 @@ namespace LynxToolkit.Documents.Spreadsheet
         /// <summary>
         /// Gets the cells.
         /// </summary>
-        public List<Cell> Cells { get; private set; }
+        public List<Cell> Cells { get; }
 
         /// <summary>
         /// Gets the columns.
         /// </summary>
-        public List<Column> Columns { get; private set; }
+        public List<Column> Columns { get; }
 
         /// <summary>
         /// Gets the merge cells.
         /// </summary>
-        public List<CellRange> MergeCells { get; private set; }
+        public List<CellRange> MergeCells { get; }
 
         /// <summary>
         /// Gets or sets the name.

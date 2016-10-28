@@ -142,24 +142,24 @@ namespace LynxToolkit.Documents.OpenXml
             foreach (var style in styles)
             {
                 var cellFormat = new CellFormat
-                                     {
-                                         BorderId = 0U,
-                                         FillId = 0U,
-                                         FontId = fontId,
-                                         FormatId = formatId,
-                                         NumberFormatId = 0U,
-                                         ApplyNumberFormat = false
-                                     };
+                {
+                    BorderId = 0U,
+                    FillId = 0U,
+                    FontId = fontId,
+                    FormatId = formatId,
+                    NumberFormatId = 0U,
+                    ApplyNumberFormat = false
+                };
 
                 if (style.NumberFormat != null)
                 {
                     cellFormat.ApplyNumberFormat = true;
                     cellFormat.NumberFormatId = numberFormatId;
                     var nf = new NumberingFormat
-                                 {
-                                     NumberFormatId = numberFormatId,
-                                     FormatCode = StringValue.FromString(style.NumberFormat)
-                                 };
+                    {
+                        NumberFormatId = numberFormatId,
+                        FormatCode = StringValue.FromString(style.NumberFormat)
+                    };
                     numberingFormats.Add(nf);
                     numberFormatId++;
                 }
@@ -273,6 +273,18 @@ namespace LynxToolkit.Documents.OpenXml
                         break;
                 }
 
+                if (style.TextRotation > 0)
+                {
+                    alignment.TextRotation = (uint)style.TextRotation;
+                    cellFormat.ApplyAlignment = true;
+                }
+
+                if (style.TextRotation < 0)
+                {
+                    alignment.TextRotation = (uint)(90 - style.TextRotation);
+                    cellFormat.ApplyAlignment = true;
+                }
+
                 if (cellFormat.ApplyAlignment != null)
                 {
                     cellFormat.AppendChild(alignment);
@@ -291,20 +303,20 @@ namespace LynxToolkit.Documents.OpenXml
             var cellFormats = new CellFormats(cellFormatElements) { Count = (uint)cellFormatElements.Count };
             var differentialFormats = new DifferentialFormats { Count = 0U };
             var tableStyles = new TableStyles
-                                  {
-                                      Count = 0U,
-                                      DefaultTableStyle = "TableStyleMedium2",
-                                      DefaultPivotStyle = "PivotStyleLight16"
-                                  };
+            {
+                Count = 0U,
+                DefaultTableStyle = "TableStyleMedium2",
+                DefaultPivotStyle = "PivotStyleLight16"
+            };
 
             var cellStyleFormats1 = new CellStyleFormats { Count = 1U };
             var cellFormat1 = new CellFormat
-                                  {
-                                      NumberFormatId = 0U,
-                                      FontId = 0U,
-                                      FillId = 0U,
-                                      BorderId = 0U
-                                  };
+            {
+                NumberFormatId = 0U,
+                FontId = 0U,
+                FillId = 0U,
+                BorderId = 0U
+            };
             cellStyleFormats1.AppendChild(cellFormat1);
 
             var cellStyle1 = new CellStyle { Name = "Normal", FormatId = 0U, BuiltinId = 0U };
@@ -313,15 +325,15 @@ namespace LynxToolkit.Documents.OpenXml
 
             var stylesheet1 = new Stylesheet(
                 fonts, fills, borders, cellFormats, cellStyles, differentialFormats, tableStyles)
-                                  {
-                                      MCAttributes =
+            {
+                MCAttributes =
                                           new MarkupCompatibilityAttributes
-                                              {
-                                                  Ignorable
+                                          {
+                                              Ignorable
                                                       =
                                                       "x14ac"
-                                              }
-                                  };
+                                          }
+            };
 
             if (numberingFormats.Count > 0)
             {
@@ -371,11 +383,11 @@ namespace LynxToolkit.Documents.OpenXml
 
                 // Append a new worksheet and associate it with the workbook.
                 var sheet = new Sheet
-                                {
-                                    Id = workbookPart.GetIdOfPart(worksheetPart),
-                                    SheetId = i++,
-                                    Name = spreadSheet.Name
-                                };
+                {
+                    Id = workbookPart.GetIdOfPart(worksheetPart),
+                    SheetId = i++,
+                    Name = spreadSheet.Name
+                };
                 sheets.AppendChild(sheet);
 
                 var rows = new Dictionary<int, Row>();
@@ -419,13 +431,13 @@ namespace LynxToolkit.Documents.OpenXml
                         }
 
                         var column = new Column
-                                         {
-                                             Width = new DoubleValue(actualWidth),
-                                             Min = j,
-                                             Max = j,
-                                             BestFit = true,
-                                             CustomWidth = true
-                                         };
+                        {
+                            Width = new DoubleValue(actualWidth),
+                            Min = j,
+                            Max = j,
+                            BestFit = true,
+                            CustomWidth = true
+                        };
                         j++;
                         columns.AppendChild(column);
                     }

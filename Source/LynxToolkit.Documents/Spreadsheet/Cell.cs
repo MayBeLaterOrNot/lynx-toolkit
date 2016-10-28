@@ -43,7 +43,7 @@ namespace LynxToolkit.Documents.Spreadsheet
         /// <param name="column">
         /// The column.
         /// </param>
-        public Cell(int row, int column)
+        internal Cell(int row, int column)
         {
             this.Row = row;
             this.Column = column;
@@ -53,7 +53,7 @@ namespace LynxToolkit.Documents.Spreadsheet
         /// Gets the column.
         /// </summary>
         /// <value>The column.</value>
-        public int Column { get; private set; }
+        public int Column { get; }
 
         /// <summary>
         /// Gets or sets the content.
@@ -71,7 +71,7 @@ namespace LynxToolkit.Documents.Spreadsheet
         /// Gets the row.
         /// </summary>
         /// <value>The row.</value>
-        public int Row { get; private set; }
+        public int Row { get; }
 
         /// <summary>
         /// Gets or sets the style.
@@ -85,7 +85,7 @@ namespace LynxToolkit.Documents.Spreadsheet
         /// <returns>A <see cref="System.String" /> that represents the content of the cell.</returns>
         public string FormatContent()
         {
-            if (this.Style != null && this.Style.NumberFormat != null)
+            if (this.Style?.NumberFormat != null)
             {
                 return string.Format("{0:" + this.Style.NumberFormat + "}", this.Content);
             }

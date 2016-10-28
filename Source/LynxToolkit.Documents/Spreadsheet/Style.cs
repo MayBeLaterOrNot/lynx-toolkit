@@ -35,6 +35,14 @@ namespace LynxToolkit.Documents.Spreadsheet
     public class Style
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="Style"/> class.
+        /// </summary>
+        /// <remarks>The style should be created in the <see cref="Workbook.AddStyle" /> method.</remarks>
+        internal Style()
+        {            
+        }
+
+        /// <summary>
         /// Gets or sets the background.
         /// </summary>
         /// <value>The background.</value>
@@ -135,6 +143,14 @@ namespace LynxToolkit.Documents.Spreadsheet
         /// </summary>
         /// <value>The vertical alignment.</value>
         public VerticalAlignment VerticalAlignment { get; set; }
+
+        /// <summary>
+        /// Gets or sets the text rotation.
+        /// </summary>
+        /// <value>
+        /// The rotation in degreesh.
+        /// </value>
+        public int TextRotation { get; set; }
 
         /// <summary>
         /// Determines whether this style defines a border.

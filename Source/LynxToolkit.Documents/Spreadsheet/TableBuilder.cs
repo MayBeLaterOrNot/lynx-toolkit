@@ -53,7 +53,7 @@ namespace LynxToolkit.Documents.Spreadsheet
         /// <summary>
         /// Gets the definitions.
         /// </summary>
-        public List<BuilderDefinition> Definitions { get; private set; }
+        public List<BuilderDefinition> Definitions { get; }
 
         /// <summary>
         /// Adds a column or row definition to the table.
@@ -74,12 +74,12 @@ namespace LynxToolkit.Documents.Spreadsheet
         {
             this.Definitions.Add(
                 new BuilderDefinition
-                    {
-                        Header = header,
-                        CellValueFunction = cellValueFunction,
-                        Style = cellStyle,
-                        HeaderStyle = headerStyle
-                    });
+                {
+                    Header = header,
+                    CellValueFunction = cellValueFunction,
+                    Style = cellStyle,
+                    HeaderStyle = headerStyle
+                });
         }
 
         /// <summary>
@@ -104,11 +104,11 @@ namespace LynxToolkit.Documents.Spreadsheet
                 var p = property;
                 this.Definitions.Add(
                     new BuilderDefinition
-                        {
-                            Header = property.Name,
-                            HeaderStyle = headerStyle,
-                            CellValueFunction = item => p.GetValue(item, null)
-                        });
+                    {
+                        Header = property.Name,
+                        HeaderStyle = headerStyle,
+                        CellValueFunction = item => p.GetValue(item, null)
+                    });
             }
         }
 

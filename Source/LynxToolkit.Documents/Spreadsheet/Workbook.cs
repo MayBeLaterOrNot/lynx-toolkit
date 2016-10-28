@@ -63,13 +63,13 @@ namespace LynxToolkit.Documents.Spreadsheet
         /// Gets the sheets.
         /// </summary>
         /// <value>The sheets.</value>
-        public List<Worksheet> Sheets { get; private set; }
+        public List<Worksheet> Sheets { get; }
 
         /// <summary>
         /// Gets the styles.
         /// </summary>
         /// <value>The styles.</value>
-        public List<Style> Styles { get; private set; }
+        public List<Style> Styles { get; }
 
         /// <summary>
         /// Gets or sets the title.
@@ -96,30 +96,15 @@ namespace LynxToolkit.Documents.Spreadsheet
         /// <summary>
         /// Adds a style.
         /// </summary>
-        /// <param name="horizontalAlignment">
-        /// The horizontal alignment.
-        /// </param>
-        /// <param name="verticalAlignment">
-        /// The vertical alignment.
-        /// </param>
-        /// <param name="bold">
-        /// if set to <c>true</c> [bold].
-        /// </param>
-        /// <param name="italic">
-        /// if set to <c>true</c> [italic].
-        /// </param>
-        /// <param name="fontSize">
-        /// Size of the font.
-        /// </param>
-        /// <param name="fontName">
-        /// Name of the font.
-        /// </param>
-        /// <param name="foreground">
-        /// The foreground.
-        /// </param>
-        /// <param name="background">
-        /// The background.
-        /// </param>
+        /// <param name="horizontalAlignment">The horizontal alignment.</param>
+        /// <param name="verticalAlignment">The vertical alignment.</param>
+        /// <param name="bold">if set to <c>true</c> [bold].</param>
+        /// <param name="italic">if set to <c>true</c> [italic].</param>
+        /// <param name="fontSize">Size of the font.</param>
+        /// <param name="fontName">Name of the font.</param>
+        /// <param name="foreground">The foreground.</param>
+        /// <param name="background">The background.</param>
+        /// <param name="textRotation">The text rotation in degrees.</param>
         /// <returns>
         /// A XStyle.
         /// </returns>
@@ -131,19 +116,21 @@ namespace LynxToolkit.Documents.Spreadsheet
             double fontSize = 11,
             string fontName = "Calibri",
             uint? foreground = null,
-            uint? background = null)
+            uint? background = null,
+            int textRotation = 0)
         {
             var style = new Style
-                            {
-                                HorizontalAlignment = horizontalAlignment,
-                                VerticalAlignment = verticalAlignment,
-                                Bold = bold,
-                                Italic = italic,
-                                FontSize = fontSize,
-                                FontName = fontName,
-                                Foreground = foreground,
-                                Background = background
-                            };
+            {
+                HorizontalAlignment = horizontalAlignment,
+                VerticalAlignment = verticalAlignment,
+                Bold = bold,
+                Italic = italic,
+                FontSize = fontSize,
+                FontName = fontName,
+                Foreground = foreground,
+                Background = background,
+                TextRotation = textRotation
+            };
             this.Styles.Add(style);
             return style;
         }

@@ -136,6 +136,27 @@ namespace LynxToolkit.Documents.Tests
             }
         }
 
+        public static Workbook TextRotation
+        {
+            get
+            {
+                var wb = new Workbook();
+                var sheet1 = wb.AddSheet();
+                var i = 0;
+                for (var rotation = -90; rotation <= 90; rotation += 45)
+                {
+                    var style = wb.AddStyle(textRotation: rotation);
+                    sheet1[0, i] = rotation.ToString();
+                    sheet1.ApplyStyle(0, i, style);
+                    i++;
+                }
+
+                sheet1.AutoSizeColumns();
+
+                return wb;
+            }
+        }
+
         public static Workbook HorizontalAlignment
         {
             get
