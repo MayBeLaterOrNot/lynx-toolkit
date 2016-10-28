@@ -1,8 +1,0 @@
-﻿using System
-
-Guid
-string:Name
-bool:Included #$
-double:Length $+
-Color +
-&TestObject:ReferencedObject
