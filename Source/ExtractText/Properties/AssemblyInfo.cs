@@ -29,3 +29,11 @@ using System.Reflection;
 [assembly: AssemblyProduct("Extract first match")]
 [assembly: AssemblyTitle("Finds the first match of the specified pattern and writes the value of the first group to the output file.")]
 [assembly: AssemblyDescription("Syntax: ExtractText.exe <input-file> <output-file> <pattern>")]
+
+[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyCompany("LynxToolkit")]
+[assembly: AssemblyCopyright("Copyright (c) LynxToolkit 2012")]
+[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCulture("")]
+[assembly: AssemblyVersion("0.0.1")]
+[assembly: AssemblyFileVersion("0.0.1")]

@@ -30,3 +30,11 @@ using System.Reflection;
 [assembly: AssemblyProduct("BomInfo")]
 [assembly: AssemblyTitle("Shows information about the Byte-order-marks of text files.")]
 [assembly: AssemblyDescription("Syntax: BomInfo.exe /directory=<name> /searchPattern=<pattern> /ignore=<pattern> /donotreport=<encoding> /ignore=<pattern> /force")]
+
+[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyCompany("LynxToolkit")]
+[assembly: AssemblyCopyright("Copyright (c) LynxToolkit 2012")]
+[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCulture("")]
+[assembly: AssemblyVersion("0.0.1")]
+[assembly: AssemblyFileVersion("0.0.1")]

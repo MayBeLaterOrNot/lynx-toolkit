@@ -29,3 +29,11 @@ using System.Reflection;
 [assembly: AssemblyProduct("CleanSource")]
 [assembly: AssemblyTitle("Cleans C# source code")]
 [assembly: AssemblyDescription("Syntax: CleanSource.exe [/scc=<sccprovider>]")]
+
+[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyCompany("LynxToolkit")]
+[assembly: AssemblyCopyright("Copyright (c) LynxToolkit 2012")]
+[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCulture("")]
+[assembly: AssemblyVersion("0.0.1")]
+[assembly: AssemblyFileVersion("0.0.1")]

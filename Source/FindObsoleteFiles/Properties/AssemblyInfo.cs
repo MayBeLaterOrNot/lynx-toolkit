@@ -29,3 +29,11 @@ using System.Reflection;
 [assembly: AssemblyProduct("FindObsoleteFiles")]
 [assembly: AssemblyTitle("Finds files not included in the projects in the specified solution files.")]
 [assembly: AssemblyDescription("Syntax: FindObsoleteFiles.exe <path>")]
+
+[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyCompany("LynxToolkit")]
+[assembly: AssemblyCopyright("Copyright (c) LynxToolkit 2012")]
+[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCulture("")]
+[assembly: AssemblyVersion("0.0.1")]
+[assembly: AssemblyFileVersion("0.0.1")]

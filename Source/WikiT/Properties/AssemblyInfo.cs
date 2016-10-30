@@ -29,3 +29,11 @@ using System.Reflection;
 [assembly: AssemblyProduct("WikiT")]
 [assembly: AssemblyTitle("Converts wiki formatted text to wiki/html/word.")]
 [assembly: AssemblyDescription("Syntax: WikiT.exe <config-file> <directory> <search-pattern>")]
+
+[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyCompany("LynxToolkit")]
+[assembly: AssemblyCopyright("Copyright (c) LynxToolkit 2012")]
+[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCulture("")]
+[assembly: AssemblyVersion("0.0.1")]
+[assembly: AssemblyFileVersion("0.0.1")]

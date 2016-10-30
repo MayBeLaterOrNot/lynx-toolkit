@@ -29,3 +29,11 @@ using System.Reflection;
 [assembly: AssemblyProduct("HTML Help Contents generator")]
 [assembly: AssemblyTitle("Generates HTML Help contents files from simple input files")]
 [assembly: AssemblyDescription("Syntax: /input=inputfile /output=Contents.hhc")]
+
+[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyCompany("LynxToolkit")]
+[assembly: AssemblyCopyright("Copyright (c) LynxToolkit 2012")]
+[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCulture("")]
+[assembly: AssemblyVersion("0.0.1")]
+[assembly: AssemblyFileVersion("0.0.1")]

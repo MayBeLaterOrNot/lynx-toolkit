@@ -29,3 +29,11 @@ using System.Reflection;
 [assembly: AssemblyProduct("CleanProjects")]
 [assembly: AssemblyTitle("Deletes bin/, obj/, packages and _Resharper* folders")]
 [assembly: AssemblyDescription("Syntax: CleanProjects.exe [directory]")]
+
+[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyCompany("LynxToolkit")]
+[assembly: AssemblyCopyright("Copyright (c) LynxToolkit 2012")]
+[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCulture("")]
+[assembly: AssemblyVersion("0.0.1")]
+[assembly: AssemblyFileVersion("0.0.1")]

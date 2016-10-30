@@ -29,3 +29,11 @@ using System.Reflection;
 [assembly: AssemblyProduct("UpdateFileHeaders")]
 [assembly: AssemblyTitle("Updates file headers in all .cs files")]
 [assembly: AssemblyDescription("Syntax: UpdateFileHeaders.exe /company=companyName [/copyright=copyrightNotice] [/copyright-file=path] [/exclude=filestoExclude] directory")]
+
+[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyCompany("LynxToolkit")]
+[assembly: AssemblyCopyright("Copyright (c) LynxToolkit 2012")]
+[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCulture("")]
+[assembly: AssemblyVersion("0.0.1")]
+[assembly: AssemblyFileVersion("0.0.1")]

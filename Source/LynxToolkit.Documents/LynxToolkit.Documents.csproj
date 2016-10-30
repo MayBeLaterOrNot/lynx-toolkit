@@ -35,9 +35,6 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\GlobalAssemblyInfo.cs">
-      <Link>Properties\GlobalAssemblyInfo.cs</Link>
-    </Compile>
     <Compile Include="Text\Formatters\MarkdownFormatter.cs" />
     <Compile Include="Text\Formatters\TexFormatter.cs" />
     <Compile Include="Text\Parsers\DocumentParserExtensions.cs" />

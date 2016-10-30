@@ -29,3 +29,11 @@ using System.Reflection;
 [assembly: AssemblyProduct("UpdateVersionNumbers")]
 [assembly: AssemblyTitle("Updates version numbers in AssemblyInfo and NuSpec files.")]
 [assembly: AssemblyDescription("Syntax: UpdateVersionNumbers.exe /Version=<versionNumber> [/Company=<companyName>] [/Copyright=<copyrightnotice>] /Directory=<path>")]
+
+[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyCompany("LynxToolkit")]
+[assembly: AssemblyCopyright("Copyright (c) LynxToolkit 2012")]
+[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCulture("")]
+[assembly: AssemblyVersion("0.0.1")]
+[assembly: AssemblyFileVersion("0.0.1")]

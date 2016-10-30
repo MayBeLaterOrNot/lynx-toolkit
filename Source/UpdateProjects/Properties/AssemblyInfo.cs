@@ -29,3 +29,11 @@ using System.Reflection;
 [assembly: AssemblyProduct("UpdateProjects")]
 [assembly: AssemblyTitle("Updates csproj files (currently only setting TreatWarningsAsErrors=true).")]
 [assembly: AssemblyDescription("Syntax: UpdateProjects.exe <path>")]
+
+[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyCompany("LynxToolkit")]
+[assembly: AssemblyCopyright("Copyright (c) LynxToolkit 2012")]
+[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCulture("")]
+[assembly: AssemblyVersion("0.0.1")]
+[assembly: AssemblyFileVersion("0.0.1")]

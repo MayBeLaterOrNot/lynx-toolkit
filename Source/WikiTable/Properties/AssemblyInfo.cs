@@ -29,3 +29,11 @@ using System.Reflection;
 [assembly: AssemblyProduct("WikiTable")]
 [assembly: AssemblyTitle("Converts tables from tab-separated to wiki format on the clipboard.")]
 [assembly: AssemblyDescription("Syntax: WikiTable.exe")]
+
+[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyCompany("LynxToolkit")]
+[assembly: AssemblyCopyright("Copyright (c) LynxToolkit 2012")]
+[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCulture("")]
+[assembly: AssemblyVersion("0.0.1")]
+[assembly: AssemblyFileVersion("0.0.1")]

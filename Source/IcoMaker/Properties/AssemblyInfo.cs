@@ -29,3 +29,11 @@ using System.Reflection;
 [assembly: AssemblyProduct("IcoMaker")]
 [assembly: AssemblyTitle("Creates .ico files from png and bmp files.")]
 [assembly: AssemblyDescription("Syntax: IcoMaker.exe <file1.png> ... <output.ico>")]
+
+[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyCompany("LynxToolkit")]
+[assembly: AssemblyCopyright("Copyright (c) LynxToolkit 2012")]
+[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCulture("")]
+[assembly: AssemblyVersion("0.0.1")]
+[assembly: AssemblyFileVersion("0.0.1")]
