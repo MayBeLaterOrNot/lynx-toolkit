@@ -13,6 +13,11 @@ namespace NuGetManager
         private INuGetClient ExeClient => new NuGetExeClient(this.ApiKey);
         private readonly INuGetClient client = new NuGetCoreClient();
 
+        public MainViewModel()
+        {
+            this.Update();
+        }
+
         public string Filter
         {
             get
