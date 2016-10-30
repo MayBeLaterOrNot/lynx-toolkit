@@ -2,7 +2,7 @@
 <package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <id>LynxToolkit.Documents.OpenXml</id>
-    <version>2014.1.1.1</version>
+    <version>$version$</version>
     <title>Lynx Toolkit Documents for OpenXml</title>
     <authors>objo</authors>
     <description>OpenXml exporter for Lynx.Documents.</description>
@@ -13,8 +13,8 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <tags>openxml document model</tags>
     <dependencies>
-      <dependency id="LynxToolkit.Documents" version="2014.1" />
-      <dependency id="DocumentFormat.OpenXml" version="2.5.0" />
+      <dependency id="LynxToolkit.Documents" version="$version$" />
+      <dependency id="DocumentFormat.OpenXml" version="1.0" />
     </dependencies>
   </metadata>
   <files>

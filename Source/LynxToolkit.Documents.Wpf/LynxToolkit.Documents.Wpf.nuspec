@@ -2,7 +2,7 @@
 <package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <id>LynxToolkit.Documents.Wpf</id>
-    <version>2014.1.1.1</version>
+    <version>$version$</version>
     <title>Lynx Toolkit Documents for WPF</title>
     <authors>objo</authors>
     <description>WPF exporter for Lynx.Documents.</description>
@@ -13,7 +13,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <tags>wpf document model</tags>
     <dependencies>
-      <dependency id="LynxToolkit.Documents" version="2014.1" />
+      <dependency id="LynxToolkit.Documents" version="$version$" />
     </dependencies>
   </metadata>
   <files>

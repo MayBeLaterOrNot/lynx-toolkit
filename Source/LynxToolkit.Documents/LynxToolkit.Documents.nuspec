@@ -2,7 +2,7 @@
 <package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <id>LynxToolkit.Documents</id>
-    <version>2014.1.1.1</version>
+    <version>$version$</version>
     <title>Lynx Toolkit Documents</title>
     <authors>objo</authors>
     <description>Spreadsheet and text document model.</description>
