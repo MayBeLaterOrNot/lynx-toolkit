@@ -8,7 +8,6 @@
     <description>Lynx Toolkit is a collection of small command line tools for C# developers:
 
 - source code clean-up
-- property code generation
 - update file headers
 - updating version numbers in assemblyinfo files
 - extract sections from change logs
@@ -29,7 +28,12 @@ and more</description>
     <file src="..\Output\ExtractText.exe" target="bin" />
     <file src="..\Output\FindObsoleteFiles.exe" target="bin" />
     <file src="..\Output\FtpUpload.exe" target="bin" />
-    <file src="..\Output\PropertyCG.exe" target="bin" />
+
+    <file src="..\Output\NuGetManager.exe" target="bin" />
+    <file src="..\Output\NuGetManager.exe.config" target="bin" />
+    <file src="..\Output\NuGet.Core.dll" target="bin" />
+    <file src="..\Output\Microsoft.Web.XmlTransform.dll" target="bin" />
+
     <file src="..\Output\ReplaceTool.exe" target="bin" />
     <file src="..\Output\UpdateFileHeaders.exe" target="bin" />
     <file src="..\Output\UpdateProjects.exe" target="bin" />
