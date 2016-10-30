@@ -10,7 +10,7 @@
     [TestFixture]
     public class FlowDocumentFormatterTests : FormatterTests
     {
-        [Test]
+        [Test, RequiresSTA]
         public void Format()
         {
             var doc = LoadExample();
