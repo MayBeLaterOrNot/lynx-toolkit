@@ -1,5 +1,3 @@
-version: 2015.1.{build}
-
 environment:
   nuget_api_key:
     secure: kM3Kse+ivuuE5RVoe6dPdw+aguWx56K2YeXujGa9tMPQTms3lv7QxNpTLFMALYNa
@@ -10,21 +8,27 @@ platform: Any CPU
 
 configuration: Release
 
+install:
+  - cinst gitversion.portable -y
+  - cinst gitlink -y
+
 before_build:
-  - cmd: Tools\LynxToolkit\UpdateVersionNumbers.exe /Version=%APPVEYOR_BUILD_VERSION% /Directory=Source /Dependency=LynxToolkit.Documents /ReleaseNotesFile=release-notes.txt
-  - nuget restore Source/LynxToolkit.sln
+  - nuget restore Source\LynxToolkit.sln
+  - gitversion /l console /output buildserver /updateAssemblyInfo
 
 build:
   project: Source/LynxToolkit.sln
   verbosity: minimal
 
+after_build:
+  - cmd: gitlink c:\projects\lynx-toolkit -u https://github.com/objorke/lynx-toolkit -b master -f Source/LynxToolkit.sln
+  
 deploy_script:
-  - cmd: mkdir NuGet
-  - cmd: NuGet.exe pack Source\LynxToolkit.Documents\LynxToolkit.Documents.nuspec -OutputDirectory NuGet
-  - cmd: NuGet.exe pack Source\LynxToolkit.Documents.Html\LynxToolkit.Documents.Html.nuspec -OutputDirectory NuGet
-  - cmd: NuGet.exe pack Source\LynxToolkit.Documents.OpenXml\LynxToolkit.Documents.OpenXml.nuspec -OutputDirectory NuGet
-  - cmd: NuGet.exe pack Source\LynxToolkit.Documents.Wpf\LynxToolkit.Documents.Wpf.nuspec -OutputDirectory NuGet
-  - cmd: for %%G in (NuGet\*.nupkg) do NuGet.exe push %%G %nuget_api_key%
+  - cmd: NuGet.exe pack Source\LynxToolkit.Documents\LynxToolkit.Documents.nuspec -version "%GitVersion_NuGetVersion%"
+  - cmd: NuGet.exe pack Source\LynxToolkit.Documents.Html\LynxToolkit.Documents.Html.nuspec -version "%GitVersion_NuGetVersion%"
+  - cmd: NuGet.exe pack Source\LynxToolkit.Documents.OpenXml\LynxToolkit.Documents.OpenXml.nuspec -version "%GitVersion_NuGetVersion%"
+  - cmd: NuGet.exe pack Source\LynxToolkit.Documents.Wpf\LynxToolkit.Documents.Wpf.nuspec -version "%GitVersion_NuGetVersion%"
+#  - cmd: for %%G in (NuGet\*.nupkg) do NuGet.exe push %%G %nuget_api_key%
 
   - cmd: mkdir Chocolatey
   - cmd: NuGet.Exe pack Source\LynxToolkit.nuspec -NoPackageAnalysis -NonInteractive -OutputDirectory Chocolatey
