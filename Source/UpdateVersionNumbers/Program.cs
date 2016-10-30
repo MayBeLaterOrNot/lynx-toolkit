@@ -288,12 +288,12 @@ namespace UpdateVersionNumbers
                 this.NuSpecReplacements = new Dictionary<Regex, string> 
                 {
                     { new Regex(@"<version>.*</version>"), string.Format(@"<version>{0}</version>", this.NuGetVersion) },
-                    { new Regex(@"\$version"), this.NuGetVersion }, 
+                    { new Regex(@"\$version\$?"), this.NuGetVersion }, 
                 };
 
                 if (this.Copyright != null)
                 {
-                    this.NuSpecReplacements.Add(new Regex(@"\$copyright"), this.Copyright);
+                    this.NuSpecReplacements.Add(new Regex(@"\$copyright\$?"), this.Copyright);
                 }
 
                 foreach (var dependency in this.Dependencies)
