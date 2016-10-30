@@ -31,7 +31,7 @@ deploy_script:
 #  - cmd: for %%G in (NuGet\*.nupkg) do NuGet.exe push %%G %nuget_api_key%
 
   - cmd: mkdir Chocolatey
-  - cmd: NuGet.Exe pack Source\LynxToolkit.nuspec -NoPackageAnalysis -NonInteractive -OutputDirectory Chocolatey
+  - cmd: NuGet.Exe pack Source\LynxToolkit.nuspec -NoPackageAnalysis -NonInteractive -OutputDirectory Chocolatey -version "%GitVersion_NuGetVersion%"
 #  - cmd: for %%G in (Chocolatey\*.nupkg) do NuGet.exe push %%G %chocolatey_api_key% -source http://chocolatey.org/ -NonInteractive
 
 artifacts:
